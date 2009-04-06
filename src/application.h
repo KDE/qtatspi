@@ -41,7 +41,7 @@ public:
                                QAccessibleInterface *interface);
 
     virtual QDBusObjectPath getParentPath () const;
-    void aDummy ();
+    virtual QList <QSpiAccessibleObject *> getChildren () const;
 };
 
 #endif /* Q_SPI_APPLICATION_H */

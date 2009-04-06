@@ -21,6 +21,7 @@
  */
 
 #include <QApplication>
+#include <QObject>
 
 #include "cache.h"
 #include "application.h"
@@ -44,10 +45,10 @@ QSpiAccessibleCache::QSpiAccessibleCache (QObject *root)
     connect(this->root, SIGNAL(destroyed(QObject *)), this, SLOT(objectDestroyed(QObject *)));
     cache.insert (this->root, accessible);
     emit accessibleAdded (accessible);
-    foreach (QObject *child, this->root->findChildren<QObject *>())
-    {
-        registerObject (child);
-    }
+
+    /* Big TODO here - Get hold of the widgets *Somehow* and register them */
+
+    Q_ASSERT (cache.contains (root));
 
     new QSpiTreeAdaptor (this);
     QDBusConnection::sessionBus().registerObject(QSPI_TREE_OBJECT_PATH, this, QDBusConnection::ExportAdaptors);
@@ -58,14 +59,16 @@ QSpiAccessibleCache::QSpiAccessibleCache (QObject *root)
 bool QSpiAccessibleCache::eventFilter(QObject *obj, QEvent *event)
 {
     /* Check whether this event is for a registered object or not */
+#if 0
     if (cache.contains (obj))
     {
+#endif
         switch (event->type ())
         {
             case QEvent::ChildAdded:
             {
                 QObject *child = static_cast<QChildEvent *>(event)->child();
-                registerObject (child);
+                registerConnected (child);
             }
             case QEvent::Create:
                 /* Not sure whether the create event should do anything. Just children added right? */
@@ -76,9 +79,31 @@ bool QSpiAccessibleCache::eventFilter(QObject *obj, QEvent *event)
             default:
                 break;
         }
+#if 0
     }
+#endif
     /* Think false is the right thing to do, no need to block these events here. */
     return false;
+}
+
+/*---------------------------------------------------------------------------*/
+
+void QSpiAccessibleCache::registerConnected (QObject *object)
+{
+    QList <QObject*> parents;
+    QObject *current;
+
+    current = object;
+    while (current)
+    {
+        parents.insert(0, current);
+        current = current->parent();
+    }
+
+    foreach (QObject *parent, parents)
+    {
+        registerChildren (parent);
+    }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -86,27 +111,27 @@ bool QSpiAccessibleCache::eventFilter(QObject *obj, QEvent *event)
 /* TODO - No Idea about the threading implications here.
  * What is the equivalent of the GDK lock?
  */
-void QSpiAccessibleCache::registerObject (QObject *object)
+void QSpiAccessibleCache::registerChildren (QObject *object)
 {
-    /* Depth-first addition of unregistered objects */
+    QObject *current;
+    QAccessibleInterface *interface = NULL;
+    QSpiAccessibleObject *accessible = NULL;
     QStack <QObject *> stack;
 
-    /* Prime with first object */
-    /* Qt is broken in every way, What do I get if I queryAccessible on a DBusAdaptor child? */
+#if 0
     if (!object->isWidgetType ())
         return;
+#endif
 
     stack.push (object);
 
     /* Depth first iteration over all un-registered objects */
     while (!stack.empty())
     {
-        QAccessibleInterface *interface;
-        QSpiAccessibleObject *accessible;
 
-        QObject *current = stack.pop();
+        current = stack.pop();
 
-        if (cache.contains (object))
+        if (cache.contains (current))
             continue;
 
         /* Create the QSpiAccessibleObject,

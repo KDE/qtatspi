@@ -55,7 +55,8 @@ signals:
     void accessibleDestroyed (QSpiAccessibleObject *accessible);
 
 private:
-    void registerObject (QObject *object);
+    void registerConnected (QObject *object);
+    void registerChildren (QObject *object);
 
     QObject *root;
     QHash <QObject *, QSpiAccessibleObject *> cache;

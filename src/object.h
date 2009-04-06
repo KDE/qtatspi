@@ -46,8 +46,7 @@ public:
 
     /* I cannot believe these are not part of the QAccessibleInterface */
     virtual QDBusObjectPath getParentPath () const;
-    QSpiAccessibleObject *getParent () const;
-    QList <QSpiAccessibleObject *> getChildren () const;
+    virtual QList <QSpiAccessibleObject *> getChildren () const;
     QSpiAccessibleObject *getApplication () const;
 
 protected:

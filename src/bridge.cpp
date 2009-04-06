@@ -101,7 +101,7 @@ void QSpiAccessibleBridge::aboutToQuit ()
         }
 }
 
-void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *useless)
+void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *rootInterface)
 {
         QDBusError error;
 
@@ -110,7 +110,7 @@ void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *useless)
         qspi_initialize_adaptor_types ();
 
         /* Create the cache of accessible objects */
-        cache = new QSpiAccessibleCache (QApplication::instance());
+        cache = new QSpiAccessibleCache (rootInterface->object());
 
         /* Connect to the session bus and register with the AT-SPI registry daemon */
         if (!QDBusConnection::sessionBus().isConnected())

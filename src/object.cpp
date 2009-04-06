@@ -123,16 +123,8 @@ QStringList QSpiAccessibleObject::getSupported () const
 
 /*---------------------------------------------------------------------------*/
 
-QSpiAccessibleObject *QSpiAccessibleObject::getParent () const
-{
-    return cache->lookupObject (interface->object()->parent());
-}
-
-/*---------------------------------------------------------------------------*/
-
 QDBusObjectPath QSpiAccessibleObject::getParentPath () const
 {
-    QDBusObjectPath nullPath (QSPI_OBJECT_PATH_NULL);
     QSpiAccessibleObject *parent = cache->lookupObject (interface->object()->parent());
     if (parent)
     {
@@ -140,8 +132,7 @@ QDBusObjectPath QSpiAccessibleObject::getParentPath () const
     }
     else
     {
-       qDebug ("QSpiAccessibleBridge : Accessible without registered parent");
-       return nullPath;
+       return getApplication()->getPath();
     }
 }
 
