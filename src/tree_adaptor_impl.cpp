@@ -29,6 +29,40 @@
 
 #include "tree_adaptor.h"
 #include "cache.h"
+#include "object.h"
+#include "constant_mappings.h"
+
+/*---------------------------------------------------------------------------*/
+
+static QSpiAccessibleCacheItem getCacheItem (const QSpiAccessibleObject &obj) {
+        QSpiAccessibleCacheItem item;
+        QList <QSpiAccessibleObject *> children;
+        QList <QDBusObjectPath> childPaths;
+
+        /* Path */
+        item.path = obj.getPath();
+        /* Parent */
+        item.parent = obj.getParentPath();
+        /* Children */
+        children = obj.getChildren();
+        foreach (QSpiAccessibleObject *obj, children)
+        {
+            childPaths << obj->getPath();
+        }
+        item.children = childPaths;
+        /* Supported interfaces */
+        item.supported = obj.getSupported();
+        /* Name */
+        item.name = obj.getInterface().text(QAccessible::Name, 0);
+        /* Role */
+        item.role = qSpiRoleMapping.value(obj.getInterface().role(0));
+        /* Description */
+        item.description = obj.getInterface().text(QAccessible::Description, 0);
+        /* State set */
+        qspi_stateset_from_qstate (obj.getInterface().state(0), item.states);
+        return item;
+}
+
 
 /*
  * Implementation of adaptor class QSpiTreeAdaptor
@@ -55,5 +89,12 @@ QDBusObjectPath QSpiTreeAdaptor::getRoot()
 QSpiAccessibleCacheArray QSpiTreeAdaptor::getTree()
 {
     // handle method call org.freedesktop.atspi.Tree.getTree
-    return static_cast <QSpiAccessibleCache *> (parent())->listAccessibles();
+    QList <QSpiAccessibleCacheItem> cacheArray;
+    QList <QSpiAccessibleObject *> accessibles =
+        static_cast <QSpiAccessibleCache *> (parent())->listAccessibles ();
+    foreach (QSpiAccessibleObject *obj, accessibles)
+    {
+        cacheArray << getCacheItem (*obj);
+    }
+    return cacheArray;
 }

@@ -23,6 +23,7 @@
 #include <QApplication>
 
 #include "cache.h"
+#include "application.h"
 #include "tree_adaptor.h"
 
 #define QSPI_TREE_OBJECT_PATH "/org/freedesktop/atspi/tree"
@@ -32,11 +33,21 @@
 
 QSpiAccessibleCache::QSpiAccessibleCache (QObject *root)
 {
-    QDBusObjectPath rootPath (QSPI_OBJECT_PATH_DESKTOP);
+    QAccessibleInterface *interface;
+    QSpiAccessibleObject *accessible;
+
     QApplication::instance()->installEventFilter(this);
 
     this->root = root;
-    registerObject (root, &rootPath);
+    interface = QAccessible::queryAccessibleInterface (this->root);
+    accessible = new QSpiAccessibleApplication (this, interface);
+    connect(this->root, SIGNAL(destroyed(QObject *)), this, SLOT(objectDestroyed(QObject *)));
+    cache.insert (this->root, accessible);
+    emit accessibleAdded (accessible);
+    foreach (QObject *child, this->root->findChildren<QObject *>())
+    {
+        registerObject (child);
+    }
 
     new QSpiTreeAdaptor (this);
     QDBusConnection::sessionBus().registerObject(QSPI_TREE_OBJECT_PATH, this, QDBusConnection::ExportAdaptors);
@@ -47,7 +58,7 @@ QSpiAccessibleCache::QSpiAccessibleCache (QObject *root)
 bool QSpiAccessibleCache::eventFilter(QObject *obj, QEvent *event)
 {
     /* Check whether this event is for a registered object or not */
-    if (!cache.contains (obj))
+    if (cache.contains (obj))
     {
         switch (event->type ())
         {
@@ -75,14 +86,16 @@ bool QSpiAccessibleCache::eventFilter(QObject *obj, QEvent *event)
 /* TODO - No Idea about the threading implications here.
  * What is the equivalent of the GDK lock?
  */
-void QSpiAccessibleCache::registerObject (QObject *object, QDBusObjectPath *path)
+void QSpiAccessibleCache::registerObject (QObject *object)
 {
     /* Depth-first addition of unregistered objects */
     QStack <QObject *> stack;
 
     /* Prime with first object */
+    /* Qt is broken in every way, What do I get if I queryAccessible on a DBusAdaptor child? */
     if (!object->isWidgetType ())
         return;
+
     stack.push (object);
 
     /* Depth first iteration over all un-registered objects */
@@ -102,10 +115,10 @@ void QSpiAccessibleCache::registerObject (QObject *object, QDBusObjectPath *path
          * Emit the added signal
          */
         interface = QAccessible::queryAccessibleInterface (current);
-        if (path)
-            accessible = new QSpiAccessibleObject (this, interface, path);
-        else
-            accessible = new QSpiAccessibleObject (this, interface);
+        if (!interface)
+            continue;
+
+        accessible = new QSpiAccessibleObject (this, interface);
         connect(current, SIGNAL(destroyed(QObject *)), this, SLOT(objectDestroyed(QObject *)));
         cache.insert (current, accessible);
         emit accessibleAdded (accessible);
@@ -144,10 +157,8 @@ QSpiAccessibleObject *QSpiAccessibleCache::lookupObject (QObject *obj)
 
 QSpiAccessibleObject *QSpiAccessibleCache::getRoot ()
 {
-    if (cache.contains(root))
-        return cache.value(root);
-    else
-        return NULL;
+    Q_ASSERT (cache.contains(root));
+    return cache.value(root);
 }
 
 /*---------------------------------------------------------------------------*/

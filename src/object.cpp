@@ -49,22 +49,17 @@
 #define QSPI_INTERFACE_TREE "org.freedesktop.atspi.Tree"
 #define QSPI_INTERFACE_VALUE "org.freedesktop.atspi.Value"
 
-#define QSPI_OBJECT_PATH_PREFIX  "/org/freedesktop/atspi/accessible"
-#define QSPI_OBJECT_PATH_DESKTOP "/root"
+#define QSPI_OBJECT_PATH_PREFIX  "/org/freedesktop/atspi/accessible/"
 #define QSPI_OBJECT_PATH_NULL    "/"
 
 /*---------------------------------------------------------------------------*/
 
 QSpiAccessibleObject::QSpiAccessibleObject (QSpiAccessibleCache  *cache,
-                                            QAccessibleInterface *interface,
-                                            QDBusObjectPath      *path)
+                                            QAccessibleInterface *interface)
 {
     this->cache     = cache;
     this->interface = interface;
-    if (path)
-        this->path  = getUnique ();
-    else
-        this->path  = *path;
+    this->path  = getUnique ();
 
     /* It should be reasonable to get the interface from the adaptor here.
      * But the CLASS_INFO key is a private definition within the QtDBus bindings
@@ -135,6 +130,23 @@ QSpiAccessibleObject *QSpiAccessibleObject::getParent () const
 
 /*---------------------------------------------------------------------------*/
 
+QDBusObjectPath QSpiAccessibleObject::getParentPath () const
+{
+    QDBusObjectPath nullPath (QSPI_OBJECT_PATH_NULL);
+    QSpiAccessibleObject *parent = cache->lookupObject (interface->object()->parent());
+    if (parent)
+    {
+       return parent->getPath();
+    }
+    else
+    {
+       qDebug ("QSpiAccessibleBridge : Accessible without registered parent");
+       return nullPath;
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+
 QList <QSpiAccessibleObject *> QSpiAccessibleObject::getChildren () const
 {
     QList<QSpiAccessibleObject *> children;
@@ -142,13 +154,17 @@ QList <QSpiAccessibleObject *> QSpiAccessibleObject::getChildren () const
 
     foreach (QObject *obj, widgets)
     {
+#if 0
        if (obj->isWidgetType())
        {
+#endif
            QSpiAccessibleObject *current;
            current = cache->lookupObject (obj);
            if (current)
                children << current;
+#if 0
        }
+#endif
     }
     return children;
 }
@@ -171,75 +187,6 @@ QDBusObjectPath QSpiAccessibleObject::getUnique ()
     if (id == 0)
        id++;
     return QDBusObjectPath(prefix + num.setNum(id++));
-}
-
-/*---------------------------------------------------------------------------*/
-
-/* D-Bus Marshallers.
- * Marshalls an accessible object into its wire format including all cached
- * properties.
- *
- * Structure is "ooaoassusau"
- * Object path,
- * Parent path,
- * Array of Children paths,
- * Supported Interfaces.
- * Name,
- * Role,
- * Description,
- * State set.
- */
-
-QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAccessibleObject &obj) {
-        QSpiAccessibleObject *parent;
-        QDBusObjectPath nullPath ("QSPI_OBJECT_PATH_NULL");
-        QList <QSpiAccessibleObject *> children;
-        QList <QDBusObjectPath> childPaths;
-        QSpiStateSet stateSet = {0, 0};
-
-        argument.beginStructure();
-
-        /* Path */
-        argument << obj.getPath();
-        /* Parent */
-        parent = obj.getParent();
-        if (!parent)
-        {
-            qDebug ("QSpiBridge : Accessible object without registered parent");
-            argument << nullPath;
-        }
-        else
-        {
-            argument << parent->getPath();
-        }
-        /* Children */
-        children = obj.getChildren();
-        foreach (QSpiAccessibleObject *obj, children)
-        {
-            childPaths << obj->getPath();
-        }
-        argument << childPaths;
-        /* Supported interfaces */
-        argument << obj.getSupported();
-        /* Name */
-        argument << obj.getInterface().text(QAccessible::Name, 0);
-        /* Role */
-        argument << qSpiRoleMapping.value(obj.getInterface().role(0));
-        /* Description */
-        argument << obj.getInterface().text(QAccessible::Description, 0);
-        /* State set */
-        qspi_stateset_from_qstate (obj.getInterface().state(0), stateSet);
-        argument << stateSet;
-
-        argument.endStructure();
-        return argument;
-}
-
-const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAccessibleObject &obj) {
-        argument.beginStructure();
-        /* We never need to demarshall the accessible object so this is incomplete. */
-        argument.endStructure();
-        return argument;
 }
 
 /*END------------------------------------------------------------------------*/

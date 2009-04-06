@@ -150,8 +150,8 @@ void qspi_stateset_from_qstate (QAccessible::State state, QSpiStateSet &set)
                BITARRAY_SET (array, a);
            }
        }
-       set.one = array[0];
-       set.two = array[1];
+       set << array[0];
+       set << array[1];
 }
 
 /*---------------------------------------------------------------------------*/

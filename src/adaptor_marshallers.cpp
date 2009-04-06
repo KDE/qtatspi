@@ -21,17 +21,36 @@
 
 #include "adaptor_marshallers.h"
 
-/* QSpiStateSet */
+/* QSpiAccessibleCacheArray */
 /*---------------------------------------------------------------------------*/
 
-QDBusArgument &operator<<(QDBusArgument &argument, const QSpiStateSet &set) {
-        argument << set.one << set.two;
+QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAccessibleCacheItem &item)
+{
+        argument.beginStructure();
+        argument << item.path;
+        argument << item.parent;
+        argument << item.children;
+        argument << item.supported;
+        argument << item.name;
+        argument << item.role;
+        argument << item.description;
+        argument << item.states;
+        argument.endStructure();
         return argument;
 }
 
-const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiStateSet &set) {
-        /* No need to de-marshall this structure so left blank */
+const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAccessibleCacheItem &item)
+{
         return argument;
 }
 
 /*---------------------------------------------------------------------------*/
+
+void qspi_initialize_adaptor_types ()
+{
+        qDBusRegisterMetaType<QSpiStateSet>();
+        qDBusRegisterMetaType<QSpiAccessibleCacheItem>();
+        qDBusRegisterMetaType<QSpiAccessibleCacheArray>();
+}
+
+/*END------------------------------------------------------------------------*/

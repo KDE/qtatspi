@@ -2,6 +2,7 @@ TEMPLATE = lib
 
 HEADERS += cache.h  \
            object.h \
+           application.h \
            proxy_marshallers.h \
            constant_mappings.h \
            tree_adaptor.h \
@@ -12,6 +13,7 @@ HEADERS += cache.h  \
 SOURCES += bridge.cpp \
            cache.cpp  \
            object.cpp \
+           application.cpp \
            proxy_marshallers.cpp \
            constant_mappings.cpp \
            tree_adaptor_impl.cpp \

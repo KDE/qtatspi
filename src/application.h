@@ -19,9 +19,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef Q_SPI_OBJECT_H
-#define Q_SPI_OBJECT_H
-
+#ifndef Q_SPI_APPLICATION_H
+#define Q_SPI_APPLICATION_H
 
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
@@ -30,34 +29,19 @@
 #include <QAccessible>
 #include <QAccessibleInterface>
 
+#include "object.h"
+
 class QSpiAccessibleCache;
 
-class QSpiAccessibleObject : public QObject
+class QSpiAccessibleApplication : public QSpiAccessibleObject
 {
     Q_OBJECT
-
 public:
-    QSpiAccessibleObject (QSpiAccessibleCache  *cache,
-                          QAccessibleInterface *interface);
+    QSpiAccessibleApplication (QSpiAccessibleCache  *cache,
+                               QAccessibleInterface *interface);
 
-    QAccessibleInterface &getInterface () const;
-    QDBusObjectPath       getPath () const ;
-    QStringList           getSupported () const;
-
-    /* I cannot believe these are not part of the QAccessibleInterface */
     virtual QDBusObjectPath getParentPath () const;
-    QSpiAccessibleObject *getParent () const;
-    QList <QSpiAccessibleObject *> getChildren () const;
-    QSpiAccessibleObject *getApplication () const;
-
-protected:
-    QSpiAccessibleCache   *cache;
-    QAccessibleInterface  *interface;
-    QDBusObjectPath        path;
-
-    QStringList            supported;
-
-    static QDBusObjectPath getUnique ();
+    void aDummy ();
 };
 
-#endif /* Q_SPI_CACHE_H */
+#endif /* Q_SPI_APPLICATION_H */

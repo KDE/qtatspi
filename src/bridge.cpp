@@ -33,6 +33,7 @@
 #include "cache.h"
 #include "registry_proxy.h"
 #include "constant_mappings.h"
+#include "adaptor_marshallers.h"
 
 #define QSPI_REGISTRY_ADDRESS      "org.freedesktop.atspi.Registry"
 #define QSPI_REGISTRY_OBJECT_PATH  "/org/freedesktop/atspi/registry"
@@ -105,6 +106,8 @@ void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *useless)
         QDBusError error;
 
         qDebug ("QSpiAccessibleBridge : Initializing bridge");
+
+        qspi_initialize_adaptor_types ();
 
         /* Create the cache of accessible objects */
         cache = new QSpiAccessibleCache (QApplication::instance());

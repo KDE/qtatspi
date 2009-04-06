@@ -26,36 +26,47 @@
 #ifndef Q_SPI_ADAPTOR_MARSHALLERS_H
 #define Q_SPI_ADAPTOR_MARSHALLERS_H
 
-
-/* QSpiAccessibleCacheArray */
-/*---------------------------------------------------------------------------*/
-
 #include <QList>
 
 #include "object.h"
 
-typedef QList <QSpiAccessibleObject *> QSpiAccessibleCacheArray;
+/* QSpiStateSet */
+/*---------------------------------------------------------------------------*/
 
-QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAccessibleObject &update);
-const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAccessibleObject &update);
+typedef QList <int> QSpiStateSet;
+
+Q_DECLARE_METATYPE (QSpiStateSet);
+
+/* QSpiAccessibleCacheArray */
+/*---------------------------------------------------------------------------*/
+
+struct QSpiAccessibleCacheItem
+{
+    QDBusObjectPath         path;
+    QDBusObjectPath         parent;
+    QList <QDBusObjectPath> children;
+    QStringList             supported;
+    QString                 name;
+    int                     role;
+    QString                 description;
+    QSpiStateSet            states;
+};
+
+typedef QList <QSpiAccessibleCacheItem> QSpiAccessibleCacheArray;
+
+Q_DECLARE_METATYPE (QSpiAccessibleCacheItem);
+Q_DECLARE_METATYPE (QSpiAccessibleCacheArray);
+
+QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAccessibleCacheItem &item);
+const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAccessibleCacheItem &item);
 
 /* QSpiRelationArray TODO */
 /*---------------------------------------------------------------------------*/
 
 typedef int QSpiRelationArray;
 
-/* QSpiStateSet */
 /*---------------------------------------------------------------------------*/
 
-struct QSpiStateSet
-{
-        int one;
-        int two;
-};
-
-QDBusArgument &operator<<(QDBusArgument &argument, const QSpiStateSet &set);
-const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiStateSet &set);
-
-/*---------------------------------------------------------------------------*/
+void qspi_initialize_adaptor_types ();
 
 #endif /* Q_SPI_ADAPTOR_MARSHALLERS_H */
