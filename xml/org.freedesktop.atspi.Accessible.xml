@@ -135,6 +135,7 @@
       Get a set defining this object's relationship to other accessible objects.
     </tp:docstring>
     <arg direction="out" type="a(uao)" tp:type="RelationSet">
+            <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiRelationArray"/>
     <tp:docstring>
       A RelationSet defining this object's relationships.
     </tp:docstring>
@@ -176,6 +177,7 @@
       Get the current state of the object as a StateSet.
     </tp:docstring>
     <arg direction="out" type="au" tp:type="StateSet">
+            <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiStateSet"/>
     <tp:docstring>
       A StateSet encapsulating the currently true states of the object.
       Returns an array of (currently two) 32-bit integers giving bitwise flags.

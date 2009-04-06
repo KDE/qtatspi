@@ -49,7 +49,8 @@
     <tp:docstring>
         Updates an AT about recently added or removed applications.
     </tp:docstring>
-    <arg direction="out" name="app" type="is">
+    <arg direction="out" name="app" type="(is)">
+        <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiAppUpdate"/>
         <tp:docstring>
                 Unique bus name of the application that has been removed or added.
                 The integer is an enumeration:

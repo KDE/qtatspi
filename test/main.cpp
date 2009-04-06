@@ -36,12 +36,40 @@
 ****************************************************************************/
 
 #include <QApplication>
+#include <QPluginLoader>
+#include <QAccessible>
+#include <QAccessibleBridgePlugin>
 
 #include "calculator.h"
+
+void rootObjectHandler (QObject *)
+{
+    ; /* Hello I am a hack to fix a broken API */
+}
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
+    QPluginLoader loader("/usr/lib/qt4/plugins/accessiblebridge/libqspiaccessiblebridge.so");
+
+    QAccessibleBridgePlugin *plugin;
+    QAccessibleBridge *bridge;
+    QStringList keys;
+
+    if (!loader.load()) {
+        qDebug ("Plugin failed to load");
+        return 1;
+    } else {
+        qDebug ("Plugin loaded");
+        plugin = qobject_cast <QAccessibleBridgePlugin *> (loader.instance());
+        keys = plugin->keys();
+        qDebug(keys.join(";").toUtf8().data());
+        bridge = plugin->create ("QSPIACESSIBLEBRIDGE");
+        if (bridge)
+           bridge->setRootObject (QAccessible::queryAccessibleInterface (QApplication::instance()));
+    }
+
     Calculator calc;
     calc.show();
     return app.exec();
