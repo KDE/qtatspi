@@ -141,22 +141,21 @@ QDBusObjectPath QSpiAccessibleObject::getParentPath () const
 QList <QSpiAccessibleObject *> QSpiAccessibleObject::getChildren () const
 {
     QList<QSpiAccessibleObject *> children;
-    QList<QObject *> widgets = interface->object()->findChildren<QObject *>();
 
-    foreach (QObject *obj, widgets)
+    for (int i = 1; i <= interface->childCount (); i++)
     {
-#if 0
-       if (obj->isWidgetType())
-       {
-#endif
-           QSpiAccessibleObject *current;
-           current = cache->lookupObject (obj);
-           if (current)
-               children << current;
-#if 0
-       }
-#endif
+        QAccessibleInterface *child = NULL;
+        interface->navigate(QAccessible::Child, i, &child);
+        if (child)
+        {
+            QSpiAccessibleObject *current;
+            current = cache->lookupObject (child->object ());
+            if (current)
+                children << current;
+            delete child;
+        }
     }
+
     return children;
 }
 

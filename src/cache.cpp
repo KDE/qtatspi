@@ -128,7 +128,6 @@ void QSpiAccessibleCache::registerChildren (QObject *object)
     /* Depth first iteration over all un-registered objects */
     while (!stack.empty())
     {
-
         current = stack.pop();
 
         if (cache.contains (current))
@@ -148,9 +147,15 @@ void QSpiAccessibleCache::registerChildren (QObject *object)
         cache.insert (current, accessible);
         emit accessibleAdded (accessible);
 
-        foreach (QObject *child, current->findChildren<QObject *>())
+        for (int i = 1; i <= interface->childCount (); i++)
         {
-            stack.push (child);
+            QAccessibleInterface *child = NULL;
+            interface->navigate(QAccessible::Child, i, &child);
+            if (child)
+            {
+                stack.push (child->object ());
+                delete child;
+            }
         }
     }
 }
