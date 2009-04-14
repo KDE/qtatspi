@@ -57,11 +57,11 @@ private:
 
 /*---------------------------------------------------------------------------*/
 
-class QDBusAccessibleBridgePlugin: public QAccessibleBridgePlugin
+class QSpiAccessibleBridgePlugin: public QAccessibleBridgePlugin
 {
         Q_OBJECT
 public:
-        QDBusAccessibleBridgePlugin(QObject *parent = 0);
+        QSpiAccessibleBridgePlugin(QObject *parent = 0);
 
         virtual QAccessibleBridge* create(const QString &);
         virtual QStringList keys() const;
@@ -69,27 +69,27 @@ public:
 
 /*---------------------------------------------------------------------------*/
 
-QDBusAccessibleBridgePlugin::QDBusAccessibleBridgePlugin(QObject *parent)
+QSpiAccessibleBridgePlugin::QSpiAccessibleBridgePlugin(QObject *parent)
 : QAccessibleBridgePlugin(parent)
 {
         ;
 }
 
-QAccessibleBridge* QDBusAccessibleBridgePlugin::create(const QString &name)
+QAccessibleBridge* QSpiAccessibleBridgePlugin::create(const QString &name)
 {
-        if (name == "QSPIACESSIBLEBRIDGE")
+        if (name == "QSPIACCESSIBLEBRIDGE")
                 return new QSpiAccessibleBridge();
         return 0;
 }
 
-QStringList QDBusAccessibleBridgePlugin::keys() const
+QStringList QSpiAccessibleBridgePlugin::keys() const
 {
         QStringList l;
         l  << "QSPIACCESSIBLEBRIDGE";
         return l;
 }
 
-Q_EXPORT_PLUGIN(QDBusAccessibleBridgePlugin)
+Q_EXPORT_PLUGIN(QSpiAccessibleBridgePlugin)
 
 /*---------------------------------------------------------------------------*/
 

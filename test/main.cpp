@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
+#if 0
     QPluginLoader loader("/usr/lib/qt4/plugins/accessiblebridge/libqspiaccessiblebridge.so");
 
     QAccessibleBridgePlugin *plugin;
@@ -69,6 +70,7 @@ int main(int argc, char *argv[])
         if (bridge)
            bridge->setRootObject (QAccessible::queryAccessibleInterface (QApplication::instance()));
     }
+#endif
 
     Calculator calc;
     calc.show();
