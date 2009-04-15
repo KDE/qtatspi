@@ -125,15 +125,21 @@ QStringList QSpiAccessibleObject::getSupported () const
 
 QDBusObjectPath QSpiAccessibleObject::getParentPath () const
 {
-    QSpiAccessibleObject *parent = cache->lookupObject (interface->object()->parent());
-    if (parent)
+    QAccessibleInterface *parentInterface = NULL;
+    QSpiAccessibleObject *parent;
+
+    interface->navigate (QAccessible::Ancestor, 0, &parentInterface);
+    if (parentInterface)
     {
-       return parent->getPath();
+        parent = cache->lookupObject (parentInterface->object());
+        if (parent)
+        {
+           return parent->getPath();
+        }
+        delete parentInterface;
     }
-    else
-    {
-       return getApplication()->getPath();
-    }
+    /* TODO Return the 'NULL' path */
+    return getApplication()->getPath();
 }
 
 /*---------------------------------------------------------------------------*/

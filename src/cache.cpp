@@ -22,6 +22,9 @@
 
 #include <QApplication>
 #include <QObject>
+#include <QWidget>
+#include <QWidgetList>
+#include <QApplication>
 
 #include "cache.h"
 #include "application.h"
@@ -34,21 +37,12 @@
 
 QSpiAccessibleCache::QSpiAccessibleCache (QObject *root)
 {
-    QAccessibleInterface *interface;
-    QSpiAccessibleObject *accessible;
-
     QApplication::instance()->installEventFilter(this);
 
     this->root = root;
-    interface = QAccessible::queryAccessibleInterface (this->root);
-    accessible = new QSpiAccessibleApplication (this, interface);
-    connect(this->root, SIGNAL(destroyed(QObject *)), this, SLOT(objectDestroyed(QObject *)));
-    cache.insert (this->root, accessible);
-    emit accessibleAdded (accessible);
 
-    /* Big TODO here - Get hold of the widgets *Somehow* and register them */
-
-    Q_ASSERT (cache.contains (root));
+    /* Add all the top-level windows */
+    registerConnected (this->root);
 
     new QSpiTreeAdaptor (this);
     QDBusConnection::sessionBus().registerObject(QSPI_TREE_OBJECT_PATH, this, QDBusConnection::ExportAdaptors);
@@ -91,13 +85,17 @@ bool QSpiAccessibleCache::eventFilter(QObject *obj, QEvent *event)
 void QSpiAccessibleCache::registerConnected (QObject *object)
 {
     QList <QObject*> parents;
-    QObject *current;
+    QAccessibleInterface *current = NULL;
 
-    current = object;
+    current = QAccessible::queryAccessibleInterface (object);
+
     while (current)
     {
-        parents.insert(0, current);
-        current = current->parent();
+        QAccessibleInterface *temp;
+        parents.insert(0, current->object ());
+        current->navigate(QAccessible::Ancestor, 0, &temp);
+        delete current;
+        current = temp;
     }
 
     foreach (QObject *parent, parents)

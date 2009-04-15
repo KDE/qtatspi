@@ -152,6 +152,30 @@ QSpiAccessibleAdaptor::~QSpiAccessibleAdaptor()
     // destructor
 }
 
+int QSpiAccessibleAdaptor::childCount() const
+{
+    // get the value of property childCount
+    return 0;
+}
+
+QString QSpiAccessibleAdaptor::description() const
+{
+    // get the value of property description
+    return QString ("Nothing");
+}
+
+QString QSpiAccessibleAdaptor::name() const
+{
+    // get the value of property name
+    return QString ("Nothing");
+}
+
+QDBusObjectPath QSpiAccessibleAdaptor::getParent() const
+{
+    // get the value of property parent
+    return QDBusObjectPath ("/");
+}
+
 QDBusObjectPath QSpiAccessibleAdaptor::getApplication()
 {
     // handle method call org.freedesktop.atspi.Accessible.getApplication
