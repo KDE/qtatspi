@@ -44,6 +44,43 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAccessibleCac
         return argument;
 }
 
+/* QSpiAction */
+/*---------------------------------------------------------------------------*/
+
+QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAction &action)
+{
+        argument.beginStructure();
+        argument << action.name;
+        argument << action.description;
+        argument << action.keyBinding;
+        argument.endStructure();
+        return argument;
+}
+
+const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAction &action)
+{
+        return argument;
+}
+
+/* QSpiRect */
+/*---------------------------------------------------------------------------*/
+
+QDBusArgument &operator<<(QDBusArgument &argument, const QSpiRect &rect)
+{
+        argument.beginStructure();
+        argument << rect.x;
+        argument << rect.y;
+        argument << rect.width;
+        argument << rect.height;
+        argument.endStructure();
+        return argument;
+}
+
+const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiRect &rect)
+{
+        return argument;
+}
+
 /*---------------------------------------------------------------------------*/
 
 void qspi_initialize_adaptor_types ()
@@ -51,6 +88,7 @@ void qspi_initialize_adaptor_types ()
         qDBusRegisterMetaType<QSpiStateSet>();
         qDBusRegisterMetaType<QSpiAccessibleCacheItem>();
         qDBusRegisterMetaType<QSpiAccessibleCacheArray>();
+        qDBusRegisterMetaType<QSpiRect>();
 }
 
 /*END------------------------------------------------------------------------*/

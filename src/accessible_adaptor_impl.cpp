@@ -155,25 +155,25 @@ QSpiAccessibleAdaptor::~QSpiAccessibleAdaptor()
 int QSpiAccessibleAdaptor::childCount() const
 {
     // get the value of property childCount
-    return 0;
+    return static_cast <QSpiAccessibleObject *>(parent())->getInterface().childCount();
 }
 
 QString QSpiAccessibleAdaptor::description() const
 {
     // get the value of property description
-    return QString ("Nothing");
+    return static_cast <QSpiAccessibleObject *>(parent())->getInterface().text(QAccessible::Description, 0);
 }
 
 QString QSpiAccessibleAdaptor::name() const
 {
     // get the value of property name
-    return QString ("Nothing");
+    return static_cast <QSpiAccessibleObject *>(parent())->getInterface().text(QAccessible::Name, 0);
 }
 
 QDBusObjectPath QSpiAccessibleAdaptor::getParent() const
 {
     // get the value of property parent
-    return QDBusObjectPath ("/");
+    return static_cast <QSpiAccessibleObject *> (parent())->getApplication()->getParentPath();
 }
 
 QDBusObjectPath QSpiAccessibleAdaptor::getApplication()

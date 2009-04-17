@@ -59,9 +59,8 @@ public:
     virtual ~QSpiApplicationAdaptor();
 
 public: // PROPERTIES
-    Q_PROPERTY(int id READ id WRITE setId)
+    Q_PROPERTY(int id READ id)
     int id() const;
-    void setId(int value);
 
     Q_PROPERTY(QString toolkitName READ toolkitName)
     QString toolkitName() const;
@@ -72,8 +71,6 @@ public: // PROPERTIES
 public Q_SLOTS: // METHODS
     QString getLocale(uint lctype);
     bool pause();
-    void registerObjectEventListener(const QDBusObjectPath &listener, const QString &eventName);
-    void registerToolkitEventListener(const QDBusObjectPath &listener, const QString &eventName);
     bool resume();
 Q_SIGNALS: // SIGNALS
 };

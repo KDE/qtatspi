@@ -26,6 +26,10 @@
 #include "constant_mappings.h"
 #include "adaptor_marshallers.h"
 #include "accessible_adaptor.h"
+#include "text_adaptor.h"
+#include "value_adaptor.h"
+#include "component_adaptor.h"
+#include "action_adaptor.h"
 
 #define QSPI_INTERFACE_ACCESSIBLE "org.freedesktop.atspi.Accessible"
 #define QSPI_INTERFACE_ACTION "org.freedesktop.atspi.Action"
@@ -71,8 +75,8 @@ QSpiAccessibleObject::QSpiAccessibleObject (QSpiAccessibleCache  *cache,
 
     if (interface->textInterface())
     {
-        //new AccessibleTextAdaptor(this);
-        //supported << QSPI_INTERFACE_TEXT;
+        new QSpiTextAdaptor(this);
+        supported << QSPI_INTERFACE_TEXT;
     }
     if (interface->editableTextInterface())
     {
@@ -81,15 +85,15 @@ QSpiAccessibleObject::QSpiAccessibleObject (QSpiAccessibleCache  *cache,
     }
     if (interface->valueInterface())
     {
-        //new AccessibleValueAdaptor(this);
-        //supported << QSPI_INTERFACE_VALUE;
+        new QSpiValueAdaptor(this);
+        supported << QSPI_INTERFACE_VALUE;
     }
     if (interface->object()->isWidgetType())
     {
-        //new AccessibleComponentAdaptor(this);
-        //new AccessibleActionAdaptor(this);
-        //supported << QSPI_INTERFACE_COMPONENT;
-        //supported << QSPI_INTERFACE_ACTION;
+        new QSpiComponentAdaptor(this);
+        new QSpiActionAdaptor(this);
+        supported << QSPI_INTERFACE_COMPONENT;
+        supported << QSPI_INTERFACE_ACTION;
     }
     if (interface->tableInterface())
     {

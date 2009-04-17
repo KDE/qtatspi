@@ -17,6 +17,8 @@
 #include <QtCore/QStringList>
 #include <QtCore/QVariant>
 
+#define ACCESSIBLE_INTERFACE static_cast <QSpiAccessibleObject *>(parent())->getInterface()
+
 /*
  * Implementation of adaptor class QSpiComponentAdaptor
  */
@@ -36,80 +38,75 @@ QSpiComponentAdaptor::~QSpiComponentAdaptor()
 bool QSpiComponentAdaptor::contains(int x, int y, short coord_type)
 {
     // handle method call org.freedesktop.atspi.Component.contains
-    bool out0;
-    QMetaObject::invokeMethod(parent(), "contains", Q_RETURN_ARG(bool, out0), Q_ARG(int, x), Q_ARG(int, y), Q_ARG(short, coord_type));
-    return out0;
-}
-
-void QSpiComponentAdaptor::deregisterFocusHandler(const QDBusObjectPath &handler)
-{
-    // handle method call org.freedesktop.atspi.Component.deregisterFocusHandler
-    QMetaObject::invokeMethod(parent(), "deregisterFocusHandler", Q_ARG(QDBusObjectPath, handler));
+    // TODO What if the co-ord type is relative to the screen?
+    return ACCESSIBLE_INTERFACE.rect(0).contains(x, y);
 }
 
 QDBusObjectPath QSpiComponentAdaptor::getAccessibleAtPoint(int x, int y, short coord_type)
 {
     // handle method call org.freedesktop.atspi.Component.getAccessibleAtPoint
-    QDBusObjectPath out0;
-    QMetaObject::invokeMethod(parent(), "getAccessibleAtPoint", Q_RETURN_ARG(QDBusObjectPath, out0), Q_ARG(int, x), Q_ARG(int, y), Q_ARG(short, coord_type));
-    return out0;
+    // TODO Return a null path. This is a silly function, may take some time to work out.
+    // It should be done on the client side.
+    return QDBusObjectPath ("/");
 }
 
 double QSpiComponentAdaptor::getAlpha()
 {
     // handle method call org.freedesktop.atspi.Component.getAlpha
-    double out0;
-    QMetaObject::invokeMethod(parent(), "getAlpha", Q_RETURN_ARG(double, out0));
-    return out0;
+    // TODO Find out if the QAccessible iterface needs extending to provide an alpha value.
+    return 1.0;
 }
 
 QSpiRect QSpiComponentAdaptor::getExtents(short coord_type)
 {
     // handle method call org.freedesktop.atspi.Component.getExtents
-    QSpiRect out0;
-    QMetaObject::invokeMethod(parent(), "getExtents", Q_RETURN_ARG(QSpiRect, out0), Q_ARG(short, coord_type));
-    return out0;
+    // TODO What should we do if the coord_type is relative to the enclosing widget?
+    QRect rect = ACCESSIBLE_INTERFACE.rect(0);
+    QSpiRect val;
+
+    val.x = rect.x ();
+    val.y = rect.y ();
+    val.width = rect.width ();
+    val.height = rect.height ();
+    return val;
 }
 
 uint QSpiComponentAdaptor::getLayer()
 {
     // handle method call org.freedesktop.atspi.Component.getLayer
-    uint out0;
-    QMetaObject::invokeMethod(parent(), "getLayer", Q_RETURN_ARG(uint, out0));
-    return out0;
+    // TODO Find out if QT has any concept of 'Layers'
+    return 1; // Corresponds to LAYER_WINDOW.
 }
 
 short QSpiComponentAdaptor::getMDIZOrder()
 {
     // handle method call org.freedesktop.atspi.Component.getMDIZOrder
-    short out0;
-    QMetaObject::invokeMethod(parent(), "getMDIZOrder", Q_RETURN_ARG(short, out0));
-    return out0;
+    // TODO Does Qt have any concept of Layers?
+    return 0;
 }
 
 int QSpiComponentAdaptor::getPosition(short coord_type, int &y)
 {
     // handle method call org.freedesktop.atspi.Component.getPosition
     //return static_cast<YourObjectType *>(parent())->getPosition(coord_type, y);
+    QRect rect = ACCESSIBLE_INTERFACE.rect(0);
+    y = rect.y ();
+    return rect.x ();
 }
 
 int QSpiComponentAdaptor::getSize(int &height)
 {
     // handle method call org.freedesktop.atspi.Component.getSize
     //return static_cast<YourObjectType *>(parent())->getSize(height);
+    QRect rect = ACCESSIBLE_INTERFACE.rect(0);
+    height = rect.height ();
+    return rect.width ();
 }
 
 bool QSpiComponentAdaptor::grabFocus()
 {
     // handle method call org.freedesktop.atspi.Component.grabFocus
-    bool out0;
-    QMetaObject::invokeMethod(parent(), "grabFocus", Q_RETURN_ARG(bool, out0));
-    return out0;
+    // TODO This does not seem to be supported by QAccessibleInterface.
+    // THIS COULD CAUSE PROBLEMS
+    return false;
 }
-
-void QSpiComponentAdaptor::registerFocusHandler(const QDBusObjectPath &handler)
-{
-    // handle method call org.freedesktop.atspi.Component.registerFocusHandler
-    QMetaObject::invokeMethod(parent(), "registerFocusHandler", Q_ARG(QDBusObjectPath, handler));
-}
-

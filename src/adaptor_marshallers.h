@@ -60,10 +60,49 @@ Q_DECLARE_METATYPE (QSpiAccessibleCacheArray);
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAccessibleCacheItem &item);
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAccessibleCacheItem &item);
 
+/* QSpiActionArray */
+/*---------------------------------------------------------------------------*/
+
+struct QSpiAction
+{
+    QString name;
+    QString description;
+    QString keyBinding;
+};
+
+typedef QList <QSpiAction> QSpiActionArray;
+
+Q_DECLARE_METATYPE (QSpiAction);
+Q_DECLARE_METATYPE (QSpiActionArray);
+
+QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAction &action);
+const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAction &action);
+
 /* QSpiRelationArray TODO */
 /*---------------------------------------------------------------------------*/
 
 typedef int QSpiRelationArray;
+
+/* QSpiRangeList TODO */
+/*---------------------------------------------------------------------------*/
+
+typedef int QSpiRangeList;
+
+/* QSpiRect */
+/*---------------------------------------------------------------------------*/
+
+struct QSpiRect
+{
+    int x;
+    int y;
+    int width;
+    int height;
+};
+
+Q_DECLARE_METATYPE (QSpiRect);
+
+QDBusArgument &operator<<(QDBusArgument &argument, const QSpiRect &rect);
+const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiRect &rect);
 
 /*---------------------------------------------------------------------------*/
 

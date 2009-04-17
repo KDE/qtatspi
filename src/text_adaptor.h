@@ -63,7 +63,7 @@ class QSpiTextAdaptor: public QDBusAbstractAdaptor
 "      <arg direction=\"out\" type=\"i\" name=\"endOffset\" />\n"
 "      <arg direction=\"out\" type=\"s\" />\n"
 "    </method>\n"
-"    <method name=\"getCharacterOffset\" >\n"
+"    <method name=\"getCharacterAtOffset\" >\n"
 "      <arg direction=\"in\" type=\"i\" name=\"offset\" />\n"
 "      <arg direction=\"out\" type=\"i\" />\n"
 "    </method>\n"
@@ -171,7 +171,7 @@ public Q_SLOTS: // METHODS
     int getAttributes(int offset, int &endOffset, QString &out2);
     QSpiRangeList getBoundedRanges(int x, int y, int width, int height, short coordType, uint xClipType, uint yClipType);
     int getCharacterExtents(int offset, short coordType, int &y, int &width, int &height);
-    int getCharacterOffset(int offset);
+    int getCharacterAtOffset(int offset);
     QStringList getDefaultAttributeSet();
     QString getDefaultAttributes();
     int getNSelections();

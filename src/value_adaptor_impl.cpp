@@ -17,6 +17,11 @@
 #include <QtCore/QStringList>
 #include <QtCore/QVariant>
 
+#include <QAccessibleValueInterface>
+
+
+#define VALUE_INTERFACE static_cast <QSpiAccessibleObject *>(parent())->getInterface().valueInterface()
+
 /*
  * Implementation of adaptor class QSpiValueAdaptor
  */
@@ -36,30 +41,63 @@ QSpiValueAdaptor::~QSpiValueAdaptor()
 double QSpiValueAdaptor::currentValue() const
 {
     // get the value of property currentValue
-    return qvariant_cast< double >(parent()->property("currentValue"));
+    double val;
+    bool success;
+    val = VALUE_INTERFACE->currentValue().toDouble (&success);
+    if (success)
+    {
+        return val;
+    }
+    else
+    {
+        qDebug ("QSpiAccessibleBridge: Could not convert current value to double");
+        return 0.0;
+    }
 }
 
 void QSpiValueAdaptor::setCurrentValue(double value)
 {
     // set the value of property currentValue
-    parent()->setProperty("currentValue", value);
+    VALUE_INTERFACE->setCurrentValue(QVariant (value));
 }
 
 double QSpiValueAdaptor::maximumValue() const
 {
     // get the value of property maximumValue
-    return qvariant_cast< double >(parent()->property("maximumValue"));
+    double val;
+    bool success;
+    val = VALUE_INTERFACE->maximumValue().toDouble (&success);
+    if (success)
+    {
+        return val;
+    }
+    else
+    {
+        qDebug ("QSpiAccessibleBridge: Could not convert maximum value to double");
+        return 0.0;
+    }
 }
 
 double QSpiValueAdaptor::minimumIncrement() const
 {
     // get the value of property minimumIncrement
-    return qvariant_cast< double >(parent()->property("minimumIncrement"));
+    return 0.0;
 }
 
 double QSpiValueAdaptor::minimumValue() const
 {
     // get the value of property minimumValue
-    return qvariant_cast< double >(parent()->property("minimumValue"));
+    double val;
+    bool success;
+    val = VALUE_INTERFACE->minimumValue().toDouble (&success);
+    if (success)
+    {
+        return val;
+    }
+    else
+    {
+        qDebug ("QSpiAccessibleBridge: Could not convert minimum value to double");
+        return 0.0;
+    }
 }
 

@@ -36,25 +36,19 @@ QSpiApplicationAdaptor::~QSpiApplicationAdaptor()
 int QSpiApplicationAdaptor::id() const
 {
     // get the value of property id
-    return qvariant_cast< int >(parent()->property("id"));
-}
-
-void QSpiApplicationAdaptor::setId(int value)
-{
-    // set the value of property id
-    parent()->setProperty("id", value);
+    return 0;
 }
 
 QString QSpiApplicationAdaptor::toolkitName() const
 {
     // get the value of property toolkitName
-    return qvariant_cast< QString >(parent()->property("toolkitName"));
+    return QLatin1String("Qt");
 }
 
 QString QSpiApplicationAdaptor::version() const
 {
     // get the value of property version
-    return qvariant_cast< QString >(parent()->property("version"));
+    return QLatin1String(QT_VERSION_STR);
 }
 
 QString QSpiApplicationAdaptor::getLocale(uint lctype)
@@ -68,28 +62,12 @@ QString QSpiApplicationAdaptor::getLocale(uint lctype)
 bool QSpiApplicationAdaptor::pause()
 {
     // handle method call org.freedesktop.atspi.Application.pause
-    bool out0;
-    QMetaObject::invokeMethod(parent(), "pause", Q_RETURN_ARG(bool, out0));
-    return out0;
-}
-
-void QSpiApplicationAdaptor::registerObjectEventListener(const QDBusObjectPath &listener, const QString &eventName)
-{
-    // handle method call org.freedesktop.atspi.Application.registerObjectEventListener
-    QMetaObject::invokeMethod(parent(), "registerObjectEventListener", Q_ARG(QDBusObjectPath, listener), Q_ARG(QString, eventName));
-}
-
-void QSpiApplicationAdaptor::registerToolkitEventListener(const QDBusObjectPath &listener, const QString &eventName)
-{
-    // handle method call org.freedesktop.atspi.Application.registerToolkitEventListener
-    QMetaObject::invokeMethod(parent(), "registerToolkitEventListener", Q_ARG(QDBusObjectPath, listener), Q_ARG(QString, eventName));
+    return false;
 }
 
 bool QSpiApplicationAdaptor::resume()
 {
     // handle method call org.freedesktop.atspi.Application.resume
-    bool out0;
-    QMetaObject::invokeMethod(parent(), "resume", Q_RETURN_ARG(bool, out0));
-    return out0;
+    return false;
 }
 

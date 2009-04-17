@@ -24,8 +24,10 @@
 #include <QWidget>
 
 #include "application.h"
+#include "application_adaptor.h"
 #include "cache.h"
 
+#define QSPI_INTERFACE_APPLICATION "org.freedesktop.atspi.Application"
 #define QSPI_OBJECT_PATH_DESKTOP "/root"
 
 /*---------------------------------------------------------------------------*/
@@ -34,6 +36,8 @@ QSpiAccessibleApplication::QSpiAccessibleApplication (QSpiAccessibleCache *cache
                                                       QAccessibleInterface *interface)
         : QSpiAccessibleObject (cache, interface)
 {
+        new QSpiApplicationAdaptor(this);
+        supported << QSPI_INTERFACE_APPLICATION;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -41,33 +45,6 @@ QSpiAccessibleApplication::QSpiAccessibleApplication (QSpiAccessibleCache *cache
 QDBusObjectPath QSpiAccessibleApplication::getParentPath () const
 {
     return QDBusObjectPath (QSPI_OBJECT_PATH_DESKTOP);
-}
-
-/*---------------------------------------------------------------------------*/
-
-QList <QSpiAccessibleObject *> QSpiAccessibleApplication::getChildren () const
-{
-    QList<QSpiAccessibleObject *> children;
-    QObject *object = interface->object();
-    QApplication *app = static_cast <QApplication *> (object);
-    QList<QWidget *> widgets = app->topLevelWidgets();
-
-    foreach (QWidget *widg, widgets)
-    {
-#if 0
-       if (obj->isWidgetType())
-       {
-#endif
-           QObject *obj = static_cast <QObject *> (widg);
-           QSpiAccessibleObject *current;
-           current = cache->lookupObject (obj);
-           if (current)
-               children << current;
-#if 0
-       }
-#endif
-    }
-    return children;
 }
 
 /*---------------------------------------------------------------------------*/

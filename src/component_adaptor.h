@@ -84,7 +84,6 @@ public:
 public: // PROPERTIES
 public Q_SLOTS: // METHODS
     bool contains(int x, int y, short coord_type);
-    void deregisterFocusHandler(const QDBusObjectPath &handler);
     QDBusObjectPath getAccessibleAtPoint(int x, int y, short coord_type);
     double getAlpha();
     QSpiRect getExtents(short coord_type);
@@ -93,7 +92,6 @@ public Q_SLOTS: // METHODS
     int getPosition(short coord_type, int &y);
     int getSize(int &height);
     bool grabFocus();
-    void registerFocusHandler(const QDBusObjectPath &handler);
 Q_SIGNALS: // SIGNALS
 };
 
