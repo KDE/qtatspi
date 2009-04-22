@@ -72,6 +72,10 @@ QSpiAccessibleObject::QSpiAccessibleObject (QSpiAccessibleCache  *cache,
 
     new QSpiAccessibleAdaptor(this);
     supported << QSPI_INTERFACE_ACCESSIBLE;
+    new QSpiActionAdaptor(this);
+    supported << QSPI_INTERFACE_ACTION;
+    new QSpiComponentAdaptor(this);
+    supported << QSPI_INTERFACE_COMPONENT;
 
     if (interface->textInterface())
     {
@@ -87,13 +91,6 @@ QSpiAccessibleObject::QSpiAccessibleObject (QSpiAccessibleCache  *cache,
     {
         new QSpiValueAdaptor(this);
         supported << QSPI_INTERFACE_VALUE;
-    }
-    if (interface->object()->isWidgetType())
-    {
-        new QSpiComponentAdaptor(this);
-        new QSpiActionAdaptor(this);
-        supported << QSPI_INTERFACE_COMPONENT;
-        supported << QSPI_INTERFACE_ACTION;
     }
     if (interface->tableInterface())
     {
