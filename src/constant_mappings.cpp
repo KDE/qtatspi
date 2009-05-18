@@ -138,7 +138,7 @@ static void initialize_state_mapping ()
        qSpiStateMapping.insert (int(QAccessible::HasInvokeExtension), STATE_UNKNOWN);
 }
 
-void qspi_stateset_from_qstate (QAccessible::State state, QSpiStateSet &set)
+void qspi_stateset_from_qstate (QAccessible::State state, QSpiIntList &set)
 {
        int array[2] = {0, 0};
 

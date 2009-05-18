@@ -30,12 +30,12 @@
 
 #include "object.h"
 
-/* QSpiStateSet */
+/* QSpiIntList */
 /*---------------------------------------------------------------------------*/
 
-typedef QList <int> QSpiStateSet;
+typedef QList <int> QSpiIntList;
 
-Q_DECLARE_METATYPE (QSpiStateSet);
+Q_DECLARE_METATYPE (QSpiIntList);
 
 /* QSpiAccessibleCacheArray */
 /*---------------------------------------------------------------------------*/
@@ -49,7 +49,7 @@ struct QSpiAccessibleCacheItem
     QString                 name;
     int                     role;
     QString                 description;
-    QSpiStateSet            states;
+    QSpiIntList             states;
 };
 
 typedef QList <QSpiAccessibleCacheItem> QSpiAccessibleCacheArray;

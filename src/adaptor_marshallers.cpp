@@ -85,7 +85,7 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiRect &rect)
 
 void qspi_initialize_adaptor_types ()
 {
-        qDBusRegisterMetaType<QSpiStateSet>();
+        qDBusRegisterMetaType<QSpiIntList>();
         qDBusRegisterMetaType<QSpiAccessibleCacheItem>();
         qDBusRegisterMetaType<QSpiAccessibleCacheArray>();
         qDBusRegisterMetaType<QSpiRect>();

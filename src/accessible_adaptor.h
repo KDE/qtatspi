@@ -60,7 +60,7 @@ class QSpiAccessibleAdaptor: public QDBusAbstractAdaptor
 "    </method>\n"
 "    <method name=\"getState\" >\n"
 "      <arg direction=\"out\" type=\"au\" />\n"
-"      <annotation value=\"QSpiStateSet\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\" />\n"
+"      <annotation value=\"QSpiIntList\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\" />\n"
 "    </method>\n"
 "    <method name=\"getAttributes\" >\n"
 "      <arg direction=\"out\" type=\"as\" />\n"
@@ -97,7 +97,7 @@ public Q_SLOTS: // METHODS
     QSpiRelationArray getRelationSet();
     uint getRole();
     QString getRoleName();
-    QSpiStateSet getState();
+    QSpiIntList getState();
 Q_SIGNALS: // SIGNALS
 };
 

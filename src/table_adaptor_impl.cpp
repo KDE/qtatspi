@@ -8,7 +8,10 @@
  * Do not edit! All changes made to it will be lost.
  */
 
+
 #include "table_adaptor.h"
+#include "object.h"
+#include "cache.h"
 #include <QtCore/QMetaObject>
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
@@ -17,9 +20,18 @@
 #include <QtCore/QStringList>
 #include <QtCore/QVariant>
 
+#include <QAccessibleTableInterface>
+
 /*
  * Implementation of adaptor class QSpiTableAdaptor
  */
+
+#define TABLE_INTERFACE      static_cast <QSpiAccessibleObject *>(parent())->getInterface().tableInterface()
+#define ACCESSIBLE_INTERFACE static_cast <QSpiAccessibleObject *>(parent())->getInterface()
+#define ACCESSIBLE_CACHE     static_cast <QSpiAccessibleObject *>(parent())->cache
+
+#define MAX_SELECTED_COLUMNS 1000
+#define MAX_SELECTED_ROWS    1000
 
 QSpiTableAdaptor::QSpiTableAdaptor(QObject *parent)
     : QDBusAbstractAdaptor(parent)
@@ -35,195 +47,161 @@ QSpiTableAdaptor::~QSpiTableAdaptor()
 
 QDBusObjectPath QSpiTableAdaptor::caption() const
 {
-    // get the value of property caption
-    return qvariant_cast< QDBusObjectPath >(parent()->property("caption"));
+    return ACCESSIBLE_CACHE->lookupObject (TABLE_INTERFACE->caption()->object())->getPath();
 }
 
 int QSpiTableAdaptor::nColumns() const
 {
-    // get the value of property nColumns
-    return qvariant_cast< int >(parent()->property("nColumns"));
+    return TABLE_INTERFACE->columnCount ();
 }
 
 int QSpiTableAdaptor::nRows() const
 {
-    // get the value of property nRows
-    return qvariant_cast< int >(parent()->property("nRows"));
+    return TABLE_INTERFACE->rowCount ();
 }
 
 int QSpiTableAdaptor::nSelectedColumns() const
 {
-    // get the value of property nSelectedColumns
-    return qvariant_cast< int >(parent()->property("nSelectedColumns"));
+    return TABLE_INTERFACE->selectedColumnCount ();
 }
 
 int QSpiTableAdaptor::nSelectedRows() const
 {
-    // get the value of property nSelectedRows
-    return qvariant_cast< int >(parent()->property("nSelectedRows"));
+    return TABLE_INTERFACE->selectedRowCount ();
 }
 
 QDBusObjectPath QSpiTableAdaptor::summary() const
 {
-    // get the value of property summary
-    return qvariant_cast< QDBusObjectPath >(parent()->property("summary"));
+    return ACCESSIBLE_CACHE->lookupObject (TABLE_INTERFACE->summary()->object())->getPath();
 }
 
 bool QSpiTableAdaptor::addColumnSelection(int column)
 {
-    // handle method call org.freedesktop.atspi.Table.addColumnSelection
-    bool out0;
-    QMetaObject::invokeMethod(parent(), "addColumnSelection", Q_RETURN_ARG(bool, out0), Q_ARG(int, column));
-    return out0;
+    TABLE_INTERFACE->selectColumn (column);
+    return TRUE;
 }
 
 bool QSpiTableAdaptor::addRowSelection(int row)
 {
-    // handle method call org.freedesktop.atspi.Table.addRowSelection
-    bool out0;
-    QMetaObject::invokeMethod(parent(), "addRowSelection", Q_RETURN_ARG(bool, out0), Q_ARG(int, row));
-    return out0;
+    TABLE_INTERFACE->selectRow (row);
+    return TRUE;
 }
 
 QDBusObjectPath QSpiTableAdaptor::getAccessibleAt(int row, int column)
 {
-    // handle method call org.freedesktop.atspi.Table.getAccessibleAt
-    QDBusObjectPath out0;
-    QMetaObject::invokeMethod(parent(), "getAccessibleAt", Q_RETURN_ARG(QDBusObjectPath, out0), Q_ARG(int, row), Q_ARG(int, column));
-    return out0;
+    return ACCESSIBLE_CACHE->lookupObject (TABLE_INTERFACE->accessibleAt(row, column)->object())->getPath();
 }
 
 int QSpiTableAdaptor::getColumnAtIndex(int index)
 {
-    // handle method call org.freedesktop.atspi.Table.getColumnAtIndex
-    int out0;
-    QMetaObject::invokeMethod(parent(), "getColumnAtIndex", Q_RETURN_ARG(int, out0), Q_ARG(int, index));
-    return out0;
+    return TABLE_INTERFACE->columnIndex (index);
 }
 
 QString QSpiTableAdaptor::getColumnDescription(int column)
 {
-    // handle method call org.freedesktop.atspi.Table.getColumnDescription
-    QString out0;
-    QMetaObject::invokeMethod(parent(), "getColumnDescription", Q_RETURN_ARG(QString, out0), Q_ARG(int, column));
-    return out0;
+    return TABLE_INTERFACE->columnDescription (column);
 }
 
 int QSpiTableAdaptor::getColumnExtentAt(int row, int column)
 {
-    // handle method call org.freedesktop.atspi.Table.getColumnExtentAt
-    int out0;
-    QMetaObject::invokeMethod(parent(), "getColumnExtentAt", Q_RETURN_ARG(int, out0), Q_ARG(int, row), Q_ARG(int, column));
-    return out0;
+    return TABLE_INTERFACE->columnSpan (row, column);
 }
 
 QDBusObjectPath QSpiTableAdaptor::getColumnHeader(int column)
 {
-    // handle method call org.freedesktop.atspi.Table.getColumnHeader
-    QDBusObjectPath out0;
-    QMetaObject::invokeMethod(parent(), "getColumnHeader", Q_RETURN_ARG(QDBusObjectPath, out0), Q_ARG(int, column));
-    return out0;
+    // TODO There should be a column param in this function right?
+    return ACCESSIBLE_CACHE->lookupObject (TABLE_INTERFACE->columnHeader()->object())->getPath();
 }
 
 int QSpiTableAdaptor::getIndexAt(int row, int column)
 {
-    // handle method call org.freedesktop.atspi.Table.getIndexAt
-    int out0;
-    QMetaObject::invokeMethod(parent(), "getIndexAt", Q_RETURN_ARG(int, out0), Q_ARG(int, row), Q_ARG(int, column));
-    return out0;
+    return TABLE_INTERFACE->childIndex (row, column);
 }
 
 int QSpiTableAdaptor::getRowAtIndex(int index)
 {
-    // handle method call org.freedesktop.atspi.Table.getRowAtIndex
-    int out0;
-    QMetaObject::invokeMethod(parent(), "getRowAtIndex", Q_RETURN_ARG(int, out0), Q_ARG(int, index));
-    return out0;
+    int row, column, rowSpan, columnSpan;
+    bool isSelected;
+
+    TABLE_INTERFACE->cellAtIndex (index, &row, &column, &rowSpan, &columnSpan, &isSelected);
+    return row;
 }
 
-int QSpiTableAdaptor::getRowColumnExtentsAtIndex(int index, int &col, int &row_extents, int &col_extents, bool &is_selected, bool &out5)
+int QSpiTableAdaptor::getRowColumnExtentsAtIndex(int index,
+                                                 int &col,
+                                                 int &row_extents,
+                                                 int &col_extents,
+                                                 bool &is_selected,
+                                                 bool &out5)
 {
-    // handle method call org.freedesktop.atspi.Table.getRowColumnExtentsAtIndex
-    //return static_cast<YourObjectType *>(parent())->getRowColumnExtentsAtIndex(index, col, row_extents, col_extents, is_selected, out5);
+    int row, column, rowSpan, columnSpan;
+    bool isSelected;
+
+    TABLE_INTERFACE->cellAtIndex (index, &row, &column, &rowSpan, &columnSpan, &isSelected);
+    col = column;
+    row_extents = rowSpan;
+    col_extents = columnSpan;
+    is_selected = isSelected;
+    if (index < ACCESSIBLE_INTERFACE.childCount())
+        out5 = TRUE;
+    else
+        out5 = FALSE;
+    return row;
 }
 
 QString QSpiTableAdaptor::getRowDescription(int row)
 {
-    // handle method call org.freedesktop.atspi.Table.getRowDescription
-    QString out0;
-    QMetaObject::invokeMethod(parent(), "getRowDescription", Q_RETURN_ARG(QString, out0), Q_ARG(int, row));
-    return out0;
+    return TABLE_INTERFACE->rowDescription (row);
 }
 
 int QSpiTableAdaptor::getRowExtentAt(int row, int column)
 {
-    // handle method call org.freedesktop.atspi.Table.getRowExtentAt
-    int out0;
-    QMetaObject::invokeMethod(parent(), "getRowExtentAt", Q_RETURN_ARG(int, out0), Q_ARG(int, row), Q_ARG(int, column));
-    return out0;
+    return TABLE_INTERFACE->rowSpan (row, column);
 }
 
 QDBusObjectPath QSpiTableAdaptor::getRowHeader(int row)
 {
-    // handle method call org.freedesktop.atspi.Table.getRowHeader
-    QDBusObjectPath out0;
-    QMetaObject::invokeMethod(parent(), "getRowHeader", Q_RETURN_ARG(QDBusObjectPath, out0), Q_ARG(int, row));
-    return out0;
+    // TODO There should be a row param here right?
+    return ACCESSIBLE_CACHE->lookupObject (TABLE_INTERFACE->rowHeader()->object())->getPath();
 }
 
-QSpiSelectedColumnList QSpiTableAdaptor::getSelectedColumns()
+QSpiIntList QSpiTableAdaptor::getSelectedColumns()
 {
-    // handle method call org.freedesktop.atspi.Table.getSelectedColumns
-    QSpiSelectedColumnList out0;
-    QMetaObject::invokeMethod(parent(), "getSelectedColumns", Q_RETURN_ARG(QSpiSelectedColumnList, out0));
-    return out0;
+    QSpiIntList columns;
+    TABLE_INTERFACE->selectedColumns (MAX_SELECTED_COLUMNS, &columns);
+    return columns;
 }
 
-QSpiSelectedRowList QSpiTableAdaptor::getSelectedRows()
+QSpiIntList QSpiTableAdaptor::getSelectedRows()
 {
-    // handle method call org.freedesktop.atspi.Table.getSelectedRows
-    QSpiSelectedRowList out0;
-    QMetaObject::invokeMethod(parent(), "getSelectedRows", Q_RETURN_ARG(QSpiSelectedRowList, out0));
-    return out0;
+    QSpiIntList rows;
+    TABLE_INTERFACE->selectedRows (MAX_SELECTED_ROWS, &rows);
+    return rows;
 }
 
 bool QSpiTableAdaptor::isColumnSelected(int column)
 {
-    // handle method call org.freedesktop.atspi.Table.isColumnSelected
-    bool out0;
-    QMetaObject::invokeMethod(parent(), "isColumnSelected", Q_RETURN_ARG(bool, out0), Q_ARG(int, column));
-    return out0;
+    return TABLE_INTERFACE->isColumnSelected (column);
 }
 
 bool QSpiTableAdaptor::isRowSelected(int row)
 {
-    // handle method call org.freedesktop.atspi.Table.isRowSelected
-    bool out0;
-    QMetaObject::invokeMethod(parent(), "isRowSelected", Q_RETURN_ARG(bool, out0), Q_ARG(int, row));
-    return out0;
+    return TABLE_INTERFACE->isRowSelected (row);
 }
 
 bool QSpiTableAdaptor::isSelected(int row, int column)
 {
-    // handle method call org.freedesktop.atspi.Table.isSelected
-    bool out0;
-    QMetaObject::invokeMethod(parent(), "isSelected", Q_RETURN_ARG(bool, out0), Q_ARG(int, row), Q_ARG(int, column));
-    return out0;
+    return TABLE_INTERFACE->isSelected (row, column);
 }
 
 bool QSpiTableAdaptor::removeColumnSelection(int column)
 {
-    // handle method call org.freedesktop.atspi.Table.removeColumnSelection
-    bool out0;
-    QMetaObject::invokeMethod(parent(), "removeColumnSelection", Q_RETURN_ARG(bool, out0), Q_ARG(int, column));
-    return out0;
+    TABLE_INTERFACE->unselectColumn (column);
+    return TRUE;
 }
 
 bool QSpiTableAdaptor::removeRowSelection(int row)
 {
-    // handle method call org.freedesktop.atspi.Table.removeRowSelection
-    bool out0;
-    QMetaObject::invokeMethod(parent(), "removeRowSelection", Q_RETURN_ARG(bool, out0), Q_ARG(int, row));
-    return out0;
+    TABLE_INTERFACE->unselectRow (row);
+    return TRUE;
 }
-

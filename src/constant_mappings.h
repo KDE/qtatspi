@@ -180,7 +180,7 @@ enum QSpiState {
 
 extern QHash <int, QSpiState> qSpiStateMapping;
 
-void qspi_stateset_from_qstate (QAccessible::State state, QSpiStateSet &set);
+void qspi_stateset_from_qstate (QAccessible::State state, QSpiIntList &set);
 
 /*---------------------------------------------------------------------------*/
 

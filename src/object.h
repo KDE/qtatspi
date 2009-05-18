@@ -49,8 +49,9 @@ public:
     virtual QList <QSpiAccessibleObject *> getChildren () const;
     QSpiAccessibleObject *getApplication () const;
 
-protected:
     QSpiAccessibleCache   *cache;
+
+protected:
     QAccessibleInterface  *interface;
     QDBusObjectPath        path;
 

@@ -31,6 +31,7 @@
 #include "value_adaptor.h"
 #include "component_adaptor.h"
 #include "action_adaptor.h"
+#include "table_adaptor.h"
 
 #define QSPI_INTERFACE_ACCESSIBLE "org.freedesktop.atspi.Accessible"
 #define QSPI_INTERFACE_ACTION "org.freedesktop.atspi.Action"
@@ -85,7 +86,7 @@ QSpiAccessibleObject::QSpiAccessibleObject (QSpiAccessibleCache  *cache,
     }
     if (interface->editableTextInterface())
     {
-        new AccessibleEditableTextAdaptor(this);
+        new QSpiEditableTextAdaptor(this);
         supported << QSPI_INTERFACE_EDITABLE_TEXT;
     }
     if (interface->valueInterface())
@@ -95,8 +96,8 @@ QSpiAccessibleObject::QSpiAccessibleObject (QSpiAccessibleCache  *cache,
     }
     if (interface->tableInterface())
     {
-        //new AccessibleTableAdaptor(this);
-        //supported << QSPI_INTERFACE_TABLE;
+        new QSpiTableAdaptor(this);
+        supported << QSPI_INTERFACE_TABLE;
     }
 
     QDBusConnection::sessionBus().registerObject(this->path.path(), this, QDBusConnection::ExportAdaptors);

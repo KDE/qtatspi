@@ -249,10 +249,10 @@ QString QSpiAccessibleAdaptor::getRoleName()
     return roleName;
 }
 
-QSpiStateSet QSpiAccessibleAdaptor::getState()
+QSpiIntList QSpiAccessibleAdaptor::getState()
 {
     // handle method call org.freedesktop.atspi.Accessible.getState
-    QSpiStateSet set;
+    QSpiIntList set;
     qspi_stateset_from_qstate (static_cast <QSpiAccessibleObject *>(parent())->getInterface().state(0), set);
     return set;
 }

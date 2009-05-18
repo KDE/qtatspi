@@ -166,8 +166,8 @@ public Q_SLOTS: // METHODS
     QString getRowDescription(int row);
     int getRowExtentAt(int row, int column);
     QDBusObjectPath getRowHeader(int row);
-    QSpiSelectedColumnList getSelectedColumns();
-    QSpiSelectedRowList getSelectedRows();
+    QSpiIntList getSelectedColumns();
+    QSpiIntList getSelectedRows();
     bool isColumnSelected(int column);
     bool isRowSelected(int row);
     bool isSelected(int row, int column);

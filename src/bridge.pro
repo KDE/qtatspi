@@ -13,6 +13,7 @@ HEADERS += cache.h  \
            text_adaptor.h \
            editable_text_adaptor.h \
            accessible_adaptor.h \
+           table_adaptor.h \
            registry_proxy.h
 
 
@@ -30,12 +31,11 @@ SOURCES += bridge.cpp \
            text_adaptor_impl.cpp \
            editable_text_adaptor_impl.cpp \
            adaptor_marshallers.cpp \
+           table_adaptor_impl.cpp \
            accessible_adaptor_impl.cpp \
            registry_proxy.cpp
 
-CONFIG += qdbus plugin debug accessibility
-
-DEFINES += QT_ACCESSIBILITY
+CONFIG += qdbus plugin debug
 
 OBJECTS_DIR = tmp
 MOC_DIR = tmp
