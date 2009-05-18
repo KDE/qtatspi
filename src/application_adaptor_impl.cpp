@@ -35,39 +35,32 @@ QSpiApplicationAdaptor::~QSpiApplicationAdaptor()
 
 int QSpiApplicationAdaptor::id() const
 {
-    // get the value of property id
     return 0;
 }
 
 QString QSpiApplicationAdaptor::toolkitName() const
 {
-    // get the value of property toolkitName
     return QLatin1String("Qt");
 }
 
 QString QSpiApplicationAdaptor::version() const
 {
-    // get the value of property version
     return QLatin1String(QT_VERSION_STR);
 }
 
 QString QSpiApplicationAdaptor::getLocale(uint lctype)
 {
-    // handle method call org.freedesktop.atspi.Application.getLocale
-    QString out0;
-    QMetaObject::invokeMethod(parent(), "getLocale", Q_RETURN_ARG(QString, out0), Q_ARG(uint, lctype));
-    return out0;
+    QLocale currentLocale;
+    return currentLocale.languageToString (currentLocale.language());
 }
 
 bool QSpiApplicationAdaptor::pause()
 {
-    // handle method call org.freedesktop.atspi.Application.pause
     return false;
 }
 
 bool QSpiApplicationAdaptor::resume()
 {
-    // handle method call org.freedesktop.atspi.Application.resume
     return false;
 }
 

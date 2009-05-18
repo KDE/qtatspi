@@ -104,6 +104,13 @@ Q_DECLARE_METATYPE (QSpiRect);
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiRect &rect);
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiRect &rect);
 
+/* QSpiAttributeSet */
+/*---------------------------------------------------------------------------*/
+
+typedef QMap <QString, QString> QSpiAttributeSet;
+
+Q_DECLARE_METATYPE (QSpiAttributeSet);
+
 /*---------------------------------------------------------------------------*/
 
 void qspi_initialize_adaptor_types ();

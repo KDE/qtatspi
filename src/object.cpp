@@ -27,6 +27,7 @@
 #include "adaptor_marshallers.h"
 #include "accessible_adaptor.h"
 #include "text_adaptor.h"
+#include "editable_text_adaptor.h"
 #include "value_adaptor.h"
 #include "component_adaptor.h"
 #include "action_adaptor.h"
@@ -84,8 +85,8 @@ QSpiAccessibleObject::QSpiAccessibleObject (QSpiAccessibleCache  *cache,
     }
     if (interface->editableTextInterface())
     {
-        //new AccessibleEditableTextAdaptor(this);
-        //supported << QSPI_INTERFACE_EDITABLE_TEXT;
+        new AccessibleEditableTextAdaptor(this);
+        supported << QSPI_INTERFACE_EDITABLE_TEXT;
     }
     if (interface->valueInterface())
     {

@@ -11,6 +11,7 @@ HEADERS += cache.h  \
            constant_mappings.h \
            tree_adaptor.h \
            text_adaptor.h \
+           editable_text_adaptor.h \
            accessible_adaptor.h \
            registry_proxy.h
 
@@ -27,6 +28,7 @@ SOURCES += bridge.cpp \
            constant_mappings.cpp \
            tree_adaptor_impl.cpp \
            text_adaptor_impl.cpp \
+           editable_text_adaptor_impl.cpp \
            adaptor_marshallers.cpp \
            accessible_adaptor_impl.cpp \
            registry_proxy.cpp

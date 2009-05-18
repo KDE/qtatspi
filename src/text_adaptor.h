@@ -166,14 +166,14 @@ public: // PROPERTIES
 
 public Q_SLOTS: // METHODS
     bool addSelection(int startOffset, int endOffset);
-    int getAttributeRun(int offset, bool includeDefaults, int &endOffset, QStringList &out2);
+    int getAttributeRun(int offset, bool includeDefaults, int &endOffset, QSpiAttributeSet &out2);
     int getAttributeValue(int offset, const QString &attributeName, int &endOffset, bool &defined, QString &out3);
-    int getAttributes(int offset, int &endOffset, QString &out2);
+    int getAttributes(int offset, int &endOffset, QSpiAttributeSet &out2);
     QSpiRangeList getBoundedRanges(int x, int y, int width, int height, short coordType, uint xClipType, uint yClipType);
     int getCharacterExtents(int offset, short coordType, int &y, int &width, int &height);
     int getCharacterAtOffset(int offset);
-    QStringList getDefaultAttributeSet();
-    QString getDefaultAttributes();
+    QSpiAttributeSet getDefaultAttributeSet();
+    QSpiAttributeSet getDefaultAttributes();
     int getNSelections();
     int getOffsetAtPoint(int x, int y, short coordType);
     int getRangeExtents(int startOffset, int endOffset, short coordType, int &y, int &width, int &height);

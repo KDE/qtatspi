@@ -4,8 +4,6 @@
  *
  * dbusxml2cpp is Copyright (C) 2008 Nokia Corporation and/or its subsidiary(-ies).
  *
- * This is an auto-generated file.
- * Do not edit! All changes made to it will be lost.
  */
 
 #include "text_adaptor.h"
@@ -39,114 +37,146 @@ QSpiTextAdaptor::~QSpiTextAdaptor()
 
 int QSpiTextAdaptor::caretOffset() const
 {
-    // get the value of property caretOffset
     return TEXT_INTERFACE->cursorPosition();
 }
 
 int QSpiTextAdaptor::characterCount() const
 {
-    // get the value of property characterCount
     return TEXT_INTERFACE->cursorPosition();
 }
 
 bool QSpiTextAdaptor::addSelection(int startOffset, int endOffset)
 {
-    // handle method call org.freedesktop.atspi.Text.addSelectoion
     int lastSelection = TEXT_INTERFACE->selectionCount ();
     TEXT_INTERFACE->setSelection (lastSelection, startOffset, endOffset);
     return true;
 }
 
-int QSpiTextAdaptor::getAttributeRun(int offset, bool includeDefaults, int &endOffset, QStringList &out2)
+int QSpiTextAdaptor::getAttributeRun(int offset, bool includeDefaults, int &endOffset, QSpiAttributeSet &out2)
 {
-    // handle method call org.freedesktop.atspi.Text.getAttributeRun
-    //return static_cast<YourObjectType *>(parent())->getAttributeRun(offset, includeDefaults, endOffset, out2);
-    // TODO
-    return 0;
+    Q_UNUSED (includeDefaults);
+    return getAttributes (offset, endOffset, out2);
 }
 
-int QSpiTextAdaptor::getAttributeValue(int offset, const QString &attributeName, int &endOffset, bool &defined, QString &out3)
+int QSpiTextAdaptor::getAttributeValue(int offset,
+                                       const QString &attributeName,
+                                       int &endOffset,
+                                       bool &defined,
+                                       QString &out3)
 {
-    // handle method call org.freedesktop.atspi.Text.getAttributeValue
-    //return static_cast<YourObjectType *>(parent())->getAttributeValue(offset, attributeName, endOffset, defined, out3);
-    // TODO
-    return 0;
+    int         startOffset, endOffsetCopy;
+    QString     joined;
+    QStringList attributes;
+    QSpiAttributeSet map;
+
+    endOffsetCopy = endOffset;
+    joined = TEXT_INTERFACE->attributes(offset, &startOffset, &endOffsetCopy);
+    attributes = joined.split (';', QString::SkipEmptyParts, Qt::CaseSensitive);
+    foreach (QString attr, attributes)
+    {
+        QStringList items;
+        items = attr.split(':', QString::SkipEmptyParts, Qt::CaseSensitive);
+        map[items[0]] = items[1];
+    }
+    endOffset = endOffsetCopy;
+    out3 = map [attributeName];
+    if (out3 == "")
+       defined = TRUE;
+    else
+       defined = FALSE;
+    return startOffset;
 }
 
-int QSpiTextAdaptor::getAttributes(int offset, int &endOffset, QString &out2)
+int QSpiTextAdaptor::getAttributes(int offset, int &endOffset, QSpiAttributeSet &out2)
 {
-    // handle method call org.freedesktop.atspi.Text.getAttributes
-    //return static_cast<YourObjectType *>(parent())->getAttributes(offset, endOffset, out2);
-    //TODO
-    return 0;
+    int         startOffset, endOffsetCopy;
+    QString     joined;
+    QStringList attributes;
+
+    endOffsetCopy = endOffset;
+    joined = TEXT_INTERFACE->attributes(offset, &startOffset, &endOffsetCopy);
+    attributes = joined.split (';', QString::SkipEmptyParts, Qt::CaseSensitive);
+    foreach (QString attr, attributes)
+    {
+        QStringList items;
+        items = attr.split(':', QString::SkipEmptyParts, Qt::CaseSensitive);
+        out2[items[0]] = items[1];
+    }
+    endOffset = endOffsetCopy;
+    return startOffset;
 }
 
 QSpiRangeList QSpiTextAdaptor::getBoundedRanges(int x, int y, int width, int height, short coordType, uint xClipType, uint yClipType)
 {
-    // handle method call org.freedesktop.atspi.Text.getBoundedRanges
     // TODO
+    Q_UNUSED (x);
+    Q_UNUSED (y);
+    Q_UNUSED (width);
+    Q_UNUSED (height);
+    Q_UNUSED (coordType);
+    Q_UNUSED (xClipType);
+    Q_UNUSED (yClipType);
     QSpiRangeList out0;
     return out0;
 }
 
 int QSpiTextAdaptor::getCharacterExtents(int offset, short coordType, int &y, int &width, int &height)
 {
-    // handle method call org.freedesktop.atspi.Text.getCharacterExtents
-    //return static_cast<YourObjectType *>(parent())->getCharacterExtents(offset, coordType, y, width, height);
     // TODO use 'characterRect'
+    Q_UNUSED (y);
+    Q_UNUSED (width);
+    Q_UNUSED (height);
+    Q_UNUSED (offset);
+    Q_UNUSED (coordType);
     return 0;
 }
 
 int QSpiTextAdaptor::getCharacterAtOffset(int offset)
 {
-    // handle method call org.freedesktop.atspi.Text.getCharacterOffset
-    // TODO
     int start=offset, end=offset+1;
     QString result;
     result = TEXT_INTERFACE->textAtOffset(offset, QAccessible2::CharBoundary, &start, &end);
     return *(qPrintable (result));
 }
 
-QStringList QSpiTextAdaptor::getDefaultAttributeSet()
+QSpiAttributeSet QSpiTextAdaptor::getDefaultAttributeSet()
 {
-    // handle method call org.freedesktop.atspi.Text.getDefaultAttributeSet
-    // TODO
-    QStringList out0;
-    return out0;
+    // Empty set seems reasonable. There is no default attribute set.
+    QSpiAttributeSet attributes;
+    return attributes;
 }
 
-QString QSpiTextAdaptor::getDefaultAttributes()
+QSpiAttributeSet QSpiTextAdaptor::getDefaultAttributes()
 {
-    // handle method call org.freedesktop.atspi.Text.getDefaultAttributes
-    // TODO
-    QString out0;
-    return out0;
+    // TODO This function should be removed. It is deprecated in favour of default attribute set.
+    QSpiAttributeSet attributes;
+    return attributes;
 }
 
 int QSpiTextAdaptor::getNSelections()
 {
-    // handle method call org.freedesktop.atspi.Text.getNSelections
     return TEXT_INTERFACE->selectionCount();
 }
 
 int QSpiTextAdaptor::getOffsetAtPoint(int x, int y, short coordType)
 {
-    // handle method call org.freedesktop.atspi.Text.getOffsetAtPoint
     return TEXT_INTERFACE->offsetAtPoint (QPoint (x, y), static_cast <QAccessible2::CoordinateType> (coordType));
 }
 
 int QSpiTextAdaptor::getRangeExtents(int startOffset, int endOffset, short coordType, int &y, int &width, int &height)
 {
-    // handle method call org.freedesktop.atspi.Text.getRangeExtents
-    //return static_cast<YourObjectType *>(parent())->getRangeExtents(startOffset, endOffset, coordType, y, width, height);
     // TODO
+    Q_UNUSED (y);
+    Q_UNUSED (width);
+    Q_UNUSED (height);
+    Q_UNUSED (coordType);
+    Q_UNUSED (startOffset);
+    Q_UNUSED (endOffset);
     return 0;
 }
 
 int QSpiTextAdaptor::getSelection(int selectionNum, int &endOffset)
 {
-    // handle method call org.freedesktop.atspi.Text.getSelection
-    //return static_cast<YourObjectType *>(parent())->getSelection(selectionNum, endOffset);
     int start, end;
     TEXT_INTERFACE->selection (selectionNum, &start, &end);
     endOffset = end;
@@ -155,31 +185,41 @@ int QSpiTextAdaptor::getSelection(int selectionNum, int &endOffset)
 
 QString QSpiTextAdaptor::getText(int startOffset, int endOffset)
 {
-    // handle method call org.freedesktop.atspi.Text.getText
     return TEXT_INTERFACE->text (startOffset, endOffset);
 }
 
 int QSpiTextAdaptor::getTextAfterOffset(int offset, uint type, int &endOffset, QString &out2)
 {
-    // handle method call org.freedesktop.atspi.Text.getTextAfterOffset
-    //return static_cast<YourObjectType *>(parent())->getTextAfterOffset(offset, type, endOffset, out2);
+    // TODO
+    Q_UNUSED (type);
+    Q_UNUSED (out2);
+    Q_UNUSED (offset)
+    Q_UNUSED (endOffset);
+    return 0;
 }
 
 int QSpiTextAdaptor::getTextAtOffset(int offset, uint type, int &endOffset, QString &out2)
 {
-    // handle method call org.freedesktop.atspi.Text.getTextAtOffset
-    //return static_cast<YourObjectType *>(parent())->getTextAtOffset(offset, type, endOffset, out2);
+    // TODO
+    Q_UNUSED (type);
+    Q_UNUSED (out2);
+    Q_UNUSED (offset)
+    Q_UNUSED (endOffset);
+    return 0;
 }
 
 int QSpiTextAdaptor::getTextBeforeOffset(int offset, uint type, int &endOffset, QString &out2)
 {
-    // handle method call org.freedesktop.atspi.Text.getTextBeforeOffset
-    //return static_cast<YourObjectType *>(parent())->getTextBeforeOffset(offset, type, endOffset, out2);
+    // TODO
+    Q_UNUSED (type);
+    Q_UNUSED (out2);
+    Q_UNUSED (offset)
+    Q_UNUSED (endOffset);
+    return 0;
 }
 
 bool QSpiTextAdaptor::removeSelection(int selectionNum)
 {
-    // handle method call org.freedesktop.atspi.Text.removeSelection
     bool out0;
     QMetaObject::invokeMethod(parent(), "removeSelection", Q_RETURN_ARG(bool, out0), Q_ARG(int, selectionNum));
     return out0;
@@ -187,7 +227,6 @@ bool QSpiTextAdaptor::removeSelection(int selectionNum)
 
 bool QSpiTextAdaptor::setCaretOffset(int offset)
 {
-    // handle method call org.freedesktop.atspi.Text.setCaretOffset
     bool out0;
     QMetaObject::invokeMethod(parent(), "setCaretOffset", Q_RETURN_ARG(bool, out0), Q_ARG(int, offset));
     return out0;
@@ -195,7 +234,6 @@ bool QSpiTextAdaptor::setCaretOffset(int offset)
 
 bool QSpiTextAdaptor::setSelection(int selectionNum, int startOffset, int endOffset)
 {
-    // handle method call org.freedesktop.atspi.Text.setSelection
     bool out0;
     QMetaObject::invokeMethod(parent(), "setSelection", Q_RETURN_ARG(bool, out0), Q_ARG(int, selectionNum), Q_ARG(int, startOffset), Q_ARG(int, endOffset));
     return out0;
