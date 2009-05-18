@@ -33,7 +33,9 @@ SOURCES += bridge.cpp \
            accessible_adaptor_impl.cpp \
            registry_proxy.cpp
 
-CONFIG += qdbus plugin debug
+CONFIG += qdbus plugin debug accessibility
+
+DEFINES += QT_ACCESSIBILITY
 
 OBJECTS_DIR = tmp
 MOC_DIR = tmp
