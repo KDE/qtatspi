@@ -53,7 +53,7 @@ static void initialize_role_mapping ()
        qSpiRoleMapping.insert (QAccessible::Pane, ROLE_PANEL);
        qSpiRoleMapping.insert (QAccessible::Chart, ROLE_CHART);
        qSpiRoleMapping.insert (QAccessible::Dialog, ROLE_DIALOG);
-       qSpiRoleMapping.insert (QAccessible::Border, ROLE_UNKNOWN);
+       qSpiRoleMapping.insert (QAccessible::Border, ROLE_FRAME);
        qSpiRoleMapping.insert (QAccessible::Grouping, ROLE_PANEL);
        qSpiRoleMapping.insert (QAccessible::Separator, ROLE_SEPARATOR);
        qSpiRoleMapping.insert (QAccessible::ToolBar, ROLE_TOOL_BAR);
@@ -96,7 +96,7 @@ static void initialize_role_mapping ()
        qSpiRoleMapping.insert (QAccessible::PageTabList, ROLE_UNKNOWN);
        qSpiRoleMapping.insert (QAccessible::Clock, ROLE_UNKNOWN);
        qSpiRoleMapping.insert (QAccessible::Splitter, ROLE_UNKNOWN);
-       qSpiRoleMapping.insert (QAccessible::LayeredPane, ROLE_UNKNOWN);
+       qSpiRoleMapping.insert (QAccessible::LayeredPane, ROLE_FRAME);
        qSpiRoleMapping.insert (QAccessible::UserRole, ROLE_UNKNOWN);
 }
 

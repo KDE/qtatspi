@@ -15,6 +15,7 @@
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
 #include "adaptor_marshallers.h"
+#include "object.h"
 class QByteArray;
 template<class T> class QList;
 template<class Key, class Value> class QMap;
@@ -55,9 +56,12 @@ public: // PROPERTIES
 public Q_SLOTS: // METHODS
     QDBusObjectPath getRoot();
     QSpiAccessibleCacheArray getTree();
+private Q_SLOTS:
+    void accessibleUpdated   (QSpiAccessibleObject *accessible);
+    void accessibleDestroyed (QSpiAccessibleObject *accessible);
 Q_SIGNALS: // SIGNALS
     void removeAccessible(const QDBusObjectPath &nodeRemoved);
-    void updateAccessible(const QSpiAccessibleCacheArray &nodesAdded);
+    void updateAccessible(const QSpiAccessibleCacheItem &nodeAdded);
 };
 
 #endif

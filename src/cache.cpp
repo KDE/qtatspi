@@ -50,6 +50,21 @@ QSpiAccessibleCache::QSpiAccessibleCache (QObject *root)
 
 /*---------------------------------------------------------------------------*/
 
+void QSpiAccessibleCache::updateAccessible (QSpiAccessibleObject *accessible, QAccessible::Event event)
+{
+    switch (event)
+    {
+    case QAccessible::DescriptionChanged:
+    case QAccessible::NameChanged:
+    case QAccessible::ParentChanged:
+    case QAccessible::StateChanged:
+            emit accessibleUpdated (accessible);
+    default:;
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+
 bool QSpiAccessibleCache::eventFilter(QObject *obj, QEvent *event)
 {
     /* Check whether this event is for a registered object or not */
@@ -93,7 +108,7 @@ void QSpiAccessibleCache::registerConnected (QObject *object)
     {
         QAccessibleInterface *temp;
         parents.insert(0, current->object ());
-        current->navigate(QAccessible::Ancestor, 0, &temp);
+        current->navigate(QAccessible::Ancestor, 1, &temp);
         delete current;
         current = temp;
     }
@@ -143,7 +158,7 @@ void QSpiAccessibleCache::registerChildren (QObject *object)
         accessible = new QSpiAccessibleObject (this, interface);
         connect(current, SIGNAL(destroyed(QObject *)), this, SLOT(objectDestroyed(QObject *)));
         cache.insert (current, accessible);
-        emit accessibleAdded (accessible);
+        emit accessibleUpdated (accessible);
 
         for (int i = 1; i <= interface->childCount (); i++)
         {

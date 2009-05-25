@@ -131,7 +131,7 @@ QDBusObjectPath QSpiAccessibleObject::getParentPath () const
     QAccessibleInterface *parentInterface = NULL;
     QSpiAccessibleObject *parent;
 
-    interface->navigate (QAccessible::Ancestor, 0, &parentInterface);
+    interface->navigate (QAccessible::Ancestor, 1, &parentInterface);
     if (parentInterface)
     {
         parent = cache->lookupObject (parentInterface->object());

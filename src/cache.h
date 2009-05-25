@@ -50,11 +50,14 @@ public slots:
 
     QSpiAccessibleObject *lookupObject (QObject *);
 
+    void updateAccessible (QSpiAccessibleObject *accessible, QAccessible::Event event);
+
 signals:
-    void accessibleAdded     (QSpiAccessibleObject *accessible);
+    void accessibleUpdated   (QSpiAccessibleObject *accessible);
     void accessibleDestroyed (QSpiAccessibleObject *accessible);
 
 private:
+
     void registerConnected (QObject *object);
     void registerChildren (QObject *object);
 

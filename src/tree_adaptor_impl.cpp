@@ -63,6 +63,19 @@ static QSpiAccessibleCacheItem getCacheItem (const QSpiAccessibleObject &obj) {
         return item;
 }
 
+/*---------------------------------------------------------------------------*/
+
+void QSpiTreeAdaptor::accessibleUpdated (QSpiAccessibleObject *accessible)
+{
+        emit updateAccessible (getCacheItem (*accessible));
+}
+
+void QSpiTreeAdaptor::accessibleDestroyed (QSpiAccessibleObject *accessible)
+{
+        emit removeAccessible (accessible->getPath());
+}
+
+/*---------------------------------------------------------------------------*/
 
 /*
  * Implementation of adaptor class QSpiTreeAdaptor
@@ -71,8 +84,12 @@ static QSpiAccessibleCacheItem getCacheItem (const QSpiAccessibleObject &obj) {
 QSpiTreeAdaptor::QSpiTreeAdaptor(QObject *parent)
     : QDBusAbstractAdaptor(parent)
 {
-    // constructor
-    setAutoRelaySignals(true);
+    // Signals need some adapting from the cache update signals.
+    // setAutoRelaySignals(true);
+    connect (parent, SIGNAL(accessibleUpdated (QSpiAccessibleObject *)),
+             this, SLOT(accessibleUpdated (QSpiAccessibleObject *)));
+    connect (parent, SIGNAL(accessibleDestroyed (QSpiAccessibleObject *)),
+             this, SLOT(accessibleDestroyed (QSpiAccessibleObject *)));
 }
 
 QSpiTreeAdaptor::~QSpiTreeAdaptor()

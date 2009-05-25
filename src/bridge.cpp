@@ -148,9 +148,29 @@ void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *rootInterface)
         qspi_initialize_constant_mappings ();
 }
 
-void QSpiAccessibleBridge::notifyAccessibilityUpdate (int event, QAccessibleInterface *obj, int child)
+void QSpiAccessibleBridge::notifyAccessibilityUpdate (int reason, QAccessibleInterface *interface, int index)
 {
-        /* Needs to emit AT-SPI events based on the updates */
+        QSpiAccessibleObject *accessible = NULL;
+
+        if (!cache)
+                return;
+
+        if (index >= 0)
+        {
+                QAccessibleInterface *child = NULL;
+
+                interface->navigate(QAccessible::Child, index, &child);
+                accessible = cache->lookupObject (child->object());
+        }
+        else
+        {
+                accessible = cache->lookupObject (interface->object());
+        }
+    
+        if (accessible)
+        {
+                cache->updateAccessible (accessible, (QAccessible::Event) reason);
+        }
 }
 
 QSpiAccessibleBridge::~QSpiAccessibleBridge ()
