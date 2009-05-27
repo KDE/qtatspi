@@ -26,7 +26,8 @@
 
 #define BITARRAY_SEQ_TERM 0xffffffff
 
-#define BITARRAY_SET(p, n) ((p)[n>>5] |= (1<<(n&31)))
+#define BITARRAY_SET(p, n)   ( (p)[n>>5] |=  (1<<(n&31)) )
+#define BITARRAY_UNSET(p, n) ( (p)[n>>5] &= ~(1<<(n&31)) )
 
 /*---------------------------------------------------------------------------*/
 
@@ -102,52 +103,158 @@ static void initialize_role_mapping ()
 
 /*---------------------------------------------------------------------------*/
 
-QHash <int, QSpiState> qSpiStateMapping;
-
-static void initialize_state_mapping ()
-{
-       qSpiStateMapping.insert (int(QAccessible::Normal), STATE_ENABLED); /*STATE_ENABLED/SHOWING/VISIBLE*/
-       qSpiStateMapping.insert (int(QAccessible::Unavailable), STATE_UNKNOWN); /*STATE_INVALID?*/
-       qSpiStateMapping.insert (int(QAccessible::Selected), STATE_SELECTED);
-       qSpiStateMapping.insert (int(QAccessible::Focused), STATE_FOCUSED);
-       qSpiStateMapping.insert (int(QAccessible::Pressed), STATE_PRESSED);
-       qSpiStateMapping.insert (int(QAccessible::Checked), STATE_CHECKED);
-       qSpiStateMapping.insert (int(QAccessible::Mixed), STATE_UNKNOWN);
-       qSpiStateMapping.insert (int(QAccessible::ReadOnly), STATE_UNKNOWN); /*STATE_EDITABLE if not present?*/
-       qSpiStateMapping.insert (int(QAccessible::HotTracked), STATE_UNKNOWN);
-       qSpiStateMapping.insert (int(QAccessible::DefaultButton), STATE_UNKNOWN);
-       qSpiStateMapping.insert (int(QAccessible::Expanded), STATE_EXPANDED);
-       qSpiStateMapping.insert (int(QAccessible::Collapsed), STATE_COLLAPSED);
-       qSpiStateMapping.insert (int(QAccessible::Busy), STATE_BUSY);
-       qSpiStateMapping.insert (int(QAccessible::Marqueed), STATE_UNKNOWN);
-       qSpiStateMapping.insert (int(QAccessible::Animated), STATE_ANIMATED);
-       qSpiStateMapping.insert (int(QAccessible::Invisible), STATE_UNKNOWN); /*!STATE_VISIBLE if present?*/
-       qSpiStateMapping.insert (int(QAccessible::Offscreen), STATE_UNKNOWN); /*!STATE_VISIBLE if present?*/
-       qSpiStateMapping.insert (int(QAccessible::Sizeable), STATE_UNKNOWN);
-       qSpiStateMapping.insert (int(QAccessible::Movable), STATE_UNKNOWN);
-       qSpiStateMapping.insert (int(QAccessible::SelfVoicing), STATE_UNKNOWN);
-       qSpiStateMapping.insert (int(QAccessible::Focusable), STATE_FOCUSABLE);
-       qSpiStateMapping.insert (int(QAccessible::Selectable), STATE_SELECTABLE);
-       qSpiStateMapping.insert (int(QAccessible::Linked), STATE_UNKNOWN);
-       qSpiStateMapping.insert (int(QAccessible::Traversed), STATE_VISITED);
-       qSpiStateMapping.insert (int(QAccessible::MultiSelectable), STATE_MULTISELECTABLE);
-       qSpiStateMapping.insert (int(QAccessible::ExtSelectable), STATE_UNKNOWN);
-       qSpiStateMapping.insert (int(QAccessible::Protected), STATE_UNKNOWN);
-       qSpiStateMapping.insert (int(QAccessible::HasPopup), STATE_UNKNOWN);
-       qSpiStateMapping.insert (int(QAccessible::Modal), STATE_MODAL);
-       qSpiStateMapping.insert (int(QAccessible::HasInvokeExtension), STATE_UNKNOWN);
-}
-
 void qspi_stateset_from_qstate (QAccessible::State state, QSpiIntList &set)
 {
        int array[2] = {0, 0};
 
-       for (int mask = 1; mask <= QAccessible::HasInvokeExtension; mask <<= 1)
+       for (int mask = 1; mask <= int(QAccessible::HasInvokeExtension); mask <<= 1)
        {
-           if (state & mask)
+           /* We may need to take the role of the object into account when
+            * mapping between the state sets
+            */
+           BITARRAY_SET (array, STATE_EDITABLE);
+
+           switch (state & mask)
            {
-               int a = qSpiStateMapping.value(state & mask);
-               BITARRAY_SET (array, a);
+                 case QAccessible::Normal:
+                 {
+                         BITARRAY_SET (array, STATE_ENABLED);
+                         BITARRAY_SET (array, STATE_SHOWING);
+                         BITARRAY_SET (array, STATE_VISIBLE);
+                         BITARRAY_SET (array, STATE_SENSITIVE);
+                         break;
+                 }
+                 case QAccessible::Unavailable:
+                 {
+                         BITARRAY_UNSET (array, STATE_ENABLED);
+                         BITARRAY_UNSET (array, STATE_SHOWING);
+                         BITARRAY_UNSET (array, STATE_VISIBLE);
+                         BITARRAY_UNSET (array, STATE_SENSITIVE);
+                         break;
+                 }
+                 case QAccessible::Selected:
+                 {
+                         BITARRAY_SET (array, STATE_SELECTED);
+                         break;
+                 }
+                 case QAccessible::Focused:
+                 {
+                         BITARRAY_SET (array, STATE_FOCUSED);
+                         break;
+                 }
+                 case QAccessible::Pressed:
+                 {
+                         BITARRAY_SET (array, STATE_PRESSED);
+                         break;
+                 }
+                 case QAccessible::Checked:
+                 {
+                         BITARRAY_SET (array, STATE_CHECKED);
+                         break;
+                 }
+                 case QAccessible::Mixed:
+                 {
+                         BITARRAY_SET (array, STATE_INDETERMINATE);
+                         break;
+                 }
+                 case QAccessible::ReadOnly:
+                 {
+                         BITARRAY_UNSET (array, STATE_EDITABLE);
+                         break;
+                 }
+                 case QAccessible::HotTracked:
+                 {
+                         break;
+                 }
+                 case QAccessible::DefaultButton:
+                 {
+                         BITARRAY_SET (array, STATE_IS_DEFAULT);
+                         break;
+                 }
+                 case QAccessible::Expanded:
+                 {
+                         BITARRAY_SET (array, STATE_EXPANDED);
+                         break;
+                 }
+                 case QAccessible::Collapsed:
+                 {
+                         BITARRAY_SET (array, STATE_COLLAPSED);
+                         break;
+                 }
+                 case QAccessible::Busy:
+                 {
+                         BITARRAY_SET (array, STATE_BUSY);
+                         break;
+                 }
+                 case QAccessible::Marqueed:
+                 case QAccessible::Animated:
+                 {
+                         BITARRAY_SET (array, STATE_ANIMATED);
+                         break;
+                 }
+                 case QAccessible::Invisible:
+                 case QAccessible::Offscreen:
+                 {
+                         BITARRAY_UNSET (array, STATE_VISIBLE);
+                         break;
+                 }
+                 case QAccessible::Sizeable:
+                 {
+                         BITARRAY_SET (array, STATE_RESIZABLE);
+                         break;
+                 }
+                 case QAccessible::Movable:
+                 case QAccessible::SelfVoicing:
+                 {
+                         break;
+                 }
+                 case QAccessible::Focusable:
+                 {
+                         BITARRAY_SET (array, STATE_FOCUSABLE);
+                         break;
+                 }
+                 case QAccessible::Selectable:
+                 {
+                         BITARRAY_SET (array, STATE_SELECTABLE);
+                         break;
+                 }
+                 case QAccessible::Linked:
+                 {
+                         break;
+                 }
+                 case QAccessible::Traversed:
+                 {
+                         BITARRAY_SET (array, STATE_VISITED);
+                         break;
+                 }
+                 case QAccessible::MultiSelectable:
+                 {
+                         BITARRAY_SET (array, STATE_MULTISELECTABLE);
+                         break;
+                 }
+                 case QAccessible::ExtSelectable:
+                 {
+                         BITARRAY_SET (array, STATE_SELECTABLE);
+                         break;
+                 }
+                 case QAccessible::Protected:
+                 case QAccessible::HasPopup:
+                 {
+                         break;
+                 }
+                 case QAccessible::Modal:
+                 {
+                         BITARRAY_SET (array, STATE_MODAL);
+                         break;
+                 }
+                 case QAccessible::HasInvokeExtension:
+                 {
+                         break;
+                 }
+                 default:
+                 {
+                         break;
+                 }
            }
        }
        set << array[0];
@@ -159,7 +266,6 @@ void qspi_stateset_from_qstate (QAccessible::State state, QSpiIntList &set)
 void qspi_initialize_constant_mappings ()
 {
        initialize_role_mapping ();
-       initialize_state_mapping ();
 }
 
 /*END------------------------------------------------------------------------*/
