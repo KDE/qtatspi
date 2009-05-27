@@ -155,7 +155,7 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate (int reason, QAccessibleInt
         if (!cache)
                 return;
 
-        if (index >= 0)
+        if (index > 0)
         {
                 QAccessibleInterface *child = NULL;
 
@@ -165,11 +165,6 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate (int reason, QAccessibleInt
         else
         {
                 accessible = cache->lookupObject (interface->object());
-        }
-    
-        if (accessible)
-        {
-                cache->updateAccessible (accessible, (QAccessible::Event) reason);
         }
 }
 

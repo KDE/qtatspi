@@ -28,7 +28,7 @@
 #include "cache.h"
 
 #define QSPI_INTERFACE_APPLICATION "org.freedesktop.atspi.Application"
-#define QSPI_OBJECT_PATH_DESKTOP "/root"
+#define QSPI_OBJECT_PATH_DESKTOP "/org/freedesktop/atspi/accessible/desktop"
 
 /*---------------------------------------------------------------------------*/
 

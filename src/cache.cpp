@@ -42,7 +42,7 @@ QSpiAccessibleCache::QSpiAccessibleCache (QObject *root)
     this->root = root;
 
     /* Add all the top-level windows */
-    registerConnected (this->root);
+    registerChildren (this->root);
 
     new QSpiTreeAdaptor (this);
     QDBusConnection::sessionBus().registerObject(QSPI_TREE_OBJECT_PATH, this, QDBusConnection::ExportAdaptors);
@@ -59,7 +59,8 @@ void QSpiAccessibleCache::updateAccessible (QSpiAccessibleObject *accessible, QA
     case QAccessible::ParentChanged:
     case QAccessible::StateChanged:
             emit accessibleUpdated (accessible);
-    default:;
+    default:
+            break;
     }
 }
 
@@ -67,30 +68,57 @@ void QSpiAccessibleCache::updateAccessible (QSpiAccessibleObject *accessible, QA
 
 bool QSpiAccessibleCache::eventFilter(QObject *obj, QEvent *event)
 {
-    /* Check whether this event is for a registered object or not */
-#if 0
-    if (cache.contains (obj))
+
+    switch (event->type ())
     {
-#endif
-        switch (event->type ())
+        case QEvent::Show:
         {
-            case QEvent::ChildAdded:
-            {
-                QObject *child = static_cast<QChildEvent *>(event)->child();
-                registerConnected (child);
-            }
-            case QEvent::Create:
-                /* Not sure whether the create event should do anything. Just children added right? */
-            case QEvent::ChildRemoved:
-                /* Child removed shouldn't do anything. Objects are deleted by their destroy */
-            case QEvent::Show:
-                /* Perhaps there is a show event to emit here. Is it missing from the accessibility updates */
-            default:
-                break;
+            registerConnected (obj);
+            break;
         }
 #if 0
-    }
+        case QEvent::ChildAdded:
+        {
+            QList <QSpiAccessibleObject *> children;
+            QObject *child = static_cast<QChildEvent *>(event)->child();
+
+            qDebug ("QSpiAccessibleBridge : childAdded.\n\t%s\n\t%s\n\t%s\n",
+                    qPrintable(accessible->getPath().path()),
+                    qPrintable(accessible->getParentPath().path()),
+                    qPrintable (accessible->getInterface().text(QAccessible::Name, 0))
+                   );
+
+            children = accessible->getChildren();
+            foreach (QSpiAccessibleObject *chld, children)
+            {
+                qDebug ("\t\t%s", qPrintable(chld->getPath().path()));
+            }
+                
+            registerChildren (child);
+            emit accessibleUpdated (accessible);
+            break;
+        }
 #endif
+        case QEvent::ChildRemoved:
+        {
+            QSpiAccessibleObject *accessible = NULL;
+
+            accessible = lookupObject (obj);
+            if (accessible)
+            {
+#if 0
+                qDebug ("QSpiAccessibleBridge : childRemoved.\n\t%s\n",
+                        qPrintable(accessible->getPath().path())
+                       );
+#endif
+
+                emit accessibleUpdated (accessible);
+            }
+            break;
+        }
+        default:
+            break;
+    }
     /* Think false is the right thing to do, no need to block these events here. */
     return false;
 }
@@ -115,7 +143,22 @@ void QSpiAccessibleCache::registerConnected (QObject *object)
 
     foreach (QObject *parent, parents)
     {
+        QSpiAccessibleObject *accessible;
+
         registerChildren (parent);
+
+        accessible = lookupObject (parent);
+        if (accessible)
+        {
+#if 0
+            qDebug ("QSpiAccessibleBridge : parentUpdated .\n\t%s\n\t%s\n\t%s\n",
+                    qPrintable(accessible->getPath().path()),
+                    qPrintable(accessible->getParentPath().path()),
+                    qPrintable (accessible->getInterface().text(QAccessible::Name, 0))
+                   );
+#endif
+            emit accessibleUpdated (accessible);
+        }
     }
 }
 
@@ -155,9 +198,23 @@ void QSpiAccessibleCache::registerChildren (QObject *object)
         if (!interface)
             continue;
 
-        accessible = new QSpiAccessibleObject (this, interface);
+        /* Replace with factory method based on role? */
+        if (current == this->root)
+            accessible = new QSpiAccessibleApplication (this, interface);
+        else
+            accessible = new QSpiAccessibleObject (this, interface);
+        
         connect(current, SIGNAL(destroyed(QObject *)), this, SLOT(objectDestroyed(QObject *)));
         cache.insert (current, accessible);
+
+#if 0
+        qDebug ("QSpiAccessibleBridge : accessibleRegistered.\n\t%s\n\t%s\n\t%s\n",
+                 qPrintable(accessible->getPath().path()),
+                 qPrintable(accessible->getParentPath().path()),
+                 qPrintable (accessible->getInterface().text(QAccessible::Name, 0))
+               );
+#endif
+
         emit accessibleUpdated (accessible);
 
         for (int i = 1; i <= interface->childCount (); i++)
