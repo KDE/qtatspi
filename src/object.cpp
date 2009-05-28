@@ -74,11 +74,14 @@ QSpiAccessibleObject::QSpiAccessibleObject (QSpiAccessibleCache  *cache,
 
     new QSpiAccessibleAdaptor(this);
     supported << QSPI_INTERFACE_ACCESSIBLE;
-    new QSpiActionAdaptor(this);
-    supported << QSPI_INTERFACE_ACTION;
     new QSpiComponentAdaptor(this);
     supported << QSPI_INTERFACE_COMPONENT;
 
+    if (interface->actionInterface())
+    {
+        new QSpiActionAdaptor(this);
+        supported << QSPI_INTERFACE_ACTION;
+    }
     if (interface->textInterface())
     {
         new QSpiTextAdaptor(this);

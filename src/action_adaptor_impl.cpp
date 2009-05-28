@@ -17,7 +17,9 @@
 #include <QtCore/QStringList>
 #include <QtCore/QVariant>
 
-#define ACCESSIBLE_INTERFACE static_cast <QSpiAccessibleObject *>(parent())->getInterface()
+#include <QAccessibleTextInterface>
+
+#define ACTION_INTERFACE static_cast <QSpiAccessibleObject *>(parent())->getInterface().actionInterface()
 
 /*
  * Implementation of adaptor class QSpiActionAdaptor
@@ -37,26 +39,33 @@ QSpiActionAdaptor::~QSpiActionAdaptor()
 
 int QSpiActionAdaptor::nActions() const
 {
-    // get the value of property nActions
-    return ACCESSIBLE_INTERFACE.userActionCount (0);
+    return ACTION_INTERFACE->actionCount ();
 }
 
 bool QSpiActionAdaptor::doAction(int index)
 {
-    // handle method call org.freedesktop.atspi.Action.doAction
-    return ACCESSIBLE_INTERFACE.doAction (index, 0, QVariantList ());
+    ACTION_INTERFACE->doAction (index);
+    return TRUE;
 }
 
 QSpiActionArray QSpiActionAdaptor::getActions()
 {
-    // handle method call org.freedesktop.atspi.Action.getActions
     QSpiActionArray index;
-    for (int i = 0; i < ACCESSIBLE_INTERFACE.userActionCount(0); i++)
+    for (int i = 0; i < ACTION_INTERFACE->actionCount(); i++)
     {
         QSpiAction action;
-        action.name = ACCESSIBLE_INTERFACE.actionText (i, QAccessible::Name, 0);
-        action.description = ACCESSIBLE_INTERFACE.actionText (i, QAccessible::Description, 0);
-        action.keyBinding = ACCESSIBLE_INTERFACE.actionText (i, QAccessible::Accelerator, 0);
+        QStringList keyBindings;
+
+        action.name = ACTION_INTERFACE->name (i);
+        action.description = ACTION_INTERFACE->description (i);
+
+        keyBindings = ACTION_INTERFACE->keyBindings (i);
+
+        if (keyBindings.length() > 0)
+                action.keyBinding = keyBindings[0];
+        else
+                action.keyBinding = "";
+
         index << action;
     }
     return index;
@@ -64,19 +73,22 @@ QSpiActionArray QSpiActionAdaptor::getActions()
 
 QString QSpiActionAdaptor::getDescription(int index)
 {
-    // handle method call org.freedesktop.atspi.Action.getDescription
-    return ACCESSIBLE_INTERFACE.actionText (index, QAccessible::Description, 0);
+    return ACTION_INTERFACE->description (index);
 }
 
 QString QSpiActionAdaptor::getKeyBinding(int index)
 {
-    // handle method call org.freedesktop.atspi.Action.getKeyBinding
-    return ACCESSIBLE_INTERFACE.actionText (index, QAccessible::Accelerator, 0);
+    QStringList keyBindings;
+
+    keyBindings = ACTION_INTERFACE->keyBindings (index);
+    /* Might as well return the first key binding, what are the other options? */
+    if (keyBindings.length() > 0)
+        return keyBindings[0];
+    else
+        return "";
 }
 
 QString QSpiActionAdaptor::getName(int index)
 {
-    // handle method call org.freedesktop.atspi.Action.getName
-    return ACCESSIBLE_INTERFACE.actionText (index, QAccessible::Name, 0);
+    return ACTION_INTERFACE->name (index);
 }
-

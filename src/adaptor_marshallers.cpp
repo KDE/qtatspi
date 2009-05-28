@@ -90,6 +90,8 @@ void qspi_initialize_adaptor_types ()
         qDBusRegisterMetaType<QSpiAccessibleCacheArray>();
         qDBusRegisterMetaType<QSpiRect>();
         qDBusRegisterMetaType<QSpiAttributeSet>();
+        qDBusRegisterMetaType<QSpiAction>();
+        qDBusRegisterMetaType<QSpiActionArray>();
 }
 
 /*END------------------------------------------------------------------------*/
