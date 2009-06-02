@@ -19,6 +19,52 @@
 
 #define ACCESSIBLE_INTERFACE static_cast <QSpiAccessibleObject *>(parent())->getInterface()
 
+
+static QAccessibleInterface *getWindow (QAccessibleInterface &interface)
+{
+    QAccessibleInterface *current=NULL, *tmp=NULL;
+
+    interface.navigate (QAccessible::Ancestor, 0, &current);
+
+    while (current &&
+           current->role(0) != QAccessible::Window &&
+           current->role(0) != QAccessible::Application)
+    {
+        tmp = NULL;
+        current->navigate (QAccessible::Ancestor, 1, &tmp);
+        delete current;
+        current = tmp;
+    }
+
+    if (current)
+    {
+        return current;
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+static QRect getRelativeRect (QAccessibleInterface &interface)
+{
+    QAccessibleInterface *window;
+    QRect wr, cr;
+
+    cr = interface.rect (0);
+
+    window = getWindow (interface);
+    if (window)
+    {
+        wr = window->rect (0);
+
+        cr.setX(cr.x() - wr.x());
+        cr.setY(cr.x() - wr.y());
+        delete window;
+    }
+    return cr;
+}
+
 /*
  * Implementation of adaptor class QSpiComponentAdaptor
  */
@@ -38,11 +84,15 @@ QSpiComponentAdaptor::~QSpiComponentAdaptor()
 bool QSpiComponentAdaptor::contains(int x, int y, unsigned int coord_type)
 {
     // handle method call org.freedesktop.atspi.Component.contains
-    // TODO What if the co-ord type is relative to the screen?
-    return ACCESSIBLE_INTERFACE.rect(0).contains(x, y);
+    if (coord_type == 0)
+        return ACCESSIBLE_INTERFACE.rect(0).contains(x, y);
+    else
+        return getRelativeRect(ACCESSIBLE_INTERFACE).contains(x, y);
 }
 
-QDBusObjectPath QSpiComponentAdaptor::getAccessibleAtPoint(int x, int y, unsigned int coord_type)
+QDBusObjectPath QSpiComponentAdaptor::getAccessibleAtPoint(int x,
+                                                           int y,
+                                                           unsigned int coord_type)
 {
     // handle method call org.freedesktop.atspi.Component.getAccessibleAtPoint
     // TODO Return a null path. This is a silly function, may take some time to work out.
@@ -60,9 +110,13 @@ double QSpiComponentAdaptor::getAlpha()
 QSpiRect QSpiComponentAdaptor::getExtents(unsigned int coord_type)
 {
     // handle method call org.freedesktop.atspi.Component.getExtents
-    // TODO What should we do if the coord_type is relative to the enclosing widget?
-    QRect rect = ACCESSIBLE_INTERFACE.rect(0);
+    QRect rect;
     QSpiRect val;
+
+    if (coord_type == 0)
+        rect = ACCESSIBLE_INTERFACE.rect(0);
+    else
+        rect = getRelativeRect (ACCESSIBLE_INTERFACE);
 
     val.x = rect.x ();
     val.y = rect.y ();
@@ -89,7 +143,11 @@ int QSpiComponentAdaptor::getPosition(unsigned int coord_type, int &y)
 {
     // handle method call org.freedesktop.atspi.Component.getPosition
     //return static_cast<YourObjectType *>(parent())->getPosition(coord_type, y);
-    QRect rect = ACCESSIBLE_INTERFACE.rect(0);
+    QRect rect;
+    if (coord_type == 0)
+        rect = ACCESSIBLE_INTERFACE.rect(0);
+    else
+        rect = getRelativeRect (ACCESSIBLE_INTERFACE);
     y = rect.y ();
     return rect.x ();
 }

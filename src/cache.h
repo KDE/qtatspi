@@ -59,7 +59,7 @@ signals:
 private:
 
     void registerConnected (QObject *object);
-    void registerChildren (QObject *object);
+    void registerChildren (QAccessibleInterface *interface);
 
     QObject *root;
     QHash <QObject *, QSpiAccessibleObject *> cache;

@@ -42,7 +42,7 @@ QSpiAccessibleCache::QSpiAccessibleCache (QObject *root)
     this->root = root;
 
     /* Add all the top-level windows */
-    registerChildren (this->root);
+    registerChildren (QAccessible::queryAccessibleInterface(this->root));
 
     new QSpiTreeAdaptor (this);
     QDBusConnection::sessionBus().registerObject(QSPI_TREE_OBJECT_PATH, this, QDBusConnection::ExportAdaptors);
@@ -127,27 +127,24 @@ bool QSpiAccessibleCache::eventFilter(QObject *obj, QEvent *event)
 
 void QSpiAccessibleCache::registerConnected (QObject *object)
 {
-    QList <QObject*> parents;
+    QList <QAccessibleInterface*> parents;
     QAccessibleInterface *current = NULL;
 
     current = QAccessible::queryAccessibleInterface (object);
 
     while (current)
     {
-        QAccessibleInterface *temp;
-        parents.insert(0, current->object ());
-        current->navigate(QAccessible::Ancestor, 1, &temp);
-        delete current;
-        current = temp;
+        parents.insert(0, current);
+        current->navigate(QAccessible::Ancestor, 1, &current);
     }
 
-    foreach (QObject *parent, parents)
+    foreach (QAccessibleInterface *parent, parents)
     {
         QSpiAccessibleObject *accessible;
 
         registerChildren (parent);
 
-        accessible = lookupObject (parent);
+        accessible = lookupObject (parent->object());
         if (accessible)
         {
 #if 0
@@ -167,45 +164,39 @@ void QSpiAccessibleCache::registerConnected (QObject *object)
 /* TODO - No Idea about the threading implications here.
  * What is the equivalent of the GDK lock?
  */
-void QSpiAccessibleCache::registerChildren (QObject *object)
+void QSpiAccessibleCache::registerChildren (QAccessibleInterface *interface)
 {
-    QObject *current;
-    QAccessibleInterface *interface = NULL;
+    QAccessibleInterface *current;
     QSpiAccessibleObject *accessible = NULL;
-    QStack <QObject *> stack;
+    QStack <QAccessibleInterface *> stack;
 
-#if 0
-    if (!object->isWidgetType ())
-        return;
-#endif
-
-    stack.push (object);
+    stack.push (interface);
 
     /* Depth first iteration over all un-registered objects */
     while (!stack.empty())
     {
         current = stack.pop();
 
-        if (cache.contains (current))
+        if (cache.contains (current->object()))
+        {
+            delete current;
             continue;
+        }
 
         /* Create the QSpiAccessibleObject,
          * Connect the destroy signal,
          * Add to the cache,
          * Emit the added signal
          */
-        interface = QAccessible::queryAccessibleInterface (current);
-        if (!interface)
-            continue;
 
         /* Replace with factory method based on role? */
-        if (current == this->root)
-            accessible = new QSpiAccessibleApplication (this, interface);
+        if (current->object() == this->root)
+            accessible = new QSpiAccessibleApplication (this, current);
         else
-            accessible = new QSpiAccessibleObject (this, interface);
+            accessible = new QSpiAccessibleObject (this, current);
         
-        connect(current, SIGNAL(destroyed(QObject *)), this, SLOT(objectDestroyed(QObject *)));
-        cache.insert (current, accessible);
+        connect(current->object(), SIGNAL(destroyed(QObject *)), this, SLOT(objectDestroyed(QObject *)));
+        cache.insert (current->object(), accessible);
 
 #if 0
         qDebug ("QSpiAccessibleBridge : accessibleRegistered.\n\t%s\n\t%s\n\t%s\n",
@@ -217,14 +208,13 @@ void QSpiAccessibleCache::registerChildren (QObject *object)
 
         emit accessibleUpdated (accessible);
 
-        for (int i = 1; i <= interface->childCount (); i++)
+        for (int i = 1; i <= current->childCount (); i++)
         {
             QAccessibleInterface *child = NULL;
-            interface->navigate(QAccessible::Child, i, &child);
+            current->navigate(QAccessible::Child, i, &child);
             if (child)
             {
-                stack.push (child->object ());
-                delete child;
+                stack.push (child);
             }
         }
     }
