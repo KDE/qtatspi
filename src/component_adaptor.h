@@ -83,13 +83,13 @@ public:
 
 public: // PROPERTIES
 public Q_SLOTS: // METHODS
-    bool contains(int x, int y, short coord_type);
-    QDBusObjectPath getAccessibleAtPoint(int x, int y, short coord_type);
+    bool contains(int x, int y, unsigned int coord_type);
+    QDBusObjectPath getAccessibleAtPoint(int x, int y, unsigned int coord_type);
     double getAlpha();
-    QSpiRect getExtents(short coord_type);
+    QSpiRect getExtents(unsigned int coord_type);
     uint getLayer();
     short getMDIZOrder();
-    int getPosition(short coord_type, int &y);
+    int getPosition(unsigned int coord_type, int &y);
     int getSize(int &height);
     bool grabFocus();
 Q_SIGNALS: // SIGNALS

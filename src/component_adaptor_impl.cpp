@@ -35,14 +35,14 @@ QSpiComponentAdaptor::~QSpiComponentAdaptor()
     // destructor
 }
 
-bool QSpiComponentAdaptor::contains(int x, int y, short coord_type)
+bool QSpiComponentAdaptor::contains(int x, int y, unsigned int coord_type)
 {
     // handle method call org.freedesktop.atspi.Component.contains
     // TODO What if the co-ord type is relative to the screen?
     return ACCESSIBLE_INTERFACE.rect(0).contains(x, y);
 }
 
-QDBusObjectPath QSpiComponentAdaptor::getAccessibleAtPoint(int x, int y, short coord_type)
+QDBusObjectPath QSpiComponentAdaptor::getAccessibleAtPoint(int x, int y, unsigned int coord_type)
 {
     // handle method call org.freedesktop.atspi.Component.getAccessibleAtPoint
     // TODO Return a null path. This is a silly function, may take some time to work out.
@@ -57,7 +57,7 @@ double QSpiComponentAdaptor::getAlpha()
     return 1.0;
 }
 
-QSpiRect QSpiComponentAdaptor::getExtents(short coord_type)
+QSpiRect QSpiComponentAdaptor::getExtents(unsigned int coord_type)
 {
     // handle method call org.freedesktop.atspi.Component.getExtents
     // TODO What should we do if the coord_type is relative to the enclosing widget?
@@ -85,7 +85,7 @@ short QSpiComponentAdaptor::getMDIZOrder()
     return 0;
 }
 
-int QSpiComponentAdaptor::getPosition(short coord_type, int &y)
+int QSpiComponentAdaptor::getPosition(unsigned int coord_type, int &y)
 {
     // handle method call org.freedesktop.atspi.Component.getPosition
     //return static_cast<YourObjectType *>(parent())->getPosition(coord_type, y);
