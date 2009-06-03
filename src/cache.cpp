@@ -142,8 +142,6 @@ void QSpiAccessibleCache::registerConnected (QObject *object)
     {
         QSpiAccessibleObject *accessible;
 
-        registerChildren (parent);
-
         accessible = lookupObject (parent->object());
         if (accessible)
         {
@@ -156,6 +154,8 @@ void QSpiAccessibleCache::registerConnected (QObject *object)
 #endif
             emit accessibleUpdated (accessible);
         }
+
+        registerChildren (parent);
     }
 }
 
