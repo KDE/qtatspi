@@ -107,23 +107,19 @@ void qspi_stateset_from_qstate (QAccessible::State state, QSpiIntList &set)
 {
        int array[2] = {0, 0};
 
+       /* We may need to take the role of the object into account when
+        * mapping between the state sets
+        */
+       BITARRAY_SET (array, STATE_EDITABLE);
+       BITARRAY_SET (array, STATE_ENABLED);
+       BITARRAY_SET (array, STATE_SHOWING);
+       BITARRAY_SET (array, STATE_VISIBLE);
+       BITARRAY_SET (array, STATE_SENSITIVE);
+
        for (int mask = 1; mask <= int(QAccessible::HasInvokeExtension); mask <<= 1)
        {
-           /* We may need to take the role of the object into account when
-            * mapping between the state sets
-            */
-           BITARRAY_SET (array, STATE_EDITABLE);
-
            switch (state & mask)
            {
-                 case QAccessible::Normal:
-                 {
-                         BITARRAY_SET (array, STATE_ENABLED);
-                         BITARRAY_SET (array, STATE_SHOWING);
-                         BITARRAY_SET (array, STATE_VISIBLE);
-                         BITARRAY_SET (array, STATE_SENSITIVE);
-                         break;
-                 }
                  case QAccessible::Unavailable:
                  {
                          BITARRAY_UNSET (array, STATE_ENABLED);
@@ -195,7 +191,7 @@ void qspi_stateset_from_qstate (QAccessible::State state, QSpiIntList &set)
                  case QAccessible::Invisible:
                  case QAccessible::Offscreen:
                  {
-                         BITARRAY_UNSET (array, STATE_VISIBLE);
+                         BITARRAY_UNSET (array, STATE_SHOWING);
                          break;
                  }
                  case QAccessible::Sizeable:

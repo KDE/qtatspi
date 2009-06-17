@@ -138,11 +138,11 @@ QDBusObjectPath QSpiAccessibleObject::getParentPath () const
     if (parentInterface)
     {
         parent = cache->lookupObject (parentInterface->object());
+        delete parentInterface;
         if (parent)
         {
            return parent->getPath();
         }
-        delete parentInterface;
     }
     /* TODO Return the 'NULL' path */
     return getApplication()->getPath();
