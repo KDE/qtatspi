@@ -5,6 +5,7 @@ HEADERS += cache.h  \
            application.h \
            application_adaptor.h \
            component_adaptor.h \
+           device_event_controller_proxy.h \
            action_adaptor.h \
            value_adaptor.h \
            proxy_marshallers.h \
@@ -23,6 +24,7 @@ SOURCES += bridge.cpp \
            application.cpp \
            application_adaptor_impl.cpp \
            component_adaptor_impl.cpp \
+           device_event_controller_proxy.cpp \
            action_adaptor_impl.cpp \
            value_adaptor_impl.cpp \
            proxy_marshallers.cpp \

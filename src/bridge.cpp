@@ -29,18 +29,23 @@
 #include <QApplication>
 #include <QAccessible>
 #include <QAccessibleBridge>
+#include <QTime>
 
 #include "cache.h"
 #include "registry_proxy.h"
+#include "device_event_controller_proxy.h"
 #include "constant_mappings.h"
 #include "adaptor_marshallers.h"
 
 #define QSPI_REGISTRY_ADDRESS      "org.freedesktop.atspi.Registry"
 #define QSPI_REGISTRY_OBJECT_PATH  "/org/freedesktop/atspi/registry"
+#define QSPI_DEC_OBJECT_PATH       "/org/freedesktop/atspi/registry/deviceeventcontroller"
 
 class QSpiAccessibleBridge: public QObject, public QAccessibleBridge
 {
         Q_OBJECT
+
+        bool eventFilter(QObject *obj, QEvent *event);
 public:
         QSpiAccessibleBridge () {cache=NULL;}
         virtual ~QSpiAccessibleBridge ();
@@ -53,6 +58,7 @@ public slots:
 private:
         QSpiAccessibleCache  *cache;
         QSpiRegistryProxy    *registry;
+        QSpiDECProxy         *dec;
 };
 
 /*---------------------------------------------------------------------------*/
@@ -123,12 +129,15 @@ void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *rootInterface)
                                           QSPI_REGISTRY_OBJECT_PATH,
                                           QDBusConnection::sessionBus());
 
+        dec = new QSpiDECProxy (QSPI_REGISTRY_ADDRESS,
+                                QSPI_REGISTRY_OBJECT_PATH,
+                                QDBusConnection::sessionBus());
+
         if (!registry->isValid ())
         {
             qDebug ("QSpiAccessibleBridge : Could not contact accessibility registry");
             return;
         }
-
 
         registry->registerApplication (QDBusConnection::sessionBus().baseService ());
         error = registry->lastError ();
@@ -139,6 +148,10 @@ void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *rootInterface)
                     qPrintable (error.name()),
                     qPrintable (error.message()));
         }
+
+        /* Register for application events to handle key events */
+        /* TODO, should this be registered on the root object? */
+        QApplication::instance()->installEventFilter(this);
 
         /* Connect to the applications about-to-quit signal for de-registering this app */
         connect (QApplication::instance(), SIGNAL (aboutToQuit()),
@@ -166,6 +179,45 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate (int reason, QAccessibleInt
         {
                 accessible = cache->lookupObject (interface->object());
         }
+}
+
+enum QSpiKeyEventType
+{
+      QSPI_KEY_EVENT_PRESS,
+      QSPI_KEY_EVENT_RELEASE,
+      QSPI_KEY_EVENT_LAST_DEFINED
+};
+
+bool QSpiAccessibleBridge::eventFilter(QObject *obj, QEvent *event)
+{
+
+    switch (event->type ())
+    {
+        case QEvent::KeyPress:
+        case QEvent::KeyRelease:
+        {
+            QKeyEvent *key_event = static_cast <QKeyEvent *>(event);
+            QSpiDeviceEvent de;
+
+            if (event->type() == QEvent::KeyPress)
+                de.type = QSPI_KEY_EVENT_PRESS;
+            else
+                de.type = QSPI_KEY_EVENT_RELEASE;
+           
+            de.id = key_event->key();
+            de.hw_code = 0; /* What is a keyval and what is a keycode */
+            /* TODO Insert the keyboard modifiers here */
+            de.modifiers = 0;
+            de.timestamp = QTime::currentTime().elapsed();
+            de.event_string =  key_event->text();
+            /* TODO Work out if there is an easy equivalent of "is_text" */
+            de.is_text = false; 
+            break;
+        }
+        default:
+            break;
+    }
+    return false;
 }
 
 QSpiAccessibleBridge::~QSpiAccessibleBridge ()

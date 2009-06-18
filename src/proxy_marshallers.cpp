@@ -44,4 +44,33 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAppUpdate &up
         return argument;
 }
 
+/* QSpiDeviceEvent */
+/*---------------------------------------------------------------------------*/
+
+QDBusArgument &operator<<(QDBusArgument &argument, const QSpiDeviceEvent &event) {
+        argument.beginStructure();
+        argument << event.type 
+                 << event.id 
+                 << event.hw_code 
+                 << event.modifiers
+                 << event.timestamp
+                 << event.event_string
+                 << event.is_text;
+        argument.endStructure();
+        return argument;
+}
+
+const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiDeviceEvent &event) {
+        argument.beginStructure();
+        argument >> event.type 
+                 >> event.id 
+                 >> event.hw_code 
+                 >> event.modifiers
+                 >> event.timestamp
+                 >> event.event_string
+                 >> event.is_text;
+        argument.endStructure();
+        return argument;
+}
+
 /*---------------------------------------------------------------------------*/

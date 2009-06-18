@@ -22,7 +22,6 @@
 #ifndef Q_SPI_OBJECT_H
 #define Q_SPI_OBJECT_H
 
-
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
 #include <QDBusObjectPath>

@@ -25,6 +25,7 @@
 #include <QWidget>
 #include <QWidgetList>
 #include <QApplication>
+#include <QStackedWidget>
 
 #include "cache.h"
 #include "application.h"
@@ -37,6 +38,7 @@
 
 QSpiAccessibleCache::QSpiAccessibleCache (QObject *root)
 {
+    /* TODO, should this be registered on the root object? */
     QApplication::instance()->installEventFilter(this);
 
     this->root = root;
@@ -104,13 +106,11 @@ bool QSpiAccessibleCache::eventFilter(QObject *obj, QEvent *event)
             QSpiAccessibleObject *accessible = NULL;
 
             accessible = lookupObject (obj);
-            if (accessible)
+            if (accessible && accessible->getInterface().isValid())
             {
-#if 0
                 qDebug ("QSpiAccessibleBridge : childRemoved.\n\t%s\n",
                         qPrintable(accessible->getPath().path())
                        );
-#endif
 
                 emit accessibleUpdated (accessible);
             }
@@ -177,7 +177,7 @@ void QSpiAccessibleCache::registerChildren (QAccessibleInterface *interface)
     {
         current = stack.pop();
 
-        if (cache.contains (current->object()))
+        if (cache.contains (current->object()) || current->object() == NULL)
         {
             delete current;
             continue;
@@ -228,6 +228,8 @@ void QSpiAccessibleCache::objectDestroyed (QObject *obj)
     if (cache.contains (obj))
     {
         QSpiAccessibleObject *accessible = cache.take (obj);
+        qDebug("QSpiAccessibleBridge : Object Destroyed\n\t%s\n",
+               qPrintable(accessible->getPath().path()));
         emit accessibleDestroyed (accessible);
         delete accessible;
     }

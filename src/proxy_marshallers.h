@@ -49,6 +49,24 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAppUpdate &up
 
 Q_DECLARE_METATYPE (QSpiAppUpdate)
 
+/* QSpiDeviceEvent */
+/*---------------------------------------------------------------------------*/
+
+struct QSpiDeviceEvent {
+        unsigned int type;
+        int id;
+        short int hw_code;
+        short int modifiers;
+        short int timestamp;
+        QString event_string;
+        bool is_text;
+};
+
+QDBusArgument &operator<<(QDBusArgument &argument, const QSpiDeviceEvent &event);
+const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiDeviceEvent &event);
+
+Q_DECLARE_METATYPE (QSpiDeviceEvent)
+
 /*---------------------------------------------------------------------------*/
 
 #endif /* Q_SPI_PROXY_MARSHALLERS_H */
