@@ -69,4 +69,6 @@ Q_DECLARE_METATYPE (QSpiDeviceEvent)
 
 /*---------------------------------------------------------------------------*/
 
+void qspi_initialize_proxy_types ();
+
 #endif /* Q_SPI_PROXY_MARSHALLERS_H */

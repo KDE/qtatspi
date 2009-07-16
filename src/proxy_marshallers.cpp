@@ -74,3 +74,11 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiDeviceEvent &
 }
 
 /*---------------------------------------------------------------------------*/
+
+void qspi_initialize_proxy_types ()
+{
+        qDBusRegisterMetaType<QSpiDeviceEvent>();
+        qDBusRegisterMetaType<QSpiAppUpdate>();
+}
+
+/*---------------------------------------------------------------------------*/

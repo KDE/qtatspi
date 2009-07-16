@@ -36,6 +36,7 @@
 #include "device_event_controller_proxy.h"
 #include "constant_mappings.h"
 #include "adaptor_marshallers.h"
+#include "proxy_marshallers.h"
 
 #define QSPI_REGISTRY_ADDRESS      "org.freedesktop.atspi.Registry"
 #define QSPI_REGISTRY_OBJECT_PATH  "/org/freedesktop/atspi/registry"
@@ -114,6 +115,7 @@ void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *rootInterface)
         qDebug ("QSpiAccessibleBridge : Initializing bridge");
 
         qspi_initialize_adaptor_types ();
+        qspi_initialize_proxy_types ();
 
         /* Create the cache of accessible objects */
         cache = new QSpiAccessibleCache (rootInterface->object());
@@ -212,6 +214,12 @@ bool QSpiAccessibleBridge::eventFilter(QObject *obj, QEvent *event)
             de.event_string =  key_event->text();
             /* TODO Work out if there is an easy equivalent of "is_text" */
             de.is_text = false; 
+
+            qDebug ("QSpiAccessibleBridge : keyEvent.\n\t%s",
+                    qPrintable (de.event_string)
+                   );
+
+            return this->dec->notifyListenersSync(de); 
             break;
         }
         default:
