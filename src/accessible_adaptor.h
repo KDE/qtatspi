@@ -58,6 +58,9 @@ class QSpiAccessibleAdaptor: public QDBusAbstractAdaptor
 "    <method name=\"getLocalizedRoleName\" >\n"
 "      <arg direction=\"out\" type=\"s\" />\n"
 "    </method>\n"
+"    <method name=\"getInterfaces\" >\n"
+"      <arg direction=\"out\" type=\"as\" />\n"
+"    </method>\n"
 "    <method name=\"getState\" >\n"
 "      <arg direction=\"out\" type=\"au\" />\n"
 "      <annotation value=\"QSpiIntList\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\" />\n"
@@ -93,6 +96,7 @@ public Q_SLOTS: // METHODS
     QDBusObjectPath getChildAtIndex(int index);
     QList<QDBusObjectPath> getChildren();
     int getIndexInParent();
+    QStringList getInterfaces();
     QString getLocalizedRoleName();
     QSpiRelationArray getRelationSet();
     uint getRole();

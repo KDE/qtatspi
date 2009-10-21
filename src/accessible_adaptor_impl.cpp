@@ -219,6 +219,12 @@ int QSpiAccessibleAdaptor::getIndexInParent()
     return 0;
 }
 
+QStringList QSpiAccessibleAdaptor::getInterfaces()
+{
+    // handle method call org.freedesktop.atspi.Accessible.getInterfaces
+    return static_cast <QSpiAccessibleObject *>(parent())->getSupported();
+}
+
 QString QSpiAccessibleAdaptor::getLocalizedRoleName()
 {
     // handle method call org.freedesktop.atspi.Accessible.getLocalizedRoleName
