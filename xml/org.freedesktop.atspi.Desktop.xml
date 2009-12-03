@@ -1,11 +1,3 @@
 <node xmlns:tp="http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0" name="/node">
-<interface name="org.freedesktop.atspi.Desktop">
-  <method name="getChildren">
-    <arg direction="out" type="as"/>
-  </method>
-  <method name="getChildAtIndex">
-    <arg direction="in" name="index" type="i"/>
-    <arg direction="out" type="s"/>
-  </method>
-</interface>
+<interface name="org.freedesktop.atspi.Desktop"/>
 </node>

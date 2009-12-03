@@ -170,19 +170,19 @@ QString QSpiAccessibleAdaptor::name() const
     return static_cast <QSpiAccessibleObject *>(parent())->getInterface().text(QAccessible::Name, 0);
 }
 
-QDBusObjectPath QSpiAccessibleAdaptor::getParent() const
+QDBusObjectPath QSpiAccessibleAdaptor::parent() const
 {
     // get the value of property parent
     return static_cast <QSpiAccessibleObject *> (parent())->getApplication()->getParentPath();
 }
 
-QDBusObjectPath QSpiAccessibleAdaptor::getApplication()
+QSpiObjectAddress QSpiAccessibleAdaptor::GetApplication()
 {
     // handle method call org.freedesktop.atspi.Accessible.getApplication
     return static_cast <QSpiAccessibleObject *> (parent())->getApplication()->getPath();
 }
 
-QStringList QSpiAccessibleAdaptor::getAttributes()
+QSpiAttributeSet QSpiAccessibleAdaptor::GetAttributes()
 {
     // handle method call org.freedesktop.atspi.Accessible.getAttributes
     // No attributes interface in QAccessible so a blank list seems the sensible option.
@@ -190,27 +190,13 @@ QStringList QSpiAccessibleAdaptor::getAttributes()
     return out0;
 }
 
-QDBusObjectPath QSpiAccessibleAdaptor::getChildAtIndex(int index)
+QSpiObjectAddress QSpiAccessibleAdaptor::GetChildAtIndex(int index)
 {
     // handle method call org.freedesktop.atspi.Accessible.getChildAtIndex
     return static_cast <QSpiAccessibleObject *> (parent())->getChildren().value(index)->getPath();
 }
 
-QList<QDBusObjectPath> QSpiAccessibleAdaptor::getChildren()
-{
-    // handle method call org.freedesktop.atspi.Accessible.getChildren
-    QList <QSpiAccessibleObject *> children;
-    QList <QDBusObjectPath> childPaths;
-
-    children = static_cast <QSpiAccessibleObject *> (parent())->getChildren();
-    foreach (QSpiAccessibleObject *obj, children)
-    {
-        childPaths << obj->getPath();
-    }
-    return childPaths;
-}
-
-int QSpiAccessibleAdaptor::getIndexInParent()
+int QSpiAccessibleAdaptor::GetIndexInParent()
 {
     // handle method call org.freedesktop.atspi.Accessible.getIndexInParent
     // Not handling for now. indexInParent can now be calculated just as
@@ -219,46 +205,43 @@ int QSpiAccessibleAdaptor::getIndexInParent()
     return 0;
 }
 
-QStringList QSpiAccessibleAdaptor::getInterfaces()
+QString QSpiAccessibleAdaptor::GetLocalizedRoleName()
 {
-    // handle method call org.freedesktop.atspi.Accessible.getInterfaces
-    return static_cast <QSpiAccessibleObject *>(parent())->getSupported();
-}
-
-QString QSpiAccessibleAdaptor::getLocalizedRoleName()
-{
-    // handle method call org.freedesktop.atspi.Accessible.getLocalizedRoleName
-    // TODO For now the same as 'getRoleName'
-    QString roleName (roles + roles_offsets[getRole()]);
-    return roleName;
-}
-
-QSpiRelationArray QSpiAccessibleAdaptor::getRelationSet()
-{
-    // handle method call org.freedesktop.atspi.Accessible.getRelationSet
-    QSpiRelationArray out0;
+    // handle method call org.freedesktop.atspi.Accessible.GetLocalizedRoleName
     // TODO
+    QString out0;
+    QMetaObject::invokeMethod(parent(), "GetLocalizedRoleName", Q_RETURN_ARG(QString, out0));
     return out0;
 }
 
-uint QSpiAccessibleAdaptor::getRole()
+QSpiRelationArray QSpiAccessibleAdaptor::GetRelationSet()
+{
+    // handle method call org.freedesktop.atspi.Accessible.GetRelationSet
+    // TODO
+    QSpiRelationArray out0;
+    QMetaObject::invokeMethod(parent(), "GetRelationSet", Q_RETURN_ARG(QSpiRelationArray, out0));
+    return out0;
+}
+
+uint QSpiAccessibleAdaptor::GetRole()
 {
     // handle method call org.freedesktop.atspi.Accessible.getRole
     QAccessible::Role role = static_cast <QSpiAccessibleObject *>(parent())->getInterface().role(0);
     return qSpiRoleMapping[role];
 }
 
-QString QSpiAccessibleAdaptor::getRoleName()
+QString QSpiAccessibleAdaptor::GetRoleName()
 {
     // handle method call org.freedesktop.atspi.Accessible.getRoleName
     QString roleName (roles + roles_offsets[getRole()]);
     return roleName;
 }
 
-QSpiIntList QSpiAccessibleAdaptor::getState()
+QSpiIntList QSpiAccessibleAdaptor::GetState()
 {
     // handle method call org.freedesktop.atspi.Accessible.getState
     QSpiIntList set;
     qspi_stateset_from_qstate (static_cast <QSpiAccessibleObject *>(parent())->getInterface().state(0), set);
     return set;
 }
+

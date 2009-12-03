@@ -6,95 +6,98 @@
   <property name="summary" type="o" access="read"/>
   <property name="nSelectedRows" type="i" access="read"/>
   <property name="nSelectedColumns" type="i" access="read"/>
-  <method name="getAccessibleAt">
+  <method name="GetAccessibleAt">
     <arg direction="in" name="row" type="i"/>
     <arg direction="in" name="column" type="i"/>
-    <arg direction="out" type="o"/>
+    <arg direction="out" type="(so)"/>
+    <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiObjectAddress"/>
   </method>
-  <method name="getIndexAt">
+  <method name="GetIndexAt">
     <arg direction="in" name="row" type="i"/>
     <arg direction="in" name="column" type="i"/>
     <arg direction="out" type="i"/>
   </method>
-  <method name="getRowAtIndex">
+  <method name="GetRowAtIndex">
     <arg direction="in" name="index" type="i"/>
     <arg direction="out" type="i"/>
   </method>
-  <method name="getColumnAtIndex">
+  <method name="GetColumnAtIndex">
     <arg direction="in" name="index" type="i"/>
     <arg direction="out" type="i"/>
   </method>
-  <method name="getRowDescription">
+  <method name="GetRowDescription">
     <arg direction="in" name="row" type="i"/>
     <arg direction="out" type="s"/>
   </method>
-  <method name="getColumnDescription">
+  <method name="GetColumnDescription">
     <arg direction="in" name="column" type="i"/>
     <arg direction="out" type="s"/>
   </method>
-  <method name="getRowExtentAt">
+  <method name="GetRowExtentAt">
     <arg direction="in" name="row" type="i"/>
     <arg direction="in" name="column" type="i"/>
     <arg direction="out" type="i"/>
   </method>
-  <method name="getColumnExtentAt">
+  <method name="GetColumnExtentAt">
     <arg direction="in" name="row" type="i"/>
     <arg direction="in" name="column" type="i"/>
     <arg direction="out" type="i"/>
   </method>
-  <method name="getRowHeader">
+  <method name="GetRowHeader">
     <arg direction="in" name="row" type="i"/>
-    <arg direction="out" type="o"/>
+    <arg direction="out" type="(so)"/>
+    <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiObjectAddress"/>
   </method>
-  <method name="getColumnHeader">
+  <method name="GetColumnHeader">
     <arg direction="in" name="column" type="i"/>
-    <arg direction="out" type="o"/>
+    <arg direction="out" type="(so)"/>
+    <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiObjectAddress"/>
   </method>
-  <method name="getSelectedRows">
+  <method name="GetSelectedRows">
     <arg direction="out" type="ai"/>
-    <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiSelectedRowList"/>
+    <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiIntList"/>
   </method>
-  <method name="getSelectedColumns">
+  <method name="GetSelectedColumns">
     <arg direction="out" type="ai"/>
-    <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiSelectedColumnList"/>
+    <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiIntList"/>
   </method>
-  <method name="isRowSelected">
+  <method name="IsRowSelected">
     <arg direction="in" name="row" type="i"/>
     <arg direction="out" type="b"/>
   </method>
-  <method name="isColumnSelected">
+  <method name="IsColumnSelected">
     <arg direction="in" name="column" type="i"/>
     <arg direction="out" type="b"/>
   </method>
-  <method name="isSelected">
+  <method name="IsSelected">
     <arg direction="in" name="row" type="i"/>
     <arg direction="in" name="column" type="i"/>
     <arg direction="out" type="b"/>
   </method>
-  <method name="addRowSelection">
+  <method name="AddRowSelection">
     <arg direction="in" name="row" type="i"/>
     <arg direction="out" type="b"/>
   </method>
-  <method name="addColumnSelection">
+  <method name="AddColumnSelection">
     <arg direction="in" name="column" type="i"/>
     <arg direction="out" type="b"/>
   </method>
-  <method name="removeRowSelection">
+  <method name="RemoveRowSelection">
     <arg direction="in" name="row" type="i"/>
     <arg direction="out" type="b"/>
   </method>
-  <method name="removeColumnSelection">
+  <method name="RemoveColumnSelection">
     <arg direction="in" name="column" type="i"/>
     <arg direction="out" type="b"/>
   </method>
-  <method name="getRowColumnExtentsAtIndex">
+  <method name="GetRowColumnExtentsAtIndex">
     <arg direction="in" name="index" type="i"/>
+    <arg direction="out" type="b"/>
     <arg direction="out" name="row" type="i"/>
     <arg direction="out" name="col" type="i"/>
     <arg direction="out" name="row_extents" type="i"/>
     <arg direction="out" name="col_extents" type="i"/>
     <arg direction="out" name="is_selected" type="b"/>
-    <arg direction="out" type="b"/>
   </method>
 </interface>
 </node>

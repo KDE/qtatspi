@@ -3,21 +3,7 @@
   <property name="toolkitName" type="s" access="read"/>
   <property name="version" type="s" access="read"/>
   <property name="id" type="i" access="read"/>
-  <method name="registerToolkitEventListener">
-    <arg direction="in" name="listener" type="o"/>
-    <arg direction="in" name="eventName" type="s"/>
-  </method>
-  <method name="registerObjectEventListener">
-    <arg direction="in" name="listener" type="o"/>
-    <arg direction="in" name="eventName" type="s"/>
-  </method>
-  <method name="pause">
-    <arg direction="out" type="b"/>
-  </method>
-  <method name="resume">
-    <arg direction="out" type="b"/>
-  </method>
-  <method name="getLocale">
+  <method name="GetLocale">
     <arg direction="in" name="lctype" type="u"/>
     <arg direction="out" type="s"/>
   </method>

@@ -2,122 +2,125 @@
 <interface name="org.freedesktop.atspi.Text">
   <property name="characterCount" type="i" access="read"/>
   <property name="caretOffset" type="i" access="read"/>
-  <method name="getText">
+  <method name="GetText">
     <arg direction="in" name="startOffset" type="i"/>
     <arg direction="in" name="endOffset" type="i"/>
     <arg direction="out" type="s"/>
   </method>
-  <method name="setCaretOffset">
+  <method name="SetCaretOffset">
     <arg direction="in" name="offset" type="i"/>
     <arg direction="out" type="b"/>
   </method>
-  <method name="getTextBeforeOffset">
+  <method name="GetTextBeforeOffset">
     <arg direction="in" name="offset" type="i"/>
     <arg direction="in" name="type" type="u"/>
+    <arg direction="out" type="s"/>
     <arg direction="out" name="startOffset" type="i"/>
     <arg direction="out" name="endOffset" type="i"/>
-    <arg direction="out" type="s"/>
   </method>
-  <method name="getTextAtOffset">
+  <method name="GetTextAtOffset">
     <arg direction="in" name="offset" type="i"/>
     <arg direction="in" name="type" type="u"/>
+    <arg direction="out" type="s"/>
     <arg direction="out" name="startOffset" type="i"/>
     <arg direction="out" name="endOffset" type="i"/>
-    <arg direction="out" type="s"/>
   </method>
-  <method name="getTextAfterOffset">
+  <method name="GetTextAfterOffset">
     <arg direction="in" name="offset" type="i"/>
     <arg direction="in" name="type" type="u"/>
+    <arg direction="out" type="s"/>
     <arg direction="out" name="startOffset" type="i"/>
     <arg direction="out" name="endOffset" type="i"/>
-    <arg direction="out" type="s"/>
   </method>
-  <method name="getCharacterOffset">
+  <method name="GetCharacterAtOffset">
     <arg name="offset" type="i" direction="in"/>
     <arg type="i" direction="out"/>
   </method>
-  <method name="getAttributeValue">
+  <method name="GetAttributeValue">
     <arg direction="in" name="offset" type="i"/>
     <arg direction="in" name="attributeName" type="s"/>
+    <arg direction="out" type="s"/>
     <arg direction="out" name="startOffset" type="i"/>
     <arg direction="out" name="endOffset" type="i"/>
     <arg direction="out" name="defined" type="b"/>
-    <arg direction="out" type="s"/>
   </method>
-  <method name="getAttributes">
+  <method name="GetAttributes">
     <arg direction="in" name="offset" type="i"/>
+    <arg direction="out" type="a{ss}"/>
     <arg direction="out" name="startOffset" type="i"/>
     <arg direction="out" name="endOffset" type="i"/>
-    <arg direction="out" type="s"/>
+    <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiAttributeArray"/>
   </method>
-  <method name="getDefaultAttributes">
-    <arg direction="out" type="s"/>
+  <method name="GetDefaultAttributes">
+    <arg direction="out" type="a{ss}"/>
+    <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiAttributeArray"/>
   </method>
-  <method name="getCharacterExtents">
+  <method name="GetCharacterExtents">
     <arg direction="in" name="offset" type="i"/>
     <arg direction="out" name="x" type="i"/>
     <arg direction="out" name="y" type="i"/>
     <arg direction="out" name="width" type="i"/>
     <arg direction="out" name="height" type="i"/>
-    <arg direction="in" name="coordType" type="n"/>
+    <arg direction="in" name="coordType" type="u"/>
   </method>
-  <method name="getOffsetAtPoint">
+  <method name="GetOffsetAtPoint">
     <arg direction="in" name="x" type="i"/>
     <arg direction="in" name="y" type="i"/>
-    <arg direction="in" name="coordType" type="n"/>
+    <arg direction="in" name="coordType" type="u"/>
     <arg direction="out" type="i"/>
   </method>
-  <method name="getNSelections">
+  <method name="GetNSelections">
     <arg direction="out" type="i"/>
   </method>
-  <method name="getSelection">
+  <method name="GetSelection">
     <arg direction="in" name="selectionNum" type="i"/>
     <arg direction="out" name="startOffset" type="i"/>
     <arg direction="out" name="endOffset" type="i"/>
   </method>
-  <method name="addSelection">
+  <method name="AddSelection">
     <arg direction="in" name="startOffset" type="i"/>
     <arg direction="in" name="endOffset" type="i"/>
     <arg direction="out" type="b"/>
   </method>
-  <method name="removeSelection">
+  <method name="RemoveSelection">
     <arg direction="in" name="selectionNum" type="i"/>
     <arg direction="out" type="b"/>
   </method>
-  <method name="setSelection">
+  <method name="SetSelection">
     <arg direction="in" name="selectionNum" type="i"/>
     <arg direction="in" name="startOffset" type="i"/>
     <arg direction="in" name="endOffset" type="i"/>
     <arg direction="out" type="b"/>
   </method>
-  <method name="getRangeExtents">
+  <method name="GetRangeExtents">
     <arg direction="in" name="startOffset" type="i"/>
     <arg direction="in" name="endOffset" type="i"/>
     <arg direction="out" name="x" type="i"/>
     <arg direction="out" name="y" type="i"/>
     <arg direction="out" name="width" type="i"/>
     <arg direction="out" name="height" type="i"/>
-    <arg direction="in" name="coordType" type="n"/>
+    <arg direction="in" name="coordType" type="u"/>
   </method>
-  <method name="getBoundedRanges">
+  <method name="GetBoundedRanges">
     <arg direction="in" name="x" type="i"/>
     <arg direction="in" name="y" type="i"/>
     <arg direction="in" name="width" type="i"/>
     <arg direction="in" name="height" type="i"/>
-    <arg direction="in" name="coordType" type="n"/>
+    <arg direction="in" name="coordType" type="u"/>
     <arg direction="in" name="xClipType" type="u"/>
     <arg direction="in" name="yClipType" type="u"/>
     <arg direction="out" type="a(iisv)"/>
     <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiRangeList"/>
   </method>
-  <method name="getAttributeRun">
+  <method name="GetAttributeRun">
     <arg direction="in" name="offset" type="i"/>
+    <arg direction="in" name="includeDefaults" type="b"/>
+    <arg direction="out" type="a{ss}"/>
     <arg direction="out" name="startOffset" type="i"/>
     <arg direction="out" name="endOffset" type="i"/>
-    <arg direction="in" name="includeDefaults" type="b"/>
-    <arg direction="out" type="as"/>
+    <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiAttributeArray"/>
   </method>
-  <method name="getDefaultAttributeSet">
+  <method name="GetDefaultAttributeSet">
     <arg direction="out" type="as"/>
   </method>
 </interface>

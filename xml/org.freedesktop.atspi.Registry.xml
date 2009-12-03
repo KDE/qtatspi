@@ -1,15 +1,16 @@
 <node xmlns:tp="http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0" name="/node">
 <interface name="org.freedesktop.atspi.Registry">
-  <method name="getApplications">
+  <method name="GetApplications">
     <arg direction="out" name="applications" type="as"/>
   </method>
-  <signal name="updateApplications">
-    <arg direction="out" name="app" type="is"/>
+  <signal name="UpdateApplications">
+    <arg direction="out" name="app" type="i"/>
+    <arg direction="out" name="app" type="s"/>
   </signal>
-  <method name="registerApplication">
+  <method name="RegisterApplication">
     <arg direction="in" name="app" type="s"/>
   </method>
-  <method name="deregisterApplication">
+  <method name="deRegisterApplication">
     <arg direction="in" name="app" type="s"/>
   </method>
 </interface>

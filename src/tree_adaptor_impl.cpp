@@ -97,13 +97,13 @@ QSpiTreeAdaptor::~QSpiTreeAdaptor()
     // destructor
 }
 
-QDBusObjectPath QSpiTreeAdaptor::getRoot()
+QDBusObjectPath QSpiTreeAdaptor::GetRoot()
 {
     // handle method call org.freedesktop.atspi.Tree.getRoot
     return static_cast <QSpiAccessibleCache *> (parent())->getRoot()->getPath();
 }
 
-QSpiAccessibleCacheArray QSpiTreeAdaptor::getTree()
+QSpiAccessibleCacheArray QSpiTreeAdaptor::GetTree()
 {
     // handle method call org.freedesktop.atspi.Tree.getTree
     QList <QSpiAccessibleCacheItem> cacheArray;

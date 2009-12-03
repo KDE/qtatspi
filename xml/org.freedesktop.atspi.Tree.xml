@@ -1,17 +1,17 @@
 <node xmlns:tp="http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0" name="/node">
 <interface name="org.freedesktop.atspi.Tree">
-  <method name="getRoot">
+  <method name="GetRoot">
     <arg name="root" type="o" direction="out"/>
   </method>
-  <method name="getTree">
-    <arg name="nodes" type="a(ooaoassusau)" direction="out"/>
+  <method name="GetTree">
+    <arg name="nodes" type="a(o(so)a(so)assusau)" direction="out"/>
     <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiAccessibleCacheArray"/>
   </method>
-  <signal name="updateAccessible">
-    <arg name="nodesAdded" type="a(ooaoassusau)"/>
+  <signal name="UpdateAccessible">
+    <arg name="nodesAdded" type="((so)(so)a(so)assusau)"/>
     <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiAccessibleCacheArray"/>
   </signal>
-  <signal name="removeAccessible">
+  <signal name="RemoveAccessible">
     <arg name="nodeRemoved" type="o"/>
   </signal>
 </interface>

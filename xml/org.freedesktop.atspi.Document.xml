@@ -1,12 +1,14 @@
+<node xmlns:tp="http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0" name="/node">
 <interface name="org.freedesktop.atspi.Document">
-  <method name="getLocale">
+  <method name="GetLocale">
     <arg direction="out" type="s"/>
   </method>
-  <method name="getAttributeValue">
+  <method name="GetAttributeValue">
     <arg direction="in" name="attributename" type="s"/>
     <arg direction="out" type="s"/>
   </method>
-  <method name="getAttributes">
-    <arg direction="out" type="as"/>
+  <method name="GetAttributes">
+    <arg direction="out" type="{ss}"/>
   </method>
 </interface>
+</node>

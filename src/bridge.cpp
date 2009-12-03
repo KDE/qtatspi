@@ -104,7 +104,7 @@ void QSpiAccessibleBridge::aboutToQuit ()
 {
         if (registry != NULL)
         {
-            registry->deregisterApplication (QDBusConnection::sessionBus().baseService ());
+            registry->DeregisterApplication (QDBusConnection::sessionBus().baseService ());
         }
 }
 
@@ -141,7 +141,7 @@ void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *rootInterface)
             return;
         }
 
-        registry->registerApplication (QDBusConnection::sessionBus().baseService ());
+        registry->RegisterApplication (QDBusConnection::sessionBus().baseService ());
         error = registry->lastError ();
         if (error.type() != QDBusError::NoError)
         {
@@ -219,7 +219,7 @@ bool QSpiAccessibleBridge::eventFilter(QObject *obj, QEvent *event)
                     qPrintable (de.event_string)
                    );
 
-            return this->dec->notifyListenersSync(de); 
+            return this->dec->NotifyListenersSync(de); 
             break;
         }
         default:

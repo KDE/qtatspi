@@ -44,6 +44,25 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAccessibleCac
         return argument;
 }
 
+/* QSpiObjectAddress */
+/*---------------------------------------------------------------------------*/
+
+QDBusArgument &operator<<(QDBusArgument &argument, const QSpiObjectAddress &address)
+{
+        argument.beginStructure();
+        argument << address.name
+        argument << address.path
+        argument.endStructure();
+        return argument;
+}
+
+const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiObjectAddress &address)
+{
+        argument >> address.name
+        argument >> address.path
+        return argument;
+}
+
 /* QSpiAction */
 /*---------------------------------------------------------------------------*/
 
@@ -88,6 +107,7 @@ void qspi_initialize_adaptor_types ()
         qDBusRegisterMetaType<QSpiIntList>();
         qDBusRegisterMetaType<QSpiAccessibleCacheItem>();
         qDBusRegisterMetaType<QSpiAccessibleCacheArray>();
+        qDBusRegisterMetaType<QSpiObjectAddress>();
         qDBusRegisterMetaType<QSpiRect>();
         qDBusRegisterMetaType<QSpiAttributeSet>();
         qDBusRegisterMetaType<QSpiAction>();

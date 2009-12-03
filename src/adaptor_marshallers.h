@@ -60,6 +60,20 @@ Q_DECLARE_METATYPE (QSpiAccessibleCacheArray);
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAccessibleCacheItem &item);
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAccessibleCacheItem &item);
 
+/* QSpiObjectAddress */
+/*---------------------------------------------------------------------------*/
+
+struct QSpiObjectAddress
+{
+    QString         name;
+    QDBusObjectPath path;
+};
+
+Q_DECLARE_METATYPE (QSpiObjectAddress);
+
+QDBusArgument &operator<<(QDBusArgument &argument, const QSpiObjectAddress &address);
+const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiObjectAddress &address);
+
 /* QSpiActionArray */
 /*---------------------------------------------------------------------------*/
 

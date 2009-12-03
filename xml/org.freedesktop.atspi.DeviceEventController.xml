@@ -1,44 +1,13 @@
 <node xmlns:tp="http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0" name="/node">
 <interface name="org.freedesktop.atspi.DeviceEventController">
-  <method name="registerKeystrokeListener">
-    <arg direction="in" name="listener" type="o"/>
-    <arg direction="in" name="keys" type="a(iisi)"/>
-    <arg direction="in" name="mask" type="u"/>
-    <arg direction="in" name="type" type="au"/>
-    <arg direction="in" name="mode" type="(bbb)"/>
-    <arg direction="out" type="b"/>
-  </method>
-  <method name="deregisterKeystrokeListener">
-    <arg direction="in" name="listener" type="o"/>
-    <arg direction="in" name="keys" type="a(iisi)"/>
-    <arg direction="in" name="mask" type="u"/>
-    <arg direction="in" name="type" type="u"/>
-  </method>
-  <method name="registerDeviceEventListener">
-    <arg direction="in" name="listener" type="o"/>
-    <arg direction="in" name="types" type="u"/>
-    <arg direction="out" type="b"/>
-  </method>
-  <method name="deregisterDeviceEventListener">
-    <arg direction="in" name="listener" type="o"/>
-    <arg direction="in" name="types" type="u"/>
-  </method>
-  <method name="notifyListenersSync">
+  <method name="NotifyListenersSync">
     <arg direction="in" name="event" type="(uinnisb)"/>
     <arg direction="out" type="b"/>
+    <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiDeviceEvent"/>
   </method>
-  <method name="notifyListenersAsync">
+  <method name="NotifyListenersAsync">
     <arg direction="in" name="event" type="(uinnisb)"/>
-  </method>
-  <method name="generateKeyboardEvent">
-    <arg direction="in" name="keycode" type="i"/>
-    <arg direction="in" name="keystring" type="s"/>
-    <arg direction="in" name="type" type="u"/>
-  </method>
-  <method name="generateMouseEvent">
-    <arg direction="in" name="x" type="i"/>
-    <arg direction="in" name="y" type="i"/>
-    <arg direction="in" name="eventName" type="s"/>
+    <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiDeviceEvent"/>
   </method>
 </interface>
 </node>

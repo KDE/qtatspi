@@ -1,13 +1,13 @@
 <node xmlns:tp="http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0" name="/node">
 <interface name="org.freedesktop.atspi.Hypertext">
-  <method name="getNLinks">
+  <method name="GetNLinks">
     <arg direction="out" type="i"/>
   </method>
-  <method name="getLink">
+  <method name="GetLink">
     <arg direction="in" name="linkIndex" type="i"/>
     <arg direction="out" type="o"/>
   </method>
-  <method name="getLinkIndex">
+  <method name="GetLinkIndex">
     <arg direction="in" name="characterIndex" type="i"/>
     <arg direction="out" type="i"/>
   </method>

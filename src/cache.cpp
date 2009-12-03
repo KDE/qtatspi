@@ -108,9 +108,11 @@ bool QSpiAccessibleCache::eventFilter(QObject *obj, QEvent *event)
             accessible = lookupObject (obj);
             if (accessible && accessible->getInterface().isValid())
             {
+#if 0
                 qDebug ("QSpiAccessibleBridge : childRemoved.\n\t%s\n",
                         qPrintable(accessible->getPath().path())
                        );
+#endif
 
                 emit accessibleUpdated (accessible);
             }
@@ -228,8 +230,10 @@ void QSpiAccessibleCache::objectDestroyed (QObject *obj)
     if (cache.contains (obj))
     {
         QSpiAccessibleObject *accessible = cache.take (obj);
+#if 0
         qDebug("QSpiAccessibleBridge : Object Destroyed\n\t%s\n",
                qPrintable(accessible->getPath().path()));
+#endif
         emit accessibleDestroyed (accessible);
         delete accessible;
     }

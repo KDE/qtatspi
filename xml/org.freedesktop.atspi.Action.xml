@@ -1,23 +1,23 @@
 <node xmlns:tp="http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0" name="/node">
 <interface name="org.freedesktop.atspi.Action">
   <property name="nActions" type="i" access="read"/>
-  <method name="getDescription">
+  <method name="GetDescription">
     <arg type="i" name="index" direction="in"/>
     <arg type="s" direction="out"/>
   </method>
-  <method name="getName">
+  <method name="GetName">
     <arg type="i" name="index" direction="in"/>
     <arg type="s" direction="out"/>
   </method>
-  <method name="getKeyBinding">
+  <method name="GetKeyBinding">
     <arg type="i" name="index" direction="in"/>
     <arg type="s" direction="out"/>
   </method>
-  <method name="getActions">
+  <method name="GetActions">
     <arg direction="out" name="index" type="a(sss)"/>
     <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiActionArray"/>
   </method>
-  <method name="doAction">
+  <method name="DoAction">
     <arg direction="in" name="index" type="i"/>
     <arg direction="out" type="b"/>
   </method>
