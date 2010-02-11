@@ -29,34 +29,66 @@
 #include <QAccessible>
 #include <QAccessibleInterface>
 
+#include "struct_marshallers.h"
+
+#define QSPI_INTERFACE_PREFIX "org.a11y.atspi"
+
+#define QSPI_INTERFACE_ACCESSIBLE            QSPI_INTERFACE_PREFIX ".Accessible"
+#define QSPI_INTERFACE_ACTION                QSPI_INTERFACE_PREFIX ".Action"
+#define QSPI_INTERFACE_APPLICATION           QSPI_INTERFACE_PREFIX ".Application"
+#define QSPI_INTERFACE_COLLECTION            QSPI_INTERFACE_PREFIX ".Collection"
+#define QSPI_INTERFACE_COMPONENT             QSPI_INTERFACE_PREFIX ".Component"
+#define QSPI_INTERFACE_DOCUMENT              QSPI_INTERFACE_PREFIX ".Document"
+#define QSPI_INTERFACE_EDITABLE_TEXT         QSPI_INTERFACE_PREFIX ".EditableText"
+#define QSPI_INTERFACE_HYPERLINK             QSPI_INTERFACE_PREFIX ".Hyperlink"
+#define QSPI_INTERFACE_HYPERTEXT             QSPI_INTERFACE_PREFIX ".Hypertext"
+#define QSPI_INTERFACE_IMAGE                 QSPI_INTERFACE_PREFIX ".Image"
+#define QSPI_INTERFACE_REGISTRY              QSPI_INTERFACE_PREFIX ".Registry"
+#define QSPI_INTERFACE_SELECTION             QSPI_INTERFACE_PREFIX ".Selection"
+#define QSPI_INTERFACE_TABLE                 QSPI_INTERFACE_PREFIX ".Table"
+#define QSPI_INTERFACE_TEXT                  QSPI_INTERFACE_PREFIX ".Text"
+#define QSPI_INTERFACE_TREE                  QSPI_INTERFACE_PREFIX ".Tree"
+#define QSPI_INTERFACE_VALUE                 QSPI_INTERFACE_PREFIX ".Value"
+
+#define QSPI_OBJECT_PATH_PREFIX  "/org/a11y/atspi/accessible/"
+#define QSPI_OBJECT_PATH_NULL    QSPI_OBJECT_PATH_PREFIX "null"
+#define QSPI_OBJECT_PATH_ROOT    QSPI_OBJECT_PATH_PREFIX "root"
+
+/*---------------------------------------------------------------------------*/
+
 class QSpiAccessibleCache;
 
-class QSpiAccessibleObject : public QObject
+/*
+ * This class is the virtual base class for all accessible objects.
+ *
+ * These are objects that are resident within this program and have a 
+ * QAccessibleInterface backing them.
+ * 
+ */
+
+class QSpiObject : public QObject
 {
     Q_OBJECT
 
 public:
-    QSpiAccessibleObject (QSpiAccessibleCache  *cache,
-                          QAccessibleInterface *interface);
+    QSpiObject (QSpiAccessibleCache  *cache,
+                QAccessibleInterface *interface);
 
-    QAccessibleInterface &getInterface () const;
-    QDBusObjectPath       getPath () const ;
-    QStringList           getSupported () const;
+    QAccessibleInterface     &getInterface () const;
+    QStringList               getSupported () const;
+    QSpiAccessibleCacheItem   getItem      () const;
 
-    /* I cannot believe these are not part of the QAccessibleInterface */
-    virtual QDBusObjectPath getParentPath () const;
-    virtual QList <QSpiAccessibleObject *> getChildren () const;
-    QSpiAccessibleObject *getApplication () const;
+    virtual QSpiObjectReference &getReference () const;
+    virtual QSpiObjectReference &getParentReference () const = 0;
 
-    QSpiAccessibleCache   *cache;
+    void accessibleEvent (QAccessible::Event event);
+    bool eventFilter     (QObject *obj, QEvent *event);
 
 protected:
     QAccessibleInterface  *interface;
-    QDBusObjectPath        path;
-
     QStringList            supported;
-
-    static QDBusObjectPath getUnique ();
+    QSpiAccessibleCache  *cache;
+    QSpiObjectReference  *reference;
 };
 
-#endif /* Q_SPI_CACHE_H */
+#endif /* Q_SPI_OBJECT_H */

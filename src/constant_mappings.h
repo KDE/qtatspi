@@ -27,7 +27,7 @@
 #ifndef Q_SPI_CONSTANT_MAPPINGS_H
 #define Q_SPI_CONSTANT_MAPPINGS_H
 
-#include "adaptor_marshallers.h"
+#include "struct_marshallers.h"
 
 /* Role mapping */
 /*---------------------------------------------------------------------------*/

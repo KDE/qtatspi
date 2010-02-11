@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node name="/node">
+<interface name="org.a11y.atspi.DeviceEventController">
+
+  <method name="NotifyListenersSync">
+    <arg direction="in" name="event" type="(uinnisb)"/>
+    <arg direction="out" type="b"/>
+    <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiDeviceEvent"/>
+  </method>
+
+  <method name="NotifyListenersAsync">
+    <arg direction="in" name="event" type="(uinnisb)"/>
+    <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiDeviceEvent"/>
+  </method>
+
+</interface>
+</node>

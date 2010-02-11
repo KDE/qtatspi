@@ -31,16 +31,15 @@
 #include <QAccessibleBridge>
 #include <QTime>
 
+#include "object.h"
 #include "cache.h"
-#include "registry_proxy.h"
-#include "device_event_controller_proxy.h"
 #include "constant_mappings.h"
-#include "adaptor_marshallers.h"
-#include "proxy_marshallers.h"
+#include "struct_marshallers.h"
 
-#define QSPI_REGISTRY_ADDRESS      "org.freedesktop.atspi.Registry"
-#define QSPI_REGISTRY_OBJECT_PATH  "/org/freedesktop/atspi/registry"
-#define QSPI_DEC_OBJECT_PATH       "/org/freedesktop/atspi/registry/deviceeventcontroller"
+#include "generated/dec_proxy.h"
+
+#define QSPI_DEC_NAME        "/org/a11y/atspi/registry"
+#define QSPI_DEC_OBJECT_PATH "/org/a11y/atspi/registry/deviceeventcontroller"
 
 class QSpiAccessibleBridge: public QObject, public QAccessibleBridge
 {
@@ -58,8 +57,7 @@ public slots:
 
 private:
         QSpiAccessibleCache  *cache;
-        QSpiRegistryProxy    *registry;
-        QSpiDECProxy         *dec;
+        DECProxy             *dec;
 };
 
 /*---------------------------------------------------------------------------*/
@@ -102,10 +100,7 @@ Q_EXPORT_PLUGIN(QSpiAccessibleBridgePlugin)
 
 void QSpiAccessibleBridge::aboutToQuit ()
 {
-        if (registry != NULL)
-        {
-            registry->DeregisterApplication (QDBusConnection::sessionBus().baseService ());
-        }
+        ;
 }
 
 void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *rootInterface)
@@ -114,8 +109,8 @@ void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *rootInterface)
 
         qDebug ("QSpiAccessibleBridge : Initializing bridge");
 
-        qspi_initialize_adaptor_types ();
-        qspi_initialize_proxy_types ();
+        qspi_initialize_struct_types ();
+        qspi_initialize_constant_mappings ();
 
         /* Create the cache of accessible objects */
         cache = new QSpiAccessibleCache (rootInterface->object());
@@ -127,29 +122,9 @@ void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *rootInterface)
             return;
         }
 
-        registry = new QSpiRegistryProxy (QSPI_REGISTRY_ADDRESS,
-                                          QSPI_REGISTRY_OBJECT_PATH,
-                                          QDBusConnection::sessionBus());
-
-        dec = new QSpiDECProxy (QSPI_REGISTRY_ADDRESS,
-                                QSPI_REGISTRY_OBJECT_PATH,
-                                QDBusConnection::sessionBus());
-
-        if (!registry->isValid ())
-        {
-            qDebug ("QSpiAccessibleBridge : Could not contact accessibility registry");
-            return;
-        }
-
-        registry->RegisterApplication (QDBusConnection::sessionBus().baseService ());
-        error = registry->lastError ();
-        if (error.type() != QDBusError::NoError)
-        {
-            qDebug ("QSpiAccessibleBridge : Could not register with accessibility registry.\n \"%s:%s:%s\"",
-                    qPrintable (error.errorString(error.type())),
-                    qPrintable (error.name()),
-                    qPrintable (error.message()));
-        }
+        dec = new DECProxy (QSPI_DEC_NAME,
+                            QSPI_DEC_OBJECT_PATH,
+                            QDBusConnection::sessionBus());
 
         /* Register for application events to handle key events */
         /* TODO, should this be registered on the root object? */
@@ -159,13 +134,11 @@ void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *rootInterface)
         connect (QApplication::instance(), SIGNAL (aboutToQuit()),
                  this, SLOT (aboutToQuit()));
 
-        /* Initialize maps of QAccessible <-> AT-SPI constants */
-        qspi_initialize_constant_mappings ();
 }
 
 void QSpiAccessibleBridge::notifyAccessibilityUpdate (int reason, QAccessibleInterface *interface, int index)
 {
-        QSpiAccessibleObject *accessible = NULL;
+        QSpiObject *accessible = NULL;
 
         if (!cache)
                 return;
@@ -175,12 +148,13 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate (int reason, QAccessibleInt
                 QAccessibleInterface *child = NULL;
 
                 interface->navigate(QAccessible::Child, index, &child);
-                accessible = cache->lookupObject (child->object());
+                accessible = cache->objectToAccessible (child->object());
         }
         else
         {
-                accessible = cache->lookupObject (interface->object());
+                accessible = cache->objectToAccessible (interface->object());
         }
+	accessible->accessibleEvent ((QAccessible::Event) reason);
 }
 
 enum QSpiKeyEventType
@@ -192,7 +166,7 @@ enum QSpiKeyEventType
 
 bool QSpiAccessibleBridge::eventFilter(QObject *obj, QEvent *event)
 {
-
+    Q_UNUSED (obj);
     switch (event->type ())
     {
         case QEvent::KeyPress:
@@ -215,11 +189,17 @@ bool QSpiAccessibleBridge::eventFilter(QObject *obj, QEvent *event)
             /* TODO Work out if there is an easy equivalent of "is_text" */
             de.is_text = false; 
 
+#if 0
             qDebug ("QSpiAccessibleBridge : keyEvent.\n\t%s",
                     qPrintable (de.event_string)
                    );
+#endif
 
-            return this->dec->NotifyListenersSync(de); 
+            /* TODO Work through the sync issues with key event notifications.
+             * How can we block the events here?
+             */
+            /*return this->dec->NotifyListenersSync(de);*/
+            return false;
             break;
         }
         default:

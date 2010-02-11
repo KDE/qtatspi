@@ -22,16 +22,15 @@
 #ifndef Q_SPI_CACHE_H
 #define Q_SPI_CACHE_H
 
-
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
 #include <QtDBus/QtDBus>
-
 #include <QAccessible>
 
-class QSpiAccessibleObject;
+#include "object.h"
+#include "struct_marshallers.h"
 
 class QSpiAccessibleCache : public QObject
 {
@@ -39,30 +38,26 @@ class QSpiAccessibleCache : public QObject
 
 public:
     QSpiAccessibleCache (QObject *root);
+    QSpiObject *objectToAccessible (QObject *);
 
+    QObject *getRoot ();
     bool eventFilter(QObject *obj, QEvent *event);
 
 public slots:
-    void objectDestroyed (QObject *object);
-
-    QSpiAccessibleObject *getRoot ();
-    QList <QSpiAccessibleObject *> listAccessibles ();
-
-    QSpiAccessibleObject *lookupObject (QObject *);
-
-    void updateAccessible (QSpiAccessibleObject *accessible, QAccessible::Event event);
+    void objectDestroyed  (QObject *object);
 
 signals:
-    void accessibleUpdated   (QSpiAccessibleObject *accessible);
-    void accessibleDestroyed (QSpiAccessibleObject *accessible);
+    void AddAccessible(const QSpiAccessibleCacheItem &nodeAdded);
+    void RemoveAccessible(const QSpiObjectReference &nodeRemoved);
 
 private:
-
-    void registerConnected (QObject *object);
-    void registerChildren (QAccessibleInterface *interface);
-
     QObject *root;
-    QHash <QObject *, QSpiAccessibleObject *> cache;
+    QHash <QObject *, QSpiObject *> cache;
+    void registerChildren  (QAccessibleInterface *interface);
+
+/* AT-SPI Cache interface */
+public Q_SLOTS:
+    QSpiAccessibleCacheArray GetItems();
 };
 
 #endif /* Q_SPI_CACHE_H */

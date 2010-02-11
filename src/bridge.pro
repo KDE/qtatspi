@@ -1,41 +1,46 @@
 TEMPLATE = lib
 
-HEADERS += cache.h  \
+HEADERS += \
+           generated/marshallers.h \
+           generated/dec_proxy.h \
+           generated/socket_proxy.h \
+           generated/accessible_adaptor.h \
+           generated/action_adaptor.h \
+           generated/application_adaptor.h \
+           generated/cache_adaptor.h \
+           generated/component_adaptor.h \
+           generated/editable_text_adaptor.h \
+           generated/event_adaptor.h \
+           generated/table_adaptor.h \
+           generated/text_adaptor.h \
+           generated/value_adaptor.h \
+           cache.h  \
            object.h \
-           application.h \
-           application_adaptor.h \
-           component_adaptor.h \
-           device_event_controller_proxy.h \
-           action_adaptor.h \
-           value_adaptor.h \
-           proxy_marshallers.h \
+           adaptor.h \
+           struct_marshallers.h \
            constant_mappings.h \
-           tree_adaptor.h \
-           text_adaptor.h \
-           editable_text_adaptor.h \
-           accessible_adaptor.h \
-           table_adaptor.h \
-           registry_proxy.h
+           accessible.h
 
-
-SOURCES += bridge.cpp \
+SOURCES += \
+           generated/dec_proxy.cpp \
+           generated/socket_proxy.cpp \
+           generated/accessible_adaptor.cpp \
+           generated/action_adaptor.cpp \
+           generated/application_adaptor.cpp \
+           generated/cache_adaptor.cpp \
+           generated/component_adaptor.cpp \
+           generated/editable_text_adaptor.cpp \
+           generated/event_adaptor.cpp \
+           generated/table_adaptor.cpp \
+           generated/text_adaptor.cpp \
+           generated/value_adaptor.cpp \
+           bridge.cpp \
            cache.cpp  \
            object.cpp \
-           application.cpp \
-           application_adaptor_impl.cpp \
-           component_adaptor_impl.cpp \
-           device_event_controller_proxy.cpp \
-           action_adaptor_impl.cpp \
-           value_adaptor_impl.cpp \
-           proxy_marshallers.cpp \
+           adaptor.cpp \
+           struct_marshallers.cpp \
            constant_mappings.cpp \
-           tree_adaptor_impl.cpp \
-           text_adaptor_impl.cpp \
-           editable_text_adaptor_impl.cpp \
-           adaptor_marshallers.cpp \
-           table_adaptor_impl.cpp \
-           accessible_adaptor_impl.cpp \
-           registry_proxy.cpp
+           accessible.cpp
 
 DEFINES += QT_ACCESSIBILITY
 
