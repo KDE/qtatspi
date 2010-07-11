@@ -1,0 +1,24 @@
+Notes about differences, missing bits in qt-at-spi
+
+GetApplication is returning invalid dbus paths ("/" for test app)
+accessible/root doesn't have GetChildren
+cache is not under accessible
+Cache Children added signal is broken
+
+intermediate paths show in d-feet introspection
+
+gtk-atk has
+Action
+Component
+Document
+EditableText
+Hyperlink
+HyperText
+Image
+Selection
+Table
+Text
+Value
+
+qt-at-spi has
+Event?

@@ -31,7 +31,7 @@ The cache object is responsible for:
 - Listening to the `QSpiAccessible` interface and creating `QSpiAccessible`
   objects when new widgets are added.
 - Listening to the `objectDestroyed` signal of these widgets and deleting
-  its `QSpiAccessible` object on widged destruction. (Essentially tying the
+  its `QSpiAccessible` object on widget destruction. (Essentially tying the
   life-time of an adaptor object to the widget it represents.
 - Maintaining a look-up mechanism to get hold of a `QSpiAccessible` from the
   widget it represents.
