@@ -52,6 +52,12 @@ Q_DECLARE_METATYPE (QSpiObjectReference);
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiObjectReference &address);
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiObjectReference &address);
 
+/* QSpiObjectReferenceArray */
+/*---------------------------------------------------------------------------*/
+typedef QList <QSpiObjectReference> QSpiObjectReferenceArray;
+
+Q_DECLARE_METATYPE (QSpiObjectReferenceArray);
+
 /* QSpiAccessibleCacheArray */
 /*---------------------------------------------------------------------------*/
 

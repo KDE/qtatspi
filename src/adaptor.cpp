@@ -33,6 +33,8 @@
 #include <QAccessibleActionInterface>
 #include <QAccessibleValueInterface>
 
+#include <QtDebug>
+
 #include "object.h"
 #include "adaptor.h"
 #include "cache.h"
@@ -142,16 +144,16 @@ static const char roles[] =
   "input method window";
 
 static const uint roles_offsets[] = {
-  0, 8, 26, 32, 42, 48, 57, 64, 
-  74, 90, 104, 118, 128, 139, 152, 166, 
-  171, 178, 193, 206, 219, 226, 238, 244, 
-  255, 270, 275, 281, 296, 302, 315, 320, 
-  330, 335, 344, 354, 366, 375, 389, 395, 
-  409, 420, 433, 445, 458, 474, 484, 495, 
-  506, 518, 528, 535, 546, 558, 568, 574, 
-  585, 605, 622, 641, 650, 655, 669, 678, 
-  687, 692, 703, 711, 720, 727, 734, 741, 
-  751, 757, 769, 782, 791, 810, 816, 822, 
+  0, 8, 26, 32, 42, 48, 57, 64,
+  74, 90, 104, 118, 128, 139, 152, 166,
+  171, 178, 193, 206, 219, 226, 238, 244,
+  255, 270, 275, 281, 296, 302, 315, 320,
+  330, 335, 344, 354, 366, 375, 389, 395,
+  409, 420, 433, 445, 458, 474, 484, 495,
+  506, 518, 528, 535, 546, 558, 568, 574,
+  585, 605, 622, 641, 650, 655, 669, 678,
+  687, 692, 703, 711, 720, 727, 734, 741,
+  751, 757, 769, 782, 791, 810, 816, 822,
   830, 845, 853, 858, 866, 883, 888, 893
 };
 
@@ -191,6 +193,7 @@ QSpiObjectReference QSpiAdaptor::GetChildAtIndex(int index)
 {
     QList<QSpiObject *> children;
 
+    qDebug() << "Getting child out of " << interface->childCount() << " possible children";
     for (int i = 1; i <= interface->childCount (); i++)
     {
         QAccessibleInterface *child = NULL;
@@ -205,6 +208,25 @@ QSpiObjectReference QSpiAdaptor::GetChildAtIndex(int index)
         }
     }
     return children.value(index)->getReference();
+}
+
+QSpiObjectReferenceArray QSpiAdaptor::GetChildren()
+{
+    QList<QSpiObjectReference> children;
+
+    for (int i = 1; i <= interface->childCount(); ++i) {
+        QAccessibleInterface *child = NULL;
+        interface->navigate(QAccessible::Child, i, &child);
+        if (child) {
+            QSpiObject *current;
+            current = cache->objectToAccessible (child->object ());
+            if (current)
+                children << current->getReference();
+            delete child;
+        }
+    }
+
+    return children;
 }
 
 int QSpiAdaptor::GetIndexInParent()
