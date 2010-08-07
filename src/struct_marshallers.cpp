@@ -148,9 +148,9 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAppUpdate &up
 
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiDeviceEvent &event) {
         argument.beginStructure();
-        argument << event.type 
-                 << event.id 
-                 << event.hw_code 
+        argument << event.type
+                 << event.id
+                 << event.hw_code
                  << event.modifiers
                  << event.timestamp
                  << event.event_string
@@ -161,9 +161,9 @@ QDBusArgument &operator<<(QDBusArgument &argument, const QSpiDeviceEvent &event)
 
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiDeviceEvent &event) {
         argument.beginStructure();
-        argument >> event.type 
-                 >> event.id 
-                 >> event.hw_code 
+        argument >> event.type
+                 >> event.id
+                 >> event.hw_code
                  >> event.modifiers
                  >> event.timestamp
                  >> event.event_string
@@ -180,6 +180,7 @@ void qspi_initialize_struct_types ()
         qDBusRegisterMetaType<QSpiAccessibleCacheItem>();
         qDBusRegisterMetaType<QSpiAccessibleCacheArray>();
         qDBusRegisterMetaType<QSpiObjectReference>();
+        qDBusRegisterMetaType<QSpiObjectReferenceArray>();
         qDBusRegisterMetaType<QSpiRect>();
         qDBusRegisterMetaType<QSpiAttributeSet>();
         qDBusRegisterMetaType<QSpiAction>();
