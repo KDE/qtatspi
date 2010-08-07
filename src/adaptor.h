@@ -29,11 +29,12 @@
 /*
  * Implements all methods neccessary to adapt calls from AT-SPI to the
  * QAccessibleInterface.
- * 
+ *
  */
 
 class QSpiAdaptor : public QSpiObject
 {
+    Q_OBJECT
 public:
     QSpiAdaptor (QSpiAccessibleCache  *cache,
                  QAccessibleInterface *interface):QSpiObject (cache, interface) {}
