@@ -77,7 +77,6 @@ public:
 QSpiAccessibleBridgePlugin::QSpiAccessibleBridgePlugin(QObject *parent)
 : QAccessibleBridgePlugin(parent)
 {
-        ;
 }
 
 QAccessibleBridge* QSpiAccessibleBridgePlugin::create(const QString &name)
@@ -100,14 +99,11 @@ Q_EXPORT_PLUGIN(QSpiAccessibleBridgePlugin)
 
 void QSpiAccessibleBridge::aboutToQuit ()
 {
-        ;
 }
 
 void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *rootInterface)
 {
-        QDBusError error;
-
-        qDebug ("QSpiAccessibleBridge : Initializing bridge");
+        qDebug() << "QSpiAccessibleBridge : Initializing bridge";
 
         qspi_initialize_struct_types ();
         qspi_initialize_constant_mappings ();
@@ -118,7 +114,7 @@ void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *rootInterface)
         /* Connect to the session bus and register with the AT-SPI registry daemon */
         if (!QDBusConnection::sessionBus().isConnected())
         {
-            qDebug ("QSpiAccessibleBridge : Failed to connect to session bus");
+            qDebug() << "QSpiAccessibleBridge : Failed to connect to session bus";
             return;
         }
 
@@ -128,7 +124,7 @@ void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *rootInterface)
 
         /* Register for application events to handle key events */
         /* TODO, should this be registered on the root object? */
-        QApplication::instance()->installEventFilter(this);
+        // QApplication::instance()->installEventFilter(this);
 
         /* Connect to the applications about-to-quit signal for de-registering this app */
         connect (QApplication::instance(), SIGNAL (aboutToQuit()),
