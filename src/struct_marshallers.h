@@ -38,13 +38,15 @@ Q_DECLARE_METATYPE (QSpiIntList);
 
 struct QSpiObjectReference
 {
-    QString         name;
+    QString name;
     QDBusObjectPath path;
 
     /*QSpiObjectReference &operator= (const QSpiObjectReference &other);*/
 
-    QSpiObjectReference (): name (""), path (QDBusObjectPath ("/")) {}
-    QSpiObjectReference (QString name, QDBusObjectPath path): name (name), path (path) {}
+    QSpiObjectReference()
+        : path(QDBusObjectPath("/")) {}
+    QSpiObjectReference(QString name, QDBusObjectPath path)
+        : name(name), path(path) {}
 };
 
 Q_DECLARE_METATYPE (QSpiObjectReference);

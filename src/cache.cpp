@@ -42,23 +42,19 @@ QSpiAccessibleCache::QSpiAccessibleCache (QObject *root)
 {
     CacheAdaptor *adaptor;
 
-    /* TODO, should this be registered on the root object? */
-    QApplication::instance()->installEventFilter(this);
+    //QApplication::instance()->installEventFilter(this);
 
     this->root = root;
-    cache.insert (root, new QSpiApplication (this, QAccessible::queryAccessibleInterface (root)));
-    registerChildren (QAccessible::queryAccessibleInterface(root));
+    cache.insert(root, new QSpiApplication (this, QAccessible::queryAccessibleInterface (root)));
+    registerChildren(QAccessible::queryAccessibleInterface(root));
 
-    adaptor = new CacheAdaptor (this);
+    adaptor = new CacheAdaptor(this);
     QDBusConnection::sessionBus().registerObject(QSPI_OBJECT_PATH_CACHE, this, QDBusConnection::ExportAdaptors);
 	
-    connect (this, SIGNAL(AddAccessible (const QSpiAccessibleCacheItem &)),
-             adaptor, SIGNAL(AddAccessible (const QSpiAccessibleCacheItem &)));
-    connect (this, SIGNAL(RemoveAccessible (const QSpiObjectReference &)),
-             adaptor, SIGNAL(RemoveAccessible (const QSpiObjectReference &)));
-
-    // Install global event filter.
-    QApplication::instance ()->installEventFilter (this);
+    connect (this, SIGNAL(AddAccessible(const QSpiAccessibleCacheItem &)),
+             adaptor, SIGNAL(AddAccessible(const QSpiAccessibleCacheItem &)));
+    connect (this, SIGNAL(RemoveAccessible(const QSpiObjectReference &)),
+             adaptor, SIGNAL(RemoveAccessible(const QSpiObjectReference &)));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -161,7 +157,7 @@ QSpiObject *QSpiAccessibleCache::objectToAccessible (QObject *obj)
                    );
 #endif
 
-            emit AddAccessible (accessible->getItem());
+            emit AddAccessible (accessible->getCacheItem());
         }
         return accessible;
     }
@@ -175,7 +171,7 @@ QSpiObject *QSpiAccessibleCache::objectToAccessible (QObject *obj)
  * No Idea about the threading implications here.
  * What is the equivalent of the GDK lock?
  */
-void QSpiAccessibleCache::registerChildren (QAccessibleInterface *interface)
+void QSpiAccessibleCache::registerChildren(QAccessibleInterface *interface)
 {
     QAccessibleInterface *current;
     QSpiObject *accessible = NULL;
@@ -211,7 +207,7 @@ QSpiAccessibleCacheArray QSpiAccessibleCache::GetItems()
 
     foreach (QSpiObject *obj, cache.values())
     {
-        cacheArray << obj->getItem ();
+        cacheArray << obj->getCacheItem();
     }
     return cacheArray;
 }

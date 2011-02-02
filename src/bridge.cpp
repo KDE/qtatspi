@@ -20,16 +20,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QStringList>
-
-#include <QtDBus/QtDBus>
-
-#include <QApplication>
-#include <QAccessible>
-#include <QAccessibleBridge>
-#include <QTime>
+#include "bridge.h"
 
 #include "object.h"
 #include "cache.h"
@@ -41,116 +32,59 @@
 #define QSPI_DEC_NAME        "/org/a11y/atspi/registry"
 #define QSPI_DEC_OBJECT_PATH "/org/a11y/atspi/registry/deviceeventcontroller"
 
-class QSpiAccessibleBridge: public QObject, public QAccessibleBridge
-{
-        Q_OBJECT
-
-        bool eventFilter(QObject *obj, QEvent *event);
-public:
-        QSpiAccessibleBridge () {cache=NULL;}
-        virtual ~QSpiAccessibleBridge ();
-        virtual void setRootObject (QAccessibleInterface *obj);
-        virtual void notifyAccessibilityUpdate (int reason, QAccessibleInterface *obj, int child);
-
-public slots:
-        void aboutToQuit ();
-
-private:
-        QSpiAccessibleCache  *cache;
-        DECProxy             *dec;
-};
-
-/*---------------------------------------------------------------------------*/
-
-class QSpiAccessibleBridgePlugin: public QAccessibleBridgePlugin
-{
-        Q_OBJECT
-public:
-        QSpiAccessibleBridgePlugin(QObject *parent = 0);
-
-        virtual QAccessibleBridge* create(const QString &);
-        virtual QStringList keys() const;
-};
-
-/*---------------------------------------------------------------------------*/
-
-QSpiAccessibleBridgePlugin::QSpiAccessibleBridgePlugin(QObject *parent)
-: QAccessibleBridgePlugin(parent)
-{
-}
-
-QAccessibleBridge* QSpiAccessibleBridgePlugin::create(const QString &name)
-{
-        if (name == "QSPIACCESSIBLEBRIDGE")
-                return new QSpiAccessibleBridge();
-        return 0;
-}
-
-QStringList QSpiAccessibleBridgePlugin::keys() const
-{
-        QStringList l;
-        l  << "QSPIACCESSIBLEBRIDGE";
-        return l;
-}
-
-Q_EXPORT_PLUGIN(QSpiAccessibleBridgePlugin)
-
-/*---------------------------------------------------------------------------*/
-
 void QSpiAccessibleBridge::aboutToQuit ()
 {
 }
 
 void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *rootInterface)
 {
-        qDebug() << "QSpiAccessibleBridge : Initializing bridge";
+    qDebug() << "QSpiAccessibleBridge : Initializing bridge";
 
-        qspi_initialize_struct_types ();
-        qspi_initialize_constant_mappings ();
+    qspi_initialize_struct_types ();
+    qspi_initialize_constant_mappings ();
 
-        /* Create the cache of accessible objects */
-        cache = new QSpiAccessibleCache (rootInterface->object());
+    /* Create the cache of accessible objects */
+    cache = new QSpiAccessibleCache(rootInterface->object());
 
-        /* Connect to the session bus and register with the AT-SPI registry daemon */
-        if (!QDBusConnection::sessionBus().isConnected())
-        {
-            qDebug() << "QSpiAccessibleBridge : Failed to connect to session bus";
-            return;
-        }
+    /* Connect to the session bus and register with the AT-SPI registry daemon */
+    if (!QDBusConnection::sessionBus().isConnected())
+    {
+        qDebug() << "QSpiAccessibleBridge : Failed to connect to session bus";
+        return;
+    }
 
-        dec = new DECProxy (QSPI_DEC_NAME,
-                            QSPI_DEC_OBJECT_PATH,
-                            QDBusConnection::sessionBus());
+    dec = new DeviceEventControllerProxy(QSPI_DEC_NAME,
+                                         QSPI_DEC_OBJECT_PATH,
+                                         QDBusConnection::sessionBus());
 
-        /* Register for application events to handle key events */
-        /* TODO, should this be registered on the root object? */
-        // QApplication::instance()->installEventFilter(this);
+    /* Register for application events to handle key events */
+    /* TODO, should this be registered on the root object? */
+    //QApplication::instance()->installEventFilter(this);
 
-        /* Connect to the applications about-to-quit signal for de-registering this app */
-        connect (QApplication::instance(), SIGNAL (aboutToQuit()),
-                 this, SLOT (aboutToQuit()));
+    /* Connect to the applications about-to-quit signal for de-registering this app */
+    connect (QApplication::instance(), SIGNAL (aboutToQuit()),
+             this, SLOT (aboutToQuit()));
 
 }
 
-void QSpiAccessibleBridge::notifyAccessibilityUpdate (int reason, QAccessibleInterface *interface, int index)
+void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface, int index)
 {
-        QSpiObject *accessible = NULL;
+    // qDebug() << "QSpiAccessibleBridge::notifyAccessibilityUpdate" << reason;
 
-        if (!cache)
-                return;
+    QSpiObject *accessible = NULL;
 
-        if (index > 0)
-        {
-                QAccessibleInterface *child = NULL;
+    if (!cache)
+        return;
 
-                interface->navigate(QAccessible::Child, index, &child);
-                accessible = cache->objectToAccessible (child->object());
-        }
-        else
-        {
-                accessible = cache->objectToAccessible (interface->object());
-        }
-	accessible->accessibleEvent ((QAccessible::Event) reason);
+    if (index > 0) {
+        QAccessibleInterface *child = NULL;
+
+        interface->navigate(QAccessible::Child, index, &child);
+        accessible = cache->objectToAccessible(child->object());
+    } else {
+        accessible = cache->objectToAccessible (interface->object());
+    }
+    accessible->accessibleEvent((QAccessible::Event) reason);
 }
 
 enum QSpiKeyEventType
@@ -208,7 +142,3 @@ QSpiAccessibleBridge::~QSpiAccessibleBridge ()
 {
         /* As far as I can tell this destructor is not called on program termination */
 }
-
-#include "bridge.moc"
-
-/*---------------------------------------------------------------------------*/

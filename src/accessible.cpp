@@ -99,7 +99,7 @@ QSpiAccessible::QSpiAccessible (QSpiAccessibleCache  *cache,
                                                  QDBusConnection::ExportAdaptors);
 }
 
-QSpiObjectReference &QSpiAccessible::getParentReference () const
+QSpiObjectReference &QSpiAccessible::getParentReference() const
 {
     QAccessibleInterface *parentInterface = NULL;
     QSpiObject *parent;
@@ -107,7 +107,7 @@ QSpiObjectReference &QSpiAccessible::getParentReference () const
     interface->navigate (QAccessible::Ancestor, 1, &parentInterface);
     if (parentInterface)
     {
-        parent = cache->objectToAccessible (parentInterface->object());
+        parent = cache->objectToAccessible(parentInterface->object());
         delete parentInterface;
         if (parent)
         {
@@ -121,13 +121,14 @@ QSpiObjectReference &QSpiAccessible::getParentReference () const
 /* QSpiApplication ------------------------------------------------*/
 
 QSpiApplication::QSpiApplication (QSpiAccessibleCache  *cache,
-                                  QAccessibleInterface *interface):QSpiAdaptor (cache, interface)
+                                  QAccessibleInterface *interface)
+    :QSpiAdaptor (cache, interface)
 {
     SocketProxy *proxy;
     ApplicationAdaptor *app;
     QDBusPendingReply <QSpiObjectReference> reply;
 
-    this->reference = new QSpiObjectReference (QDBusConnection::sessionBus().baseService(),
+    reference = new QSpiObjectReference (QDBusConnection::sessionBus().baseService(),
                                                QDBusObjectPath (QSPI_OBJECT_PATH_ROOT));
 
     new AccessibleAdaptor(this);
@@ -141,21 +142,17 @@ QSpiApplication::QSpiApplication (QSpiAccessibleCache  *cache,
                                                  this,
                                                  QDBusConnection::ExportAdaptors);
 
-
     /* Plug in to the desktop socket */
     proxy = new SocketProxy (QSPI_REGISTRY_NAME,
                              QSPI_OBJECT_PATH_ROOT,
                              QDBusConnection::sessionBus());
-    reply = proxy->Embed (getReference());
-    reply.waitForFinished ();
-    if (reply.isValid ())
-    {
-        const QSpiObjectReference &socket = reply.value ();
-        this->socket = new QSpiObjectReference (socket); 
-    }
-    else
-    {
-        this->socket = new QSpiObjectReference ();
+    reply = proxy->Embed(getReference());
+    reply.waitForFinished();
+    if (reply.isValid ()) {
+        const QSpiObjectReference &_socket = reply.value();
+        socket = new QSpiObjectReference(_socket);
+    } else {
+        socket = new QSpiObjectReference();
         qDebug() << "Error in contacting registry";
         qDebug() << reply.error().name();
         qDebug() << reply.error().message();
@@ -163,7 +160,7 @@ QSpiApplication::QSpiApplication (QSpiAccessibleCache  *cache,
     delete proxy;
 }
 
-QSpiObjectReference &QSpiApplication::getParentReference () const
+QSpiObjectReference &QSpiApplication::getParentReference() const
 {
     return *socket;
 }

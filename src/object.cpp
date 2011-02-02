@@ -29,36 +29,29 @@
 
 /* QSpiObject ------------------------------------------------------*/
 
-QSpiObject::QSpiObject (QSpiAccessibleCache  *cache,
-                        QAccessibleInterface *interface)
+QSpiObject::QSpiObject(QSpiAccessibleCache  *_cache,
+                        QAccessibleInterface *_interface)
+    :interface(_interface), cache(_cache)
 {
-    ObjectAdaptor *event;
-
-    this->cache     = cache;
-    this->interface = interface;
-    /*this->reference = new QSpiObjectReference ();*/
-
-    // Event set-up.
-    interface->object()->installEventFilter (this);
-    event = new ObjectAdaptor (this);
+    new ObjectAdaptor(this);
 }
 
-QSpiObjectReference &QSpiObject::getReference () const
+QSpiObjectReference &QSpiObject::getReference() const
 {
     return *reference;
 }
 
-QAccessibleInterface &QSpiObject::getInterface () const
+QAccessibleInterface &QSpiObject::getInterface() const
 {
     return *interface;
 }
 
-QStringList QSpiObject::getSupported () const
+QStringList QSpiObject::supportedInterfaces() const
 {
     return supported;
 }
 
-QSpiAccessibleCacheItem QSpiObject::getItem () const
+QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
 {
     QSpiAccessibleCacheItem item;
 
@@ -70,7 +63,7 @@ QSpiAccessibleCacheItem QSpiObject::getItem () const
     /* Parent */
     item.parent = this->getParentReference();
     /* Children */
-    for (int i = 1; i <= this->getInterface().childCount (); i++)
+    for (int i = 1; i <= this->getInterface().childCount(); i++)
     {
         QAccessibleInterface *child = NULL;
         this->getInterface().navigate(QAccessible::Child, i, &child);
@@ -89,7 +82,7 @@ QSpiAccessibleCacheItem QSpiObject::getItem () const
     }
     item.children = childPaths;
     /* Supported interfaces */
-    item.supported = this->getSupported();
+    item.supported = supportedInterfaces();
     /* Name */
     item.name = this->getInterface().text(QAccessible::Name, 0);
     /* Role */
@@ -101,7 +94,7 @@ QSpiAccessibleCacheItem QSpiObject::getItem () const
     return item;
 }
 
-void QSpiObject::accessibleEvent (QAccessible::Event event)
+void QSpiObject::accessibleEvent(QAccessible::Event event)
 {
     /* TODO Create an event type and emit the event on the object */
     switch (event)
@@ -115,32 +108,3 @@ void QSpiObject::accessibleEvent (QAccessible::Event event)
     }
 }
 
-bool QSpiObject::eventFilter(QObject *obj, QEvent *event)
-{
-    Q_UNUSED (obj);
-    switch (event->type ())
-    {
-        case QEvent::Show:
-        {
-            break;
-        }
-        /*
-         * FIXME: No Idea what to do here, the ChildAdded signal is BROKEN
-         * for accessibility as the accessible interface is not ready when this signal
-         * is emmited.
-         */
-        case QEvent::ChildAdded:
-        {
-            break;
-        }
-        case QEvent::ChildRemoved:
-        {
-            break;
-        }
-        default:
-            break;
-    }
-    return false;
-}
-
-/*END------------------------------------------------------------------------*/
