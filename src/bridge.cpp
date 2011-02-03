@@ -32,11 +32,11 @@
 #define QSPI_DEC_NAME        "/org/a11y/atspi/registry"
 #define QSPI_DEC_OBJECT_PATH "/org/a11y/atspi/registry/deviceeventcontroller"
 
-void QSpiAccessibleBridge::aboutToQuit ()
+void QSpiAccessibleBridge::aboutToQuit()
 {
 }
 
-void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *rootInterface)
+void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *rootInterface)
 {
     qDebug() << "QSpiAccessibleBridge : Initializing bridge";
 
@@ -64,17 +64,22 @@ void QSpiAccessibleBridge::setRootObject (QAccessibleInterface *rootInterface)
     /* Connect to the applications about-to-quit signal for de-registering this app */
     connect (QApplication::instance(), SIGNAL (aboutToQuit()),
              this, SLOT (aboutToQuit()));
-
 }
 
 void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface, int index)
 {
-    // qDebug() << "QSpiAccessibleBridge::notifyAccessibilityUpdate" << reason;
+    qDebug() << "QSpi::notifyAccessibilityUpdate " << QString::number(reason, 16) << " obj: " << interface->object()->objectName() << index;
+
+    if (!cache) {
+        qWarning("QSpi::notifyAccessibilityUpdate: no cache, returning");
+        return; // why?
+    }
+
+    if (reason == QAccessible::ObjectShow) {
+        qDebug() << "Object Show event";
+    }
 
     QSpiObject *accessible = NULL;
-
-    if (!cache)
-        return;
 
     if (index > 0) {
         QAccessibleInterface *child = NULL;
@@ -82,7 +87,7 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
         interface->navigate(QAccessible::Child, index, &child);
         accessible = cache->objectToAccessible(child->object());
     } else {
-        accessible = cache->objectToAccessible (interface->object());
+        accessible = cache->objectToAccessible(interface->object());
     }
     accessible->accessibleEvent((QAccessible::Event) reason);
 }

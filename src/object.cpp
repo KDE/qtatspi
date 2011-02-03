@@ -99,12 +99,18 @@ void QSpiObject::accessibleEvent(QAccessible::Event event)
     /* TODO Create an event type and emit the event on the object */
     switch (event)
     {
+    case QAccessible::ObjectShow:
+        qDebug() << "ObjectShow";
+        // send signal ChildrenChanged
+        break;
+    case QAccessible::ObjectHide:
+        break;
     case QAccessible::DescriptionChanged:
     case QAccessible::NameChanged:
     case QAccessible::ParentChanged:
     case QAccessible::StateChanged:
     default:
-            break;
+        break;
     }
 }
 

@@ -46,6 +46,7 @@
 Calculator::Calculator(QWidget *parent)
     : QDialog(parent)
 {
+    setObjectName("Calculator Dialog");
     sumInMemory = 0.0;
     sumSoFar = 0.0;
     factorSoFar = 0.0;
@@ -362,6 +363,7 @@ void Calculator::addToMemory()
 Button *Calculator::createButton(const QString &text, const char *member)
 {
     Button *button = new Button(text);
+    button->setObjectName(text);
     connect(button, SIGNAL(clicked()), this, member);
     return button;
 }
