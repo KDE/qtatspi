@@ -62,15 +62,6 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAccessibleCac
 /* QSpiObjectReference */
 /*---------------------------------------------------------------------------*/
 
-/*
-QSpiObjectReference &QSpiObjectReference::operator= (const QSpiObjectReference &other)
-{
-    this->name = other.name;
-    this->path = other.path;
-    return *this;
-}
-*/
-
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiObjectReference &address)
 {
         argument.beginStructure();

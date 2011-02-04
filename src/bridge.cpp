@@ -47,12 +47,11 @@ void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *inter)
     rootInterface = inter;
 
     qDebug() << "  got a11y root object. children: " << inter->childCount();
-    // send ChildrenChanged event
 
-    ObjectAdaptor* atspiEvent = new ObjectAdaptor(this);
-    //atspiEvent->ChildrenChanged();
-    connect(this, SIGNAL(ChildrenChanged()), atspiEvent, SIGNAL(ChildrenChanged()));
-
+    // FIXME: notify about children here
+    //ObjectAdaptor* atspiEvent = new ObjectAdaptor(this);
+    //connect(this, SIGNAL(ChildrenChanged()), atspiEvent, SIGNAL(ChildrenChanged()));
+    //emit ChildrenChanged();
 
     qspi_initialize_struct_types();
     qspi_initialize_constant_mappings();
@@ -132,7 +131,7 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
 //            /* TODO Work through the sync issues with key event notifications.
 //             * How can we block the events here?
 //             */
-//            /*return this->dec->NotifyListenersSync(de);*/
+//            /*return dec->NotifyListenersSync(de);*/
 //            return false;
 //            break;
 //        }

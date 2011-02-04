@@ -59,14 +59,14 @@ QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
     QList <QSpiObjectReference> childPaths;
 
     /* Path */
-    item.path = this->getReference();
+    item.path = getReference();
     /* Parent */
-    item.parent = this->getParentReference();
+    item.parent = getParentReference();
     /* Children */
-    for (int i = 1; i <= this->getInterface().childCount(); i++)
+    for (int i = 1; i <= getInterface().childCount(); i++)
     {
         QAccessibleInterface *child = NULL;
-        this->getInterface().navigate(QAccessible::Child, i, &child);
+        getInterface().navigate(QAccessible::Child, i, &child);
         if (child)
         {
             QSpiObject *current;
@@ -84,13 +84,13 @@ QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
     /* Supported interfaces */
     item.supported = getSupportedInterfaces();
     /* Name */
-    item.name = this->getInterface().text(QAccessible::Name, 0);
+    item.name = getInterface().text(QAccessible::Name, 0);
     /* Role */
-    item.role = qSpiRoleMapping.value(this->getInterface().role(0));
+    item.role = qSpiRoleMapping.value(getInterface().role(0));
     /* Description */
-    item.description = this->getInterface().text(QAccessible::Description, 0);
+    item.description = getInterface().text(QAccessible::Description, 0);
     /* State set */
-    qspi_stateset_from_qstate (this->getInterface().state(0), item.states);
+    qspi_stateset_from_qstate (getInterface().state(0), item.states);
     return item;
 }
 

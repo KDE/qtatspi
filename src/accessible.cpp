@@ -44,12 +44,10 @@
 static QSpiObjectReference null_reference (QDBusConnection::sessionBus().baseService(),
                                            QDBusObjectPath (QSPI_OBJECT_PATH_NULL));
 
-/* QSpiAccessible ------------------------------------------------------*/
-
 QDBusObjectPath QSpiAccessible::getUnique ()
 {
     static int id = 1;
-    QString prefix (QSPI_OBJECT_PATH_PREFIX);
+    QString prefix(QSPI_OBJECT_PATH_PREFIX);
     QString num;
 
     if (id == 0)
@@ -60,7 +58,7 @@ QDBusObjectPath QSpiAccessible::getUnique ()
 QSpiAccessible::QSpiAccessible (QSpiAccessibleCache  *cache,
                                 QAccessibleInterface *interface):QSpiAdaptor (cache, interface)
 {
-    this->reference = new QSpiObjectReference (QDBusConnection::sessionBus().baseService(),
+    reference = new QSpiObjectReference (QDBusConnection::sessionBus().baseService(),
                                                getUnique ());
 
     new AccessibleAdaptor(this);
@@ -94,7 +92,7 @@ QSpiAccessible::QSpiAccessible (QSpiAccessibleCache  *cache,
         supportedInterfaces << QSPI_INTERFACE_TABLE;
     }
 
-    QDBusConnection::sessionBus().registerObject(this->reference->path.path(),
+    QDBusConnection::sessionBus().registerObject(reference->path.path(),
                                                  this,
                                                  QDBusConnection::ExportAdaptors);
 }
@@ -138,7 +136,7 @@ QSpiApplication::QSpiApplication (QSpiAccessibleCache  *cache,
     app = new ApplicationAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_APPLICATION;
 
-    QDBusConnection::sessionBus().registerObject(this->reference->path.path(),
+    QDBusConnection::sessionBus().registerObject(reference->path.path(),
                                                  this,
                                                  QDBusConnection::ExportAdaptors);
 
@@ -164,5 +162,3 @@ QSpiObjectReference &QSpiApplication::getParentReference() const
 {
     return *socket;
 }
-
-/*END------------------------------------------------------------------------*/

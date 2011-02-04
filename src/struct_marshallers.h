@@ -41,8 +41,6 @@ struct QSpiObjectReference
     QString name;
     QDBusObjectPath path;
 
-    /*QSpiObjectReference &operator= (const QSpiObjectReference &other);*/
-
     QSpiObjectReference()
         : path(QDBusObjectPath("/")) {}
     QSpiObjectReference(QString name, QDBusObjectPath path)
