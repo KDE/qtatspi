@@ -29,8 +29,7 @@
 
 #include "struct_marshallers.h"
 
-/* Role mapping */
-/*---------------------------------------------------------------------------*/
+#include <QAccessible>
 
 enum QSpiRole
 {
@@ -127,7 +126,7 @@ enum QSpiRole
     ROLE_LAST_DEFINED //90
 };
 
-extern QHash <QAccessible::Role, QSpiRole> qSpiRoleMapping;
+extern QHash <QAccessible::Role, QPair<QSpiRole, QString> > qSpiRoleMapping;
 
 /* State mapping */
 /*---------------------------------------------------------------------------*/

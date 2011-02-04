@@ -86,11 +86,14 @@ QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
     /* Name */
     item.name = getInterface().text(QAccessible::Name, 0);
     /* Role */
-    item.role = qSpiRoleMapping.value(getInterface().role(0));
+    item.role = qSpiRoleMapping.value(getInterface().role(0)).first;
+
+    qDebug() << "item.name: " << item.name << " role: " << item.role;
+
     /* Description */
     item.description = getInterface().text(QAccessible::Description, 0);
     /* State set */
-    qspi_stateset_from_qstate (getInterface().state(0), item.states);
+    qspi_stateset_from_qstate(getInterface().state(0), item.states);
     return item;
 }
 

@@ -241,6 +241,7 @@ QString QSpiAdaptor::GetLocalizedRoleName()
 {
     // TODO
     QString out0;
+    out0 = qSpiRoleMapping.value(getInterface().role(0)).second;
     return out0;
 }
 
@@ -254,7 +255,7 @@ QSpiRelationArray QSpiAdaptor::GetRelationSet()
 uint QSpiAdaptor::GetRole()
 {
     QAccessible::Role role = ACCESSIBLE_INTERFACE.role(0);
-    return qSpiRoleMapping[role];
+    return qSpiRoleMapping[role].first;
 }
 
 QString QSpiAdaptor::GetRoleName()

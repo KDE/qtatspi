@@ -36,6 +36,8 @@
 
 void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *inter)
 {
+    // the interface we get will be for the QApplication object.
+
     qDebug() << "QSpiAccessibleBridge : Initializing bridge";
     /* Connect to the session bus and register with the AT-SPI registry daemon */
     if (!QDBusConnection::sessionBus().isConnected())
@@ -45,13 +47,7 @@ void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *inter)
     }
 
     rootInterface = inter;
-
     qDebug() << "  got a11y root object. children: " << inter->childCount();
-
-    // FIXME: notify about children here
-    //ObjectAdaptor* atspiEvent = new ObjectAdaptor(this);
-    //connect(this, SIGNAL(ChildrenChanged()), atspiEvent, SIGNAL(ChildrenChanged()));
-    //emit ChildrenChanged();
 
     qspi_initialize_struct_types();
     qspi_initialize_constant_mappings();
@@ -59,9 +55,16 @@ void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *inter)
     /* Create the cache of accessible objects */
     cache = new QSpiAccessibleCache(rootInterface->object());
 
+    // FIXME: notify about children here
+    ObjectAdaptor* atspiEvent = new ObjectAdaptor(this);
+    connect(this, SIGNAL(ChildrenChanged()), atspiEvent, SIGNAL(ChildrenChanged()));
+    emit ChildrenChanged();
+
     dec = new DeviceEventControllerProxy(QSPI_DEC_NAME,
                                          QSPI_DEC_OBJECT_PATH,
                                          QDBusConnection::sessionBus());
+
+
 }
 
 void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface, int index)
