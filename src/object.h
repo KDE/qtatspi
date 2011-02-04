@@ -71,24 +71,23 @@ class QSpiObject : public QObject
     Q_OBJECT
 
 public:
-    QSpiObject(QSpiAccessibleCache  *cache,
+    QSpiObject(QSpiAccessibleCache *cache,
                QAccessibleInterface *interface);
 
-    QAccessibleInterface     &getInterface () const;
-    QStringList               supportedInterfaces () const;
-    QSpiAccessibleCacheItem   getCacheItem      () const;
+    QAccessibleInterface &getInterface() const;
+    QStringList getSupportedInterfaces() const;
+    QSpiAccessibleCacheItem getCacheItem() const;
 
-    virtual QSpiObjectReference &getReference () const;
-    virtual QSpiObjectReference &getParentReference () const = 0;
+    virtual QSpiObjectReference &getReference() const;
+    virtual QSpiObjectReference &getParentReference() const = 0;
 
     void accessibleEvent (QAccessible::Event event);
-    //bool eventFilter     (QObject *obj, QEvent *event);
 
 protected:
     QAccessibleInterface *interface;
     QSpiAccessibleCache *cache;
     QSpiObjectReference *reference;
-    QStringList supported;
+    QStringList supportedInterfaces;
 };
 
 #endif /* Q_SPI_OBJECT_H */

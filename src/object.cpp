@@ -46,9 +46,9 @@ QAccessibleInterface &QSpiObject::getInterface() const
     return *interface;
 }
 
-QStringList QSpiObject::supportedInterfaces() const
+QStringList QSpiObject::getSupportedInterfaces() const
 {
-    return supported;
+    return supportedInterfaces;
 }
 
 QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
@@ -82,7 +82,7 @@ QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
     }
     item.children = childPaths;
     /* Supported interfaces */
-    item.supported = supportedInterfaces();
+    item.supported = getSupportedInterfaces();
     /* Name */
     item.name = this->getInterface().text(QAccessible::Name, 0);
     /* Role */

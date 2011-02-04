@@ -32,38 +32,37 @@
 #define QSPI_DEC_NAME        "/org/a11y/atspi/registry"
 #define QSPI_DEC_OBJECT_PATH "/org/a11y/atspi/registry/deviceeventcontroller"
 
-void QSpiAccessibleBridge::aboutToQuit()
-{
-}
+#include "generated/event_adaptor.h"
 
-void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *rootInterface)
+void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *inter)
 {
     qDebug() << "QSpiAccessibleBridge : Initializing bridge";
+    /* Connect to the session bus and register with the AT-SPI registry daemon */
+    if (!QDBusConnection::sessionBus().isConnected())
+    {
+        qWarning() << "QSpiAccessibleBridge : Failed to connect to session bus";
+        return;
+    }
 
-    qspi_initialize_struct_types ();
-    qspi_initialize_constant_mappings ();
+    rootInterface = inter;
+
+    qDebug() << "  got a11y root object. children: " << inter->childCount();
+    // send ChildrenChanged event
+
+    ObjectAdaptor* atspiEvent = new ObjectAdaptor(this);
+    //atspiEvent->ChildrenChanged();
+    connect(this, SIGNAL(ChildrenChanged()), atspiEvent, SIGNAL(ChildrenChanged()));
+
+
+    qspi_initialize_struct_types();
+    qspi_initialize_constant_mappings();
 
     /* Create the cache of accessible objects */
     cache = new QSpiAccessibleCache(rootInterface->object());
 
-    /* Connect to the session bus and register with the AT-SPI registry daemon */
-    if (!QDBusConnection::sessionBus().isConnected())
-    {
-        qDebug() << "QSpiAccessibleBridge : Failed to connect to session bus";
-        return;
-    }
-
     dec = new DeviceEventControllerProxy(QSPI_DEC_NAME,
                                          QSPI_DEC_OBJECT_PATH,
                                          QDBusConnection::sessionBus());
-
-    /* Register for application events to handle key events */
-    /* TODO, should this be registered on the root object? */
-    //QApplication::instance()->installEventFilter(this);
-
-    /* Connect to the applications about-to-quit signal for de-registering this app */
-    connect (QApplication::instance(), SIGNAL (aboutToQuit()),
-             this, SLOT (aboutToQuit()));
 }
 
 void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface, int index)
@@ -92,58 +91,58 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
     accessible->accessibleEvent((QAccessible::Event) reason);
 }
 
-enum QSpiKeyEventType
-{
-      QSPI_KEY_EVENT_PRESS,
-      QSPI_KEY_EVENT_RELEASE,
-      QSPI_KEY_EVENT_LAST_DEFINED
-};
+//enum QSpiKeyEventType
+//{
+//      QSPI_KEY_EVENT_PRESS,
+//      QSPI_KEY_EVENT_RELEASE,
+//      QSPI_KEY_EVENT_LAST_DEFINED
+//};
 
-bool QSpiAccessibleBridge::eventFilter(QObject *obj, QEvent *event)
-{
-    Q_UNUSED (obj);
-    switch (event->type ())
-    {
-        case QEvent::KeyPress:
-        case QEvent::KeyRelease:
-        {
-            QKeyEvent *key_event = static_cast <QKeyEvent *>(event);
-            QSpiDeviceEvent de;
+//bool QSpiAccessibleBridge::eventFilter(QObject *obj, QEvent *event)
+//{
+//    Q_UNUSED (obj);
+//    switch (event->type ())
+//    {
+//        case QEvent::KeyPress:
+//        case QEvent::KeyRelease:
+//        {
+//            QKeyEvent *key_event = static_cast <QKeyEvent *>(event);
+//            QSpiDeviceEvent de;
 
-            if (event->type() == QEvent::KeyPress)
-                de.type = QSPI_KEY_EVENT_PRESS;
-            else
-                de.type = QSPI_KEY_EVENT_RELEASE;
+//            if (event->type() == QEvent::KeyPress)
+//                de.type = QSPI_KEY_EVENT_PRESS;
+//            else
+//                de.type = QSPI_KEY_EVENT_RELEASE;
            
-            de.id = key_event->key();
-            de.hw_code = 0; /* What is a keyval and what is a keycode */
-            /* TODO Insert the keyboard modifiers here */
-            de.modifiers = 0;
-            de.timestamp = QTime::currentTime().elapsed();
-            de.event_string =  key_event->text();
-            /* TODO Work out if there is an easy equivalent of "is_text" */
-            de.is_text = false; 
+//            de.id = key_event->key();
+//            de.hw_code = 0; /* What is a keyval and what is a keycode */
+//            /* TODO Insert the keyboard modifiers here */
+//            de.modifiers = 0;
+//            de.timestamp = QTime::currentTime().elapsed();
+//            de.event_string =  key_event->text();
+//            /* TODO Work out if there is an easy equivalent of "is_text" */
+//            de.is_text = false;
 
-#if 0
-            qDebug ("QSpiAccessibleBridge : keyEvent.\n\t%s",
-                    qPrintable (de.event_string)
-                   );
-#endif
+//#if 0
+//            qDebug ("QSpiAccessibleBridge : keyEvent.\n\t%s",
+//                    qPrintable (de.event_string)
+//                   );
+//#endif
 
-            /* TODO Work through the sync issues with key event notifications.
-             * How can we block the events here?
-             */
-            /*return this->dec->NotifyListenersSync(de);*/
-            return false;
-            break;
-        }
-        default:
-            break;
-    }
-    return false;
-}
+//            /* TODO Work through the sync issues with key event notifications.
+//             * How can we block the events here?
+//             */
+//            /*return this->dec->NotifyListenersSync(de);*/
+//            return false;
+//            break;
+//        }
+//        default:
+//            break;
+//    }
+//    return false;
+//}
 
 QSpiAccessibleBridge::~QSpiAccessibleBridge ()
 {
-        /* As far as I can tell this destructor is not called on program termination */
+    qDebug() << "QSpiAccessibleBridge::~QSpiAccessibleBridge";
 }

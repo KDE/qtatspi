@@ -55,6 +55,10 @@ Calculator::Calculator(QWidget *parent)
 
 //! [1]
     display = new QLineEdit("0");
+    display->setObjectName("display line edit");
+    display->setAccessibleName("The calculator display");
+    display->setAccessibleDescription("The calculator display description");
+
 //! [1] //! [2]
     display->setReadOnly(true);
     display->setAlignment(Qt::AlignRight);
@@ -363,7 +367,6 @@ void Calculator::addToMemory()
 Button *Calculator::createButton(const QString &text, const char *member)
 {
     Button *button = new Button(text);
-    button->setObjectName(text);
     connect(button, SIGNAL(clicked()), this, member);
     return button;
 }

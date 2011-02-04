@@ -24,15 +24,12 @@
 
 #include "object.h"
 
-/*---------------------------------------------------------------------------*/
-
 /*
  * Implements all methods neccessary to adapt calls from AT-SPI to the
  * QAccessibleInterface.
  *
  */
-
-class QSpiAdaptor : public QSpiObject
+class QSpiAdaptor :public QSpiObject
 {
     Q_OBJECT
 public:

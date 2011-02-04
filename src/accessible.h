@@ -31,8 +31,6 @@
 
 #include "adaptor.h"
 
-/*---------------------------------------------------------------------------*/
-
 /*
  * Used for all accessible objects other than the root object.
  *
@@ -44,16 +42,14 @@ class QSpiAccessible : public QSpiAdaptor
     Q_OBJECT
 
 public:
-    QSpiAccessible (QSpiAccessibleCache  *cache,
-                    QAccessibleInterface *interface);
+    QSpiAccessible(QSpiAccessibleCache  *cache,
+                   QAccessibleInterface *interface);
 
-    virtual QSpiObjectReference &getParentReference () const;
+    virtual QSpiObjectReference& getParentReference () const;
 
 private:
     static QDBusObjectPath getUnique ();
 };
-
-/*---------------------------------------------------------------------------*/
 
 /*
  * Used for the root object.
@@ -65,10 +61,10 @@ class QSpiApplication : public QSpiAdaptor
     Q_OBJECT
 
 public:
-    QSpiApplication (QSpiAccessibleCache  *cache,
-                     QAccessibleInterface *interface);
+    QSpiApplication(QSpiAccessibleCache  *cache,
+                    QAccessibleInterface *interface);
 
-    virtual QSpiObjectReference  &getParentReference () const;
+    virtual QSpiObjectReference& getParentReference() const;
 
 private:
     QSpiObjectReference *socket;

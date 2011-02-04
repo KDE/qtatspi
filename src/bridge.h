@@ -34,22 +34,25 @@ class QAccessibleInterface;
 class QSpiAccessibleBridge: public QObject, public QAccessibleBridge
 {
         Q_OBJECT
-
-        bool eventFilter(QObject *obj, QEvent *event);
 public:
-        QSpiAccessibleBridge(): cache(0)
+        QSpiAccessibleBridge(): cache(0), rootInterface(0)
         {}
 
         virtual ~QSpiAccessibleBridge ();
         virtual void setRootObject(QAccessibleInterface *obj);
         virtual void notifyAccessibilityUpdate(int reason, QAccessibleInterface *obj, int child);
 
-public slots:
+public Q_SLOTS:
         void aboutToQuit();
+
+Q_SIGNALS:
+        void ChildrenChanged();
 
 private:
         QSpiAccessibleCache *cache;
         DeviceEventControllerProxy *dec;
+
+        QAccessibleInterface* rootInterface;
 };
 
 /*---------------------------------------------------------------------------*/

@@ -253,6 +253,7 @@ public:
 
 public: // PROPERTIES
 public Q_SLOTS: // METHODS
+
 Q_SIGNALS: // SIGNALS
     void ActiveDescendantChanged();
     void AttributesChanged();

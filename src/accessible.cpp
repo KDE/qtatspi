@@ -64,34 +64,34 @@ QSpiAccessible::QSpiAccessible (QSpiAccessibleCache  *cache,
                                                getUnique ());
 
     new AccessibleAdaptor(this);
-    supported << QSPI_INTERFACE_ACCESSIBLE;
+    supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;
     new ComponentAdaptor(this);
-    supported << QSPI_INTERFACE_COMPONENT;
+    supportedInterfaces << QSPI_INTERFACE_COMPONENT;
 
     if (interface->actionInterface())
     {
         new ActionAdaptor(this);
-        supported << QSPI_INTERFACE_ACTION;
+        supportedInterfaces << QSPI_INTERFACE_ACTION;
     }
     if (interface->textInterface())
     {
         new TextAdaptor(this);
-        supported << QSPI_INTERFACE_TEXT;
+        supportedInterfaces << QSPI_INTERFACE_TEXT;
     }
     if (interface->editableTextInterface())
     {
         new EditableTextAdaptor(this);
-        supported << QSPI_INTERFACE_EDITABLE_TEXT;
+        supportedInterfaces << QSPI_INTERFACE_EDITABLE_TEXT;
     }
     if (interface->valueInterface())
     {
         new ValueAdaptor(this);
-        supported << QSPI_INTERFACE_VALUE;
+        supportedInterfaces << QSPI_INTERFACE_VALUE;
     }
     if (interface->tableInterface())
     {
         new TableAdaptor(this);
-        supported << QSPI_INTERFACE_TABLE;
+        supportedInterfaces << QSPI_INTERFACE_TABLE;
     }
 
     QDBusConnection::sessionBus().registerObject(this->reference->path.path(),
@@ -132,11 +132,11 @@ QSpiApplication::QSpiApplication (QSpiAccessibleCache  *cache,
                                                QDBusObjectPath (QSPI_OBJECT_PATH_ROOT));
 
     new AccessibleAdaptor(this);
-    supported << QSPI_INTERFACE_ACCESSIBLE;
+    supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;
     new ComponentAdaptor(this);
-    supported << QSPI_INTERFACE_COMPONENT;
+    supportedInterfaces << QSPI_INTERFACE_COMPONENT;
     app = new ApplicationAdaptor(this);
-    supported << QSPI_INTERFACE_APPLICATION;
+    supportedInterfaces << QSPI_INTERFACE_APPLICATION;
 
     QDBusConnection::sessionBus().registerObject(this->reference->path.path(),
                                                  this,
