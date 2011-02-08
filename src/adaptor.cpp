@@ -165,8 +165,6 @@ QSpiIntList QSpiAdaptor::GetState()
 
 int QSpiAdaptor::nActions() const
 {
-    qDebug() << "QSpiAdaptor QUERY nActions";
-
     return ACTION_INTERFACE->actionCount();
 }
 

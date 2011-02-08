@@ -61,7 +61,7 @@ public Q_SLOTS:
 
 /* AT-SPI Action interface */
 public:
-    Q_PROPERTY(int nActions READ nActions)
+    Q_PROPERTY(int NActions READ nActions)
     int nActions() const;
 
 public Q_SLOTS:

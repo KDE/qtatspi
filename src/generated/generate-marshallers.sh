@@ -2,7 +2,7 @@ qdbusxml2cpp -i marshallers.h -p socket_proxy -c SocketProxy ../../xml/Socket.xm
 qdbusxml2cpp -i marshallers.h -p dec_proxy    -c DeviceEventControllerProxy    ../../xml/DeviceEventController.xml
 
 qdbusxml2cpp -i marshallers.h -a accessible_adaptor    ../../xml/Accessible.xml
-qdbusxml2cpp -i marshallers.h -a action_adaptor        ../../xml/Action.xml
+qdbusxml2cpp -i adaptor.h -a action_adaptor -l QSpiAdaptor ../../xml/Action.xml
 qdbusxml2cpp -i marshallers.h -a application_adaptor   ../../xml/Application.xml
 qdbusxml2cpp -i marshallers.h -a cache_adaptor         ../../xml/Cache.xml
 qdbusxml2cpp -i adaptor.h -a component_adaptor -l QSpiAdaptor ../../xml/Component.xml
