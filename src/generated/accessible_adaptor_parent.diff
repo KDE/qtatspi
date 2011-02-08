@@ -1,0 +1,29 @@
+diff --git b/src/generated/accessible_adaptor.cpp a/src/generated/accessible_adaptor.cpp
+index 5542a5c..5474686 100644
+--- b/src/generated/accessible_adaptor.cpp
++++ a/src/generated/accessible_adaptor.cpp
+@@ -51,7 +51,8 @@ QString AccessibleAdaptor::name() const
+     return qvariant_cast< QString >(parent()->property("name"));
+ }
+ 
+-QSpiObjectReference AccessibleAdaptor::parent() const
++//HAND-EDIT because parent() is a QObject method already...
++QSpiObjectReference AccessibleAdaptor::getParent() const
+ {
+     // get the value of property parent
+     return qvariant_cast< QSpiObjectReference >(parent()->property("parent"));
+diff --git b/src/generated/accessible_adaptor.h a/src/generated/accessible_adaptor.h
+index dad2cf9..75a7bb9 100644
+--- b/src/generated/accessible_adaptor.h
++++ a/src/generated/accessible_adaptor.h
+@@ -90,8 +90,8 @@ public: // PROPERTIES
+     Q_PROPERTY(QString name READ name)
+     QString name() const;
+ 
+-    Q_PROPERTY(QSpiObjectReference parent READ parent)
+-    QSpiObjectReference parent() const;
++    Q_PROPERTY(QSpiObjectReference parent READ getParent)
++    QSpiObjectReference getParent() const;
+ 
+ public Q_SLOTS: // METHODS
+     QSpiObjectReference GetApplication();
