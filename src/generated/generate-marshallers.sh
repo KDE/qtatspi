@@ -8,6 +8,6 @@ qdbusxml2cpp -i marshallers.h -a cache_adaptor         ../../xml/Cache.xml
 qdbusxml2cpp -i marshallers.h -a component_adaptor     ../../xml/Component.xml
 qdbusxml2cpp -i marshallers.h -a editable_text_adaptor ../../xml/EditableText.xml
 qdbusxml2cpp -i marshallers.h -a event_adaptor         ../../xml/Event.xml
-qdbusxml2cpp -i marshallers.h -a table_adaptor         ../../xml/Table.xml
-qdbusxml2cpp -i marshallers.h -a text_adaptor          ../../xml/Text.xml
+qdbusxml2cpp -i adaptor.h -a table_adaptor -l QSpiAdaptor ../../xml/Table.xml
+qdbusxml2cpp -i adaptor.h -a text_adaptor -l QSpiAdaptor  ../../xml/Text.xml
 qdbusxml2cpp -i marshallers.h -a value_adaptor         ../../xml/Value.xml
