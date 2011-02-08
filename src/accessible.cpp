@@ -55,11 +55,12 @@ QDBusObjectPath QSpiAccessible::getUnique ()
     return QDBusObjectPath(prefix + num.setNum(id++));
 }
 
-QSpiAccessible::QSpiAccessible (QSpiAccessibleCache  *cache,
-                                QAccessibleInterface *interface):QSpiAdaptor (cache, interface)
+QSpiAccessible::QSpiAccessible(QSpiAccessibleCache  *cache,
+                               QAccessibleInterface *interface)
+    :QSpiAdaptor (cache, interface)
 {
-    reference = new QSpiObjectReference (QDBusConnection::sessionBus().baseService(),
-                                               getUnique ());
+    reference = new QSpiObjectReference(QDBusConnection::sessionBus().baseService(),
+                                               getUnique());
 
     new AccessibleAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;

@@ -171,7 +171,7 @@ QSpiObject *QSpiAccessibleCache::objectToAccessible (QObject *obj)
     if (cache.contains(obj)) {
         return cache.value(obj);
     } else {
-        QAccessibleInterface *interface = QAccessible::queryAccessibleInterface (obj);
+        QAccessibleInterface *interface = QAccessible::queryAccessibleInterface(obj);
         if (interface)
         {
             QSpiObject *accessible = new QSpiAccessible(this, interface);
