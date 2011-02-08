@@ -21,80 +21,91 @@
 
 #include "constant_mappings.h"
 
+#include "object.h"
+
 #define BITARRAY_SEQ_TERM 0xffffffff
 
 #define BITARRAY_SET(p, n)   ( (p)[n>>5] |=  (1<<(n&31)) )
 #define BITARRAY_UNSET(p, n) ( (p)[n>>5] &= ~(1<<(n&31)) )
 
-QHash <QAccessible::Role, QPair<QSpiRole, QString> > qSpiRoleMapping;
-typedef QPair<QSpiRole, QString> role;
+
+
+// FIXME the assignment of roles is quite arbitrary, at some point go through this list and sort and check that it makes sense
+//  "calendar" "check menu item"  "color chooser" "column header"    "dateeditor"  "desktop icon"  "desktop frame"
+//  "directory pane"  "drawing area"  "file chooser" "fontchooser"  "frame"  "glass pane"  "html container"  "icon"
+//  "internal frame"  "option pane"  "password text" "radio menu item"  "root pane"  "row header"    "scroll pane"
+//  "tear off menu item"  "terminal" "toggle button" "tree table"  "unknown"  "viewport" "header"  "footer"  "paragraph"
+//  "ruler"    "autocomplete"  "edit bar" "embedded component"  "entry"    "caption"
+//  "heading"  "page"  "section"  "redundant object"  "form"  "input method window"  "menu"
+
+QHash <QAccessible::Role, RoleNames> qSpiRoleMapping;
 
 static void initialize_role_mapping ()
 {
-       qSpiRoleMapping.insert (QAccessible::NoRole, role(ROLE_INVALID, QObject::tr("no role")));
-       qSpiRoleMapping.insert (QAccessible::TitleBar, role(ROLE_TEXT, QObject::tr("title bar")));
-       qSpiRoleMapping.insert (QAccessible::MenuBar, role(ROLE_MENU_BAR, QObject::tr("menu bar")));
-       qSpiRoleMapping.insert (QAccessible::ScrollBar, role(ROLE_SCROLL_BAR, QObject::tr("scroll bar")));
-       qSpiRoleMapping.insert (QAccessible::Grip, role(ROLE_UNKNOWN, QObject::tr("grip")));
-       qSpiRoleMapping.insert (QAccessible::Sound, role(ROLE_UNKNOWN, QObject::tr("sound")));
-       qSpiRoleMapping.insert (QAccessible::Cursor, role(ROLE_ARROW, QObject::tr("cursor")));
-       qSpiRoleMapping.insert (QAccessible::Caret, role(ROLE_UNKNOWN, QObject::tr("caret")));
-       qSpiRoleMapping.insert (QAccessible::AlertMessage, role(ROLE_ALERT, QObject::tr("alert message")));
-       qSpiRoleMapping.insert (QAccessible::Window, role(ROLE_WINDOW, QObject::tr("window")));
-       qSpiRoleMapping.insert (QAccessible::Client, role(ROLE_FILLER, QObject::tr("client")));
-       qSpiRoleMapping.insert (QAccessible::PopupMenu, role(ROLE_POPUP_MENU, QObject::tr("popup menu")));
-       qSpiRoleMapping.insert (QAccessible::MenuItem, role(ROLE_MENU_ITEM, QObject::tr("menu item")));
-       qSpiRoleMapping.insert (QAccessible::ToolTip, role(ROLE_TOOL_TIP, QObject::tr("tool tip")));
-       qSpiRoleMapping.insert (QAccessible::Application, role(ROLE_APPLICATION, QObject::tr("application")));
-       qSpiRoleMapping.insert (QAccessible::Document, role(ROLE_DOCUMENT_FRAME, QObject::tr("document")));
-       qSpiRoleMapping.insert (QAccessible::Pane, role(ROLE_PANEL, QObject::tr("pane")));
-       qSpiRoleMapping.insert (QAccessible::Chart, role(ROLE_CHART, QObject::tr("chart")));
-       qSpiRoleMapping.insert (QAccessible::Dialog, role(ROLE_DIALOG, QObject::tr("dialog")));
-       qSpiRoleMapping.insert (QAccessible::Border, role(ROLE_FRAME, QObject::tr("border")));
-       qSpiRoleMapping.insert (QAccessible::Grouping, role(ROLE_PANEL, QObject::tr("grouping")));
-       qSpiRoleMapping.insert (QAccessible::Separator, role(ROLE_SEPARATOR, QObject::tr("separator")));
-       qSpiRoleMapping.insert (QAccessible::ToolBar, role(ROLE_TOOL_BAR, QObject::tr("tool bar")));
-       qSpiRoleMapping.insert (QAccessible::StatusBar, role(ROLE_STATUS_BAR, QObject::tr("status bar")));
-       qSpiRoleMapping.insert (QAccessible::Table, role(ROLE_TABLE, QObject::tr("table")));
-       qSpiRoleMapping.insert (QAccessible::ColumnHeader, role(ROLE_TABLE_COLUMN_HEADER, QObject::tr("column header")));
-       qSpiRoleMapping.insert (QAccessible::RowHeader, role(ROLE_TABLE_ROW_HEADER, QObject::tr("row header")));
-       qSpiRoleMapping.insert (QAccessible::Column, role(ROLE_TABLE_CELL, QObject::tr("column")));
-       qSpiRoleMapping.insert (QAccessible::Row, role(ROLE_TABLE_CELL, QObject::tr("row")));
-       qSpiRoleMapping.insert (QAccessible::Cell, role(ROLE_TABLE_CELL, QObject::tr("cell")));
-       qSpiRoleMapping.insert (QAccessible::Link, role(ROLE_LINK, QObject::tr("link")));
-       qSpiRoleMapping.insert (QAccessible::HelpBalloon, role(ROLE_DIALOG, QObject::tr("help balloon")));
-       qSpiRoleMapping.insert (QAccessible::Assistant, role(ROLE_DIALOG, QObject::tr("assistant")));
-       qSpiRoleMapping.insert (QAccessible::List, role(ROLE_LIST, QObject::tr("list")));
-       qSpiRoleMapping.insert (QAccessible::ListItem, role(ROLE_LIST_ITEM, QObject::tr("list item")));
-       qSpiRoleMapping.insert (QAccessible::Tree, role(ROLE_TREE, QObject::tr("tree")));
-       qSpiRoleMapping.insert (QAccessible::TreeItem, role(ROLE_TABLE_CELL, QObject::tr("tree item")));
-       qSpiRoleMapping.insert (QAccessible::PageTab, role(ROLE_PAGE_TAB, QObject::tr("page tab")));
-       qSpiRoleMapping.insert (QAccessible::PropertyPage, role(ROLE_PAGE_TAB, QObject::tr("property page")));
-       qSpiRoleMapping.insert (QAccessible::Indicator, role(ROLE_UNKNOWN, QObject::tr("indicator")));
-       qSpiRoleMapping.insert (QAccessible::Graphic, role(ROLE_IMAGE, QObject::tr("graphic")));
-       qSpiRoleMapping.insert (QAccessible::StaticText, role(ROLE_LABEL, QObject::tr("static text")));
-       qSpiRoleMapping.insert (QAccessible::EditableText, role(ROLE_TEXT, QObject::tr("editable text")));
-       qSpiRoleMapping.insert (QAccessible::PushButton, role(ROLE_PUSH_BUTTON, QObject::tr("push button")));
-       qSpiRoleMapping.insert (QAccessible::CheckBox, role(ROLE_CHECK_BOX, QObject::tr("check box")));
-       qSpiRoleMapping.insert (QAccessible::RadioButton, role(ROLE_RADIO_BUTTON, QObject::tr("radio box")));
-       qSpiRoleMapping.insert (QAccessible::ComboBox, role(ROLE_COMBO_BOX, QObject::tr("combo box")));
-       qSpiRoleMapping.insert (QAccessible::ProgressBar, role(ROLE_PROGRESS_BAR, QObject::tr("progress bar")));
-       qSpiRoleMapping.insert (QAccessible::Dial, role(ROLE_DIAL, QObject::tr("dial")));
-       qSpiRoleMapping.insert (QAccessible::HotkeyField, role(ROLE_TEXT, QObject::tr("hotkey field")));
-       qSpiRoleMapping.insert (QAccessible::Slider, role(ROLE_SLIDER, QObject::tr("slider")));
-       qSpiRoleMapping.insert (QAccessible::SpinBox, role(ROLE_SPIN_BUTTON, QObject::tr("spin box")));
-       qSpiRoleMapping.insert (QAccessible::Canvas, role(ROLE_CANVAS, QObject::tr("canvas")));
-       qSpiRoleMapping.insert (QAccessible::Animation, role(ROLE_ANIMATION, QObject::tr("animation")));
-       qSpiRoleMapping.insert (QAccessible::Equation, role(ROLE_TEXT, QObject::tr("equation")));
-       qSpiRoleMapping.insert (QAccessible::ButtonDropDown, role(ROLE_PUSH_BUTTON, QObject::tr("button drop down")));
-       qSpiRoleMapping.insert (QAccessible::ButtonMenu, role(ROLE_PUSH_BUTTON, QObject::tr("button menu")));
-       qSpiRoleMapping.insert (QAccessible::ButtonDropGrid, role(ROLE_PUSH_BUTTON, QObject::tr("button drop grid")));
-       qSpiRoleMapping.insert (QAccessible::Whitespace, role(ROLE_FILLER, QObject::tr("whitespace")));
-       qSpiRoleMapping.insert (QAccessible::PageTabList, role(ROLE_PAGE_TAB_LIST, QObject::tr("page tab list")));
-       qSpiRoleMapping.insert (QAccessible::Clock, role(ROLE_UNKNOWN, QObject::tr("clock")));
-       qSpiRoleMapping.insert (QAccessible::Splitter, role(ROLE_SPLIT_PANE, QObject::tr("splitter")));
-       qSpiRoleMapping.insert (QAccessible::LayeredPane, role(ROLE_LAYERED_PANE, QObject::tr("layered pane")));
-       qSpiRoleMapping.insert (QAccessible::UserRole, role(ROLE_UNKNOWN, QObject::tr("user role")));
+       qSpiRoleMapping.insert(QAccessible::NoRole, RoleNames(ROLE_INVALID, "invalid", QSpiObject::tr("invalid role")));
+       qSpiRoleMapping.insert(QAccessible::TitleBar, RoleNames(ROLE_TEXT, "text", QSpiObject::tr("title bar")));
+       qSpiRoleMapping.insert(QAccessible::MenuBar, RoleNames(ROLE_MENU_BAR, "menu bar", QSpiObject::tr("menu bar")));
+       qSpiRoleMapping.insert(QAccessible::ScrollBar, RoleNames(ROLE_SCROLL_BAR, "scroll bar", QSpiObject::tr("scroll bar")));
+       qSpiRoleMapping.insert(QAccessible::Grip, RoleNames(ROLE_UNKNOWN, "unknown", QSpiObject::tr("grip")));
+       qSpiRoleMapping.insert(QAccessible::Sound, RoleNames(ROLE_UNKNOWN, "unknown", QSpiObject::tr("sound")));
+       qSpiRoleMapping.insert(QAccessible::Cursor, RoleNames(ROLE_ARROW, "arrow", QSpiObject::tr("cursor")));
+       qSpiRoleMapping.insert(QAccessible::Caret, RoleNames(ROLE_UNKNOWN, "unknown", QSpiObject::tr("caret")));
+       qSpiRoleMapping.insert(QAccessible::AlertMessage, RoleNames(ROLE_ALERT, "alert", QSpiObject::tr("alert message")));
+       qSpiRoleMapping.insert(QAccessible::Window, RoleNames(ROLE_WINDOW, "window", QSpiObject::tr("window")));
+       qSpiRoleMapping.insert(QAccessible::Client, RoleNames(ROLE_FILLER, "filler", QSpiObject::tr("client")));
+       qSpiRoleMapping.insert(QAccessible::PopupMenu, RoleNames(ROLE_POPUP_MENU, "popup menu", QSpiObject::tr("popup menu")));
+       qSpiRoleMapping.insert(QAccessible::MenuItem, RoleNames(ROLE_MENU_ITEM, "menu item", QSpiObject::tr("menu item")));
+       qSpiRoleMapping.insert(QAccessible::ToolTip, RoleNames(ROLE_TOOL_TIP, "tool tip", QSpiObject::tr("tool tip")));
+       qSpiRoleMapping.insert(QAccessible::Application, RoleNames(ROLE_APPLICATION, "application", QSpiObject::tr("application")));
+       qSpiRoleMapping.insert(QAccessible::Document, RoleNames(ROLE_DOCUMENT_FRAME, "document frame", QSpiObject::tr("document")));
+       qSpiRoleMapping.insert(QAccessible::Pane, RoleNames(ROLE_PANEL, "panel", QSpiObject::tr("pane")));
+       qSpiRoleMapping.insert(QAccessible::Chart, RoleNames(ROLE_CHART, "chart", QSpiObject::tr("chart")));
+       qSpiRoleMapping.insert(QAccessible::Dialog, RoleNames(ROLE_DIALOG, "dialog", QSpiObject::tr("dialog")));
+       qSpiRoleMapping.insert(QAccessible::Border, RoleNames(ROLE_FRAME, "frame", QSpiObject::tr("border")));
+       qSpiRoleMapping.insert(QAccessible::Grouping, RoleNames(ROLE_PANEL, "panel", QSpiObject::tr("grouping")));
+       qSpiRoleMapping.insert(QAccessible::Separator, RoleNames(ROLE_SEPARATOR, "separator", QSpiObject::tr("separator")));
+       qSpiRoleMapping.insert(QAccessible::ToolBar, RoleNames(ROLE_TOOL_BAR, "tool bar", QSpiObject::tr("tool bar")));
+       qSpiRoleMapping.insert(QAccessible::StatusBar, RoleNames(ROLE_STATUS_BAR, "statusbar", QSpiObject::tr("status bar")));
+       qSpiRoleMapping.insert(QAccessible::Table, RoleNames(ROLE_TABLE, "table", QSpiObject::tr("table")));
+       qSpiRoleMapping.insert(QAccessible::ColumnHeader, RoleNames(ROLE_TABLE_COLUMN_HEADER, "column header", QSpiObject::tr("column header")));
+       qSpiRoleMapping.insert(QAccessible::RowHeader, RoleNames(ROLE_TABLE_ROW_HEADER, "row header", QSpiObject::tr("row header")));
+       qSpiRoleMapping.insert(QAccessible::Column, RoleNames(ROLE_TABLE_CELL, "table cell", QSpiObject::tr("column")));
+       qSpiRoleMapping.insert(QAccessible::Row, RoleNames(ROLE_TABLE_CELL, "table cell", QSpiObject::tr("row")));
+       qSpiRoleMapping.insert(QAccessible::Cell, RoleNames(ROLE_TABLE_CELL, "table cell", QSpiObject::tr("cell")));
+       qSpiRoleMapping.insert(QAccessible::Link, RoleNames(ROLE_LINK, "link" , QSpiObject::tr("link")));
+       qSpiRoleMapping.insert(QAccessible::HelpBalloon, RoleNames(ROLE_DIALOG, "dialog", QSpiObject::tr("help balloon")));
+       qSpiRoleMapping.insert(QAccessible::Assistant, RoleNames(ROLE_DIALOG, "dialog", QSpiObject::tr("assistant")));
+       qSpiRoleMapping.insert(QAccessible::List, RoleNames(ROLE_LIST, "list", QSpiObject::tr("list")));
+       qSpiRoleMapping.insert(QAccessible::ListItem, RoleNames(ROLE_LIST_ITEM, "list item", QSpiObject::tr("list item")));
+       qSpiRoleMapping.insert(QAccessible::Tree, RoleNames(ROLE_TREE, "tree", QSpiObject::tr("tree")));
+       qSpiRoleMapping.insert(QAccessible::TreeItem, RoleNames(ROLE_TABLE_CELL, "table cell", QSpiObject::tr("tree item")));
+       qSpiRoleMapping.insert(QAccessible::PageTab, RoleNames(ROLE_PAGE_TAB, "page tab", QSpiObject::tr("page tab")));
+       qSpiRoleMapping.insert(QAccessible::PropertyPage, RoleNames(ROLE_PAGE_TAB, "page tab", QSpiObject::tr("property page")));
+       qSpiRoleMapping.insert(QAccessible::Indicator, RoleNames(ROLE_UNKNOWN, "unknown", QSpiObject::tr("indicator")));
+       qSpiRoleMapping.insert(QAccessible::Graphic, RoleNames(ROLE_IMAGE, "image", QSpiObject::tr("graphic")));
+       qSpiRoleMapping.insert(QAccessible::StaticText, RoleNames(ROLE_LABEL, "label", QSpiObject::tr("static text")));
+       qSpiRoleMapping.insert(QAccessible::EditableText, RoleNames(ROLE_TEXT, "text", QSpiObject::tr("editable text")));
+       qSpiRoleMapping.insert(QAccessible::PushButton, RoleNames(ROLE_PUSH_BUTTON, "push button", QSpiObject::tr("push button")));
+       qSpiRoleMapping.insert(QAccessible::CheckBox, RoleNames(ROLE_CHECK_BOX, "check box", QSpiObject::tr("check box")));
+       qSpiRoleMapping.insert(QAccessible::RadioButton, RoleNames(ROLE_RADIO_BUTTON, "radio button", QSpiObject::tr("radio box")));
+       qSpiRoleMapping.insert(QAccessible::ComboBox, RoleNames(ROLE_COMBO_BOX, "combo box", QSpiObject::tr("combo box")));
+       qSpiRoleMapping.insert(QAccessible::ProgressBar, RoleNames(ROLE_PROGRESS_BAR, "progress bar", QSpiObject::tr("progress bar")));
+       qSpiRoleMapping.insert(QAccessible::Dial, RoleNames(ROLE_DIAL, "accelerator label", QSpiObject::tr("dial")));
+       qSpiRoleMapping.insert(QAccessible::HotkeyField, RoleNames(ROLE_TEXT, "text", QSpiObject::tr("hotkey field"))); //FIXME text?
+       qSpiRoleMapping.insert(QAccessible::Slider, RoleNames(ROLE_SLIDER, "slider", QSpiObject::tr("slider")));
+       qSpiRoleMapping.insert(QAccessible::SpinBox, RoleNames(ROLE_SPIN_BUTTON, "spin button", QSpiObject::tr("spin box")));
+       qSpiRoleMapping.insert(QAccessible::Canvas, RoleNames(ROLE_CANVAS, "canvas", QSpiObject::tr("canvas")));
+       qSpiRoleMapping.insert(QAccessible::Animation, RoleNames(ROLE_ANIMATION, "animation", QSpiObject::tr("animation")));
+       qSpiRoleMapping.insert(QAccessible::Equation, RoleNames(ROLE_TEXT, "text", QSpiObject::tr("equation")));
+       qSpiRoleMapping.insert(QAccessible::ButtonDropDown, RoleNames(ROLE_PUSH_BUTTON, "push button", QSpiObject::tr("button drop down")));
+       qSpiRoleMapping.insert(QAccessible::ButtonMenu, RoleNames(ROLE_PUSH_BUTTON, "push button", QSpiObject::tr("button menu")));
+       qSpiRoleMapping.insert(QAccessible::ButtonDropGrid, RoleNames(ROLE_PUSH_BUTTON, "push button", QSpiObject::tr("button drop grid")));
+       qSpiRoleMapping.insert(QAccessible::Whitespace, RoleNames(ROLE_FILLER, "filler", QSpiObject::tr("whitespace")));
+       qSpiRoleMapping.insert(QAccessible::PageTabList, RoleNames(ROLE_PAGE_TAB_LIST, "page tab list", QSpiObject::tr("page tab list")));
+       qSpiRoleMapping.insert(QAccessible::Clock, RoleNames(ROLE_UNKNOWN, "unknown", QSpiObject::tr("clock")));
+       qSpiRoleMapping.insert(QAccessible::Splitter, RoleNames(ROLE_SPLIT_PANE, "split pane", QSpiObject::tr("splitter")));
+       qSpiRoleMapping.insert(QAccessible::LayeredPane, RoleNames(ROLE_LAYERED_PANE, "layered pane", QSpiObject::tr("layered pane")));
+       qSpiRoleMapping.insert(QAccessible::UserRole, RoleNames(ROLE_UNKNOWN, "unknown", QSpiObject::tr("user role")));
 }
 
 /*---------------------------------------------------------------------------*/

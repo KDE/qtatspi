@@ -126,7 +126,23 @@ enum QSpiRole
     ROLE_LAST_DEFINED //90
 };
 
-extern QHash <QAccessible::Role, QPair<QSpiRole, QString> > qSpiRoleMapping;
+struct RoleNames {
+    RoleNames() {}
+    RoleNames(QSpiRole r, const QString& n, const QString& ln)
+        :spiRole_(r), name_(n), localizedName_(ln)
+    {}
+
+    QSpiRole spiRole() const {return spiRole_;}
+    QString name() const {return name_;}
+    QString localizedName() const {return localizedName_;}
+
+private:
+    QSpiRole spiRole_;
+    QString name_;
+    QString localizedName_;
+};
+
+extern QHash <QAccessible::Role, RoleNames> qSpiRoleMapping;
 
 /* State mapping */
 /*---------------------------------------------------------------------------*/

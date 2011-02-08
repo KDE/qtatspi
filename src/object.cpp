@@ -86,9 +86,7 @@ QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
     /* Name */
     item.name = getInterface().text(QAccessible::Name, 0);
     /* Role */
-    item.role = qSpiRoleMapping.value(getInterface().role(0)).first;
-
-    qDebug() << "item.name: " << item.name << " role: " << item.role;
+    item.role = qSpiRoleMapping.value(getInterface().role(0)).spiRole();
 
     /* Description */
     item.description = getInterface().text(QAccessible::Description, 0);
