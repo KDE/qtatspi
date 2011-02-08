@@ -85,17 +85,18 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiObjectReferen
 
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAction &action)
 {
-        argument.beginStructure();
-        argument << action.name;
-        argument << action.description;
-        argument << action.keyBinding;
-        argument.endStructure();
-        return argument;
+    argument.beginStructure();
+    argument << action.name;
+    argument << action.description;
+    argument << action.keyBinding;
+    argument.endStructure();
+    return argument;
 }
 
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAction &action)
 {
-        return argument;
+    qWarning() << "QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAction &action): implement me!";
+    return argument;
 }
 
 /* QSpiRect */
@@ -103,18 +104,19 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAction &actio
 
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiRect &rect)
 {
-        argument.beginStructure();
-        argument << rect.x;
-        argument << rect.y;
-        argument << rect.width;
-        argument << rect.height;
-        argument.endStructure();
-        return argument;
+    argument.beginStructure();
+    argument << rect.x;
+    argument << rect.y;
+    argument << rect.width;
+    argument << rect.height;
+    argument.endStructure();
+    return argument;
 }
 
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiRect &rect)
 {
-        return argument;
+    qWarning() << "QDBusArgument &operator>>(const QDBusArgument &argument, QSpiRect &rect): implement me!";
+    return argument;
 }
 
 /* QSpiAppUpdate */
