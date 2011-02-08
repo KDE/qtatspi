@@ -3,6 +3,7 @@
 
 # binary app
 test/test
+test/simple/simple
 
 callgrind.out.*
 pcviewer.cfg
