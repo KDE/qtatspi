@@ -29,34 +29,34 @@
 
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAccessibleCacheItem &item)
 {
-        argument.beginStructure();
-        argument << item.path;
-        argument << item.application;
-        argument << item.parent;
-        argument << item.children;
-        argument << item.supported;
-        argument << item.name;
-        argument << item.role;
-        argument << item.description;
-        argument << item.states;
-        argument.endStructure();
-        return argument;
+    argument.beginStructure();
+    argument << item.path;
+    argument << item.application;
+    argument << item.parent;
+    argument << item.children;
+    argument << item.supported;
+    argument << item.name;
+    argument << item.role;
+    argument << item.description;
+    argument << item.states;
+    argument.endStructure();
+    return argument;
 }
 
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAccessibleCacheItem &item)
 {
-        argument.beginStructure();
-        argument >> item.path;
-        argument >> item.application;
-        argument >> item.parent;
-        argument >> item.children;
-        argument >> item.supported;
-        argument >> item.name;
-        argument >> item.role;
-        argument >> item.description;
-        argument >> item.states;
-        argument.endStructure();
-        return argument;
+    argument.beginStructure();
+    argument >> item.path;
+    argument >> item.application;
+    argument >> item.parent;
+    argument >> item.children;
+    argument >> item.supported;
+    argument >> item.name;
+    argument >> item.role;
+    argument >> item.description;
+    argument >> item.states;
+    argument.endStructure();
+    return argument;
 }
 
 /* QSpiObjectReference */
@@ -64,20 +64,20 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAccessibleCac
 
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiObjectReference &address)
 {
-        argument.beginStructure();
-        argument << address.name;
-        argument << address.path;
-        argument.endStructure();
-        return argument;
+    argument.beginStructure();
+    argument << address.name;
+    argument << address.path;
+    argument.endStructure();
+    return argument;
 }
 
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiObjectReference &address)
 {
-        argument.beginStructure();
-        argument >> address.name;
-        argument >> address.path;
-        argument.endStructure();
-        return argument;
+    argument.beginStructure();
+    argument >> address.name;
+    argument >> address.path;
+    argument.endStructure();
+    return argument;
 }
 
 /* QSpiAction */
@@ -123,63 +123,63 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiRect &rect)
 /*---------------------------------------------------------------------------*/
 
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAppUpdate &update) {
-        argument.beginStructure();
-        argument << update.type << update.address;
-        argument.endStructure();
-        return argument;
+    argument.beginStructure();
+    argument << update.type << update.address;
+    argument.endStructure();
+    return argument;
 }
 
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAppUpdate &update) {
-        argument.beginStructure();
-        argument >> update.type >> update.address;
-        argument.endStructure();
-        return argument;
+    argument.beginStructure();
+    argument >> update.type >> update.address;
+    argument.endStructure();
+    return argument;
 }
 
 /* QSpiDeviceEvent */
 /*---------------------------------------------------------------------------*/
 
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiDeviceEvent &event) {
-        argument.beginStructure();
-        argument << event.type
-                 << event.id
-                 << event.hw_code
-                 << event.modifiers
-                 << event.timestamp
-                 << event.event_string
-                 << event.is_text;
-        argument.endStructure();
-        return argument;
+    argument.beginStructure();
+    argument << event.type
+             << event.id
+             << event.hw_code
+             << event.modifiers
+             << event.timestamp
+             << event.event_string
+             << event.is_text;
+    argument.endStructure();
+    return argument;
 }
 
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiDeviceEvent &event) {
-        argument.beginStructure();
-        argument >> event.type
-                 >> event.id
-                 >> event.hw_code
-                 >> event.modifiers
-                 >> event.timestamp
-                 >> event.event_string
-                 >> event.is_text;
-        argument.endStructure();
-        return argument;
+    argument.beginStructure();
+    argument >> event.type
+             >> event.id
+             >> event.hw_code
+             >> event.modifiers
+             >> event.timestamp
+             >> event.event_string
+             >> event.is_text;
+    argument.endStructure();
+    return argument;
 }
 
 /*---------------------------------------------------------------------------*/
 
 void qspi_initialize_struct_types ()
 {
-        qDBusRegisterMetaType<QSpiIntList>();
-        qDBusRegisterMetaType<QSpiAccessibleCacheItem>();
-        qDBusRegisterMetaType<QSpiAccessibleCacheArray>();
-        qDBusRegisterMetaType<QSpiObjectReference>();
-        qDBusRegisterMetaType<QSpiObjectReferenceArray>();
-        qDBusRegisterMetaType<QSpiRect>();
-        qDBusRegisterMetaType<QSpiAttributeSet>();
-        qDBusRegisterMetaType<QSpiAction>();
-        qDBusRegisterMetaType<QSpiActionArray>();
-        qDBusRegisterMetaType<QSpiDeviceEvent>();
-        qDBusRegisterMetaType<QSpiAppUpdate>();
+    qDBusRegisterMetaType<QSpiIntList>();
+    qDBusRegisterMetaType<QSpiAccessibleCacheItem>();
+    qDBusRegisterMetaType<QSpiAccessibleCacheArray>();
+    qDBusRegisterMetaType<QSpiObjectReference>();
+    qDBusRegisterMetaType<QSpiObjectReferenceArray>();
+    qDBusRegisterMetaType<QSpiRect>();
+    qDBusRegisterMetaType<QSpiAttributeSet>();
+    qDBusRegisterMetaType<QSpiAction>();
+    qDBusRegisterMetaType<QSpiActionArray>();
+    qDBusRegisterMetaType<QSpiDeviceEvent>();
+    qDBusRegisterMetaType<QSpiAppUpdate>();
 }
 
 /*END------------------------------------------------------------------------*/
