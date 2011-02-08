@@ -144,7 +144,8 @@
   </method>
 
   <method name="GetDefaultAttributeSet">
-    <arg direction="out" type="as"/>
+    <arg direction="out" type="a{ss}"/>
+    <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiAttributeSet"/>
   </method>
 
 </interface>
