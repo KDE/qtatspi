@@ -219,7 +219,7 @@ QString QSpiAdaptor::GetKeyBinding(int index)
 
 QString QSpiAdaptor::GetName(int index)
 {
-    return ACTION_INTERFACE->name (index);
+    return ACTION_INTERFACE->name(index);
 }
 
 /* AT-SPI Application interface ---------------------------------------------*/
@@ -676,14 +676,10 @@ QSpiRangeList QSpiAdaptor::GetBoundedRanges(int x,
 					        uint xClipType,
 					        uint yClipType)
 {
-    // TODO
-    Q_UNUSED (x);
-    Q_UNUSED (y);
-    Q_UNUSED (width);
-    Q_UNUSED (height);
-    Q_UNUSED (coordType);
-    Q_UNUSED (xClipType);
-    Q_UNUSED (yClipType);
+    qWarning("Not implemented: QSpiAdaptor::GetBoundedRanges");
+    Q_UNUSED(x) Q_UNUSED (y) Q_UNUSED(width)
+    Q_UNUSED(height) Q_UNUSED(coordType)
+    Q_UNUSED(xClipType) Q_UNUSED(yClipType)
     QSpiRangeList out0;
     return out0;
 }
@@ -788,22 +784,25 @@ QString QSpiAdaptor::GetTextBeforeOffset(int offset, uint type, int &startOffset
 
 bool QSpiAdaptor::RemoveSelection(int selectionNum)
 {
-    // TODO
-    bool out0;
+    Q_UNUSED(selectionNum)
+    qWarning("Not implemented: QSpiAdaptor::RemoveSelection");
+    bool out0 = false;
     return out0;
 }
 
 bool QSpiAdaptor::SetCaretOffset(int offset)
 {
-    // TODO
-    bool out0;
+    Q_UNUSED(offset)
+    qWarning("Not implemented: QSpiAdaptor::SetCaretOffset");
+    bool out0 = false;
     return out0;
 }
 
 bool QSpiAdaptor::SetSelection(int selectionNum, int startOffset, int endOffset)
 {
-    // TODO
-    bool out0;
+    Q_UNUSED(selectionNum) Q_UNUSED(startOffset) Q_UNUSED(endOffset)
+    qWarning("Not implemented: QSpiAdaptor::SetSelection");
+    bool out0 = false;
     return out0;
 }
 

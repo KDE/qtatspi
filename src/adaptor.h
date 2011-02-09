@@ -38,13 +38,13 @@ public:
 
 /* AT-SPI Accessible interface */
 public:
-    Q_PROPERTY(int childCount READ childCount)
+    Q_PROPERTY(int ChildCount READ childCount)
     int childCount() const;
-    Q_PROPERTY(QString description READ description)
+    Q_PROPERTY(QString Description READ description)
     QString description() const;
-    Q_PROPERTY(QString name READ name)
+    Q_PROPERTY(QString Name READ name)
     QString name() const;
-    Q_PROPERTY(QSpiObjectReference parent READ parent)
+    Q_PROPERTY(QSpiObjectReference Parent READ parent)
     QSpiObjectReference parent() const;
 
 public Q_SLOTS:
@@ -73,11 +73,11 @@ public Q_SLOTS:
 
 /* AT-SPI Application interface */
 public:
-    Q_PROPERTY(int id READ id)
+    Q_PROPERTY(int Id READ id)
     int id() const;
-    Q_PROPERTY(QString toolkitName READ toolkitName)
+    Q_PROPERTY(QString ToolkitName READ toolkitName)
     QString toolkitName() const;
-    Q_PROPERTY(QString version READ version)
+    Q_PROPERTY(QString Version READ version)
     QString version() const;
 
 public Q_SLOTS: // METHODS
@@ -106,17 +106,17 @@ public Q_SLOTS:
 
 /* AT-SPI Table interface */
 public:
-    Q_PROPERTY(QSpiObjectReference caption READ caption)
+    Q_PROPERTY(QSpiObjectReference Caption READ caption)
     QSpiObjectReference caption() const;
-    Q_PROPERTY(int nColumns READ nColumns)
+    Q_PROPERTY(int NColumns READ nColumns)
     int nColumns() const;
-    Q_PROPERTY(int nRows READ nRows)
+    Q_PROPERTY(int NRows READ nRows)
     int nRows() const;
-    Q_PROPERTY(int nSelectedColumns READ nSelectedColumns)
+    Q_PROPERTY(int NSelectedColumns READ nSelectedColumns)
     int nSelectedColumns() const;
-    Q_PROPERTY(int nSelectedRows READ nSelectedRows)
+    Q_PROPERTY(int NSelectedRows READ nSelectedRows)
     int nSelectedRows() const;
-    Q_PROPERTY(QSpiObjectReference summary READ summary)
+    Q_PROPERTY(QSpiObjectReference Summary READ summary)
     QSpiObjectReference summary() const;
 
 public Q_SLOTS:
@@ -143,9 +143,9 @@ public Q_SLOTS:
 
 /* AT-SPI Text interface */
 public:
-    Q_PROPERTY(int caretOffset READ caretOffset)
+    Q_PROPERTY(int CaretOffset READ caretOffset)
     int caretOffset() const;
-    Q_PROPERTY(int characterCount READ characterCount)
+    Q_PROPERTY(int CharacterCount READ characterCount)
     int characterCount() const;
 
 public Q_SLOTS:
@@ -172,14 +172,14 @@ public Q_SLOTS:
 
 /* AT-SPI Text interface */
 public:
-    Q_PROPERTY(double currentValue READ currentValue WRITE setCurrentValue)
+    Q_PROPERTY(double CurrentValue READ currentValue WRITE setCurrentValue)
     double currentValue() const;
     void setCurrentValue(double value);
-    Q_PROPERTY(double maximumValue READ maximumValue)
+    Q_PROPERTY(double MaximumValue READ maximumValue)
     double maximumValue() const;
-    Q_PROPERTY(double minimumIncrement READ minimumIncrement)
+    Q_PROPERTY(double MinimumIncrement READ minimumIncrement)
     double minimumIncrement() const;
-    Q_PROPERTY(double minimumValue READ minimumValue)
+    Q_PROPERTY(double MinimumValue READ minimumValue)
     double minimumValue() const;
 };
 

@@ -8,8 +8,8 @@
  * Do not edit! All changes made to it will be lost.
  */
 
-#ifndef DEC_PROXY_H_1296659428
-#define DEC_PROXY_H_1296659428
+#ifndef DEC_PROXY_H_1297240343
+#define DEC_PROXY_H_1297240343
 
 #include <QtCore/QObject>
 #include <QtCore/QByteArray>

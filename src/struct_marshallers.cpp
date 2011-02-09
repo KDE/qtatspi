@@ -95,6 +95,7 @@ QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAction &action)
 
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAction &action)
 {
+    Q_UNUSED(action)
     qWarning() << "QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAction &action): implement me!";
     return argument;
 }
@@ -115,6 +116,7 @@ QDBusArgument &operator<<(QDBusArgument &argument, const QSpiRect &rect)
 
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiRect &rect)
 {
+    Q_UNUSED(rect)
     qWarning() << "QDBusArgument &operator>>(const QDBusArgument &argument, QSpiRect &rect): implement me!";
     return argument;
 }

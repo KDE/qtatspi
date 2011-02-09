@@ -9,8 +9,8 @@
  * before re-generating it.
  */
 
-#ifndef ACCESSIBLE_ADAPTOR_H_1280272811
-#define ACCESSIBLE_ADAPTOR_H_1280272811
+#ifndef ACCESSIBLE_ADAPTOR_H_1297240343
+#define ACCESSIBLE_ADAPTOR_H_1297240343
 
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
@@ -31,12 +31,12 @@ class AccessibleAdaptor: public QDBusAbstractAdaptor
     Q_CLASSINFO("D-Bus Interface", "org.a11y.atspi.Accessible")
     Q_CLASSINFO("D-Bus Introspection", ""
 "  <interface name=\"org.a11y.atspi.Accessible\">\n"
-"    <property access=\"read\" type=\"s\" name=\"name\"/>\n"
-"    <property access=\"read\" type=\"s\" name=\"description\"/>\n"
-"    <property access=\"read\" type=\"(so)\" name=\"parent\">\n"
+"    <property access=\"read\" type=\"s\" name=\"Name\"/>\n"
+"    <property access=\"read\" type=\"s\" name=\"Description\"/>\n"
+"    <property access=\"read\" type=\"(so)\" name=\"Parent\">\n"
 "      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName\"/>\n"
 "    </property>\n"
-"    <property access=\"read\" type=\"i\" name=\"childCount\"/>\n"
+"    <property access=\"read\" type=\"i\" name=\"ChildCount\"/>\n"
 "    <method name=\"GetChildAtIndex\">\n"
 "      <arg direction=\"in\" type=\"i\" name=\"index\"/>\n"
 "      <arg direction=\"out\" type=\"(so)\"/>\n"
@@ -81,16 +81,16 @@ public:
     virtual ~AccessibleAdaptor();
 
 public: // PROPERTIES
-    Q_PROPERTY(int childCount READ childCount)
+    Q_PROPERTY(int ChildCount READ childCount)
     int childCount() const;
 
-    Q_PROPERTY(QString description READ description)
+    Q_PROPERTY(QString Description READ description)
     QString description() const;
 
-    Q_PROPERTY(QString name READ name)
+    Q_PROPERTY(QString Name READ name)
     QString name() const;
 
-    Q_PROPERTY(QSpiObjectReference parent READ getParent)
+    Q_PROPERTY(QSpiObjectReference Parent READ getParent)
     QSpiObjectReference getParent() const;
 
 public Q_SLOTS: // METHODS

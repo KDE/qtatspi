@@ -100,15 +100,22 @@ Q_DECLARE_METATYPE (QSpiActionArray);
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAction &action);
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAction &action);
 
-/* QSpiRelationArray TODO */
+/* QSpiRelationArray */
 /*---------------------------------------------------------------------------*/
 
-typedef int QSpiRelationArray;
+typedef QMap < unsigned int, QMap < QString, QSpiObjectReference > > QSpiRelationArray;
 
-/* QSpiRangeList TODO */
+/* QSpiRangeList */
 /*---------------------------------------------------------------------------*/
 
-typedef int QSpiRangeList;
+//a(iisv)
+struct QSpiTextRange {
+    int startOffset;
+    int endOffset;
+    QString contents;
+    QVariant v; // TODO: check
+};
+typedef QList <QSpiTextRange> QSpiRangeList;
 
 /* QSpiRect */
 /*---------------------------------------------------------------------------*/
