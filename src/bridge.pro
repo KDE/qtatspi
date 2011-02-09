@@ -42,9 +42,12 @@ SOURCES += \
            struct_marshallers.cpp \
            constant_mappings.cpp \
            accessible.cpp \
-    main.cpp
+           main.cpp
 
 DEFINES += QT_ACCESSIBILITY
+
+QMAKE_CFLAGS+=-Werror
+QMAKE_CXXFLAGS+=-Werror
 
 CONFIG += qdbus plugin debug
 
