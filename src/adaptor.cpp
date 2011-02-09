@@ -49,113 +49,6 @@
 #define TABLE_INTERFACE         getInterface().tableInterface()
 #define VALUE_INTERFACE         getInterface().valueInterface()
 
-/* AT-SPI Accessible interface ----------------------------------------------*/
-/*---------------------------------------------------------------------------*/
-
-/* This is silly. Should talk about moving this mapping into client bindings */
-static const char roles[] =
-  "invalid\0"
-  "accelerator label\0"
-  "alert\0"
-  "animation\0"
-  "arrow\0"
-  "calendar\0"
-  "canvas\0"
-  "check box\0"
-  "check menu item\0"
-  "color chooser\0"
-  "column header\0"
-  "combo box\0"
-  "dateeditor\0"
-  "desktop icon\0"
-  "desktop frame\0"
-  "dial\0"
-  "dialog\0"
-  "directory pane\0"
-  "drawing area\0"
-  "file chooser\0"
-  "filler\0"
-  "fontchooser\0"
-  "frame\0"
-  "glass pane\0"
-  "html container\0"
-  "icon\0"
-  "image\0"
-  "internal frame\0"
-  "label\0"
-  "layered pane\0"
-  "list\0"
-  "list item\0"
-  "menu\0"
-  "menu bar\0"
-  "menu item\0"
-  "option pane\0"
-  "page tab\0"
-  "page tab list\0"
-  "panel\0"
-  "password text\0"
-  "popup menu\0"
-  "progress bar\0"
-  "push button\0"
-  "radio button\0"
-  "radio menu item\0"
-  "root pane\0"
-  "row header\0"
-  "scroll bar\0"
-  "scroll pane\0"
-  "separator\0"
-  "slider\0"
-  "split pane\0"
-  "spin button\0"
-  "statusbar\0"
-  "table\0"
-  "table cell\0"
-  "table column header\0"
-  "table row header\0"
-  "tear off menu item\0"
-  "terminal\0"
-  "text\0"
-  "toggle button\0"
-  "tool bar\0"
-  "tool tip\0"
-  "tree\0"
-  "tree table\0"
-  "unknown\0"
-  "viewport\0"
-  "window\0"
-  "header\0"
-  "footer\0"
-  "paragraph\0"
-  "ruler\0"
-  "application\0"
-  "autocomplete\0"
-  "edit bar\0"
-  "embedded component\0"
-  "entry\0"
-  "chart\0"
-  "caption\0"
-  "document frame\0"
-  "heading\0"
-  "page\0"
-  "section\0"
-  "redundant object\0"
-  "form\0"
-  "link\0"
-  "input method window";
-
-static const uint roles_offsets[] = {
-  0, 8, 26, 32, 42, 48, 57, 64,
-  74, 90, 104, 118, 128, 139, 152, 166,
-  171, 178, 193, 206, 219, 226, 238, 244,
-  255, 270, 275, 281, 296, 302, 315, 320,
-  330, 335, 344, 354, 366, 375, 389, 395,
-  409, 420, 433, 445, 458, 474, 484, 495,
-  506, 518, 528, 535, 546, 558, 568, 574,
-  585, 605, 622, 641, 650, 655, 669, 678,
-  687, 692, 703, 711, 720, 727, 734, 741,
-  751, 757, 769, 782, 791, 810, 816, 822,
-  830, 845, 853, 858, 866, 883, 888, 893
-};
 
 int QSpiAdaptor::childCount() const
 {
@@ -241,6 +134,7 @@ QString QSpiAdaptor::GetLocalizedRoleName()
 {
     // TODO
     QString out0;
+    out0 = qSpiRoleMapping.value(getInterface().role(0)).localizedName();
     return out0;
 }
 
@@ -254,13 +148,12 @@ QSpiRelationArray QSpiAdaptor::GetRelationSet()
 uint QSpiAdaptor::GetRole()
 {
     QAccessible::Role role = ACCESSIBLE_INTERFACE.role(0);
-    return qSpiRoleMapping[role];
+    return qSpiRoleMapping[role].spiRole();
 }
 
 QString QSpiAdaptor::GetRoleName()
 {
-    QString roleName (roles + roles_offsets[GetRole()]);
-    return roleName;
+    return qSpiRoleMapping[ACCESSIBLE_INTERFACE.role(0)].name();
 }
 
 QSpiIntList QSpiAdaptor::GetState()
@@ -272,12 +165,12 @@ QSpiIntList QSpiAdaptor::GetState()
 
 int QSpiAdaptor::nActions() const
 {
-    return ACTION_INTERFACE->actionCount ();
+    return ACTION_INTERFACE->actionCount();
 }
 
 bool QSpiAdaptor::DoAction(int index)
 {
-    ACTION_INTERFACE->doAction (index);
+    ACTION_INTERFACE->doAction(index);
     return TRUE;
 }
 
@@ -326,7 +219,7 @@ QString QSpiAdaptor::GetKeyBinding(int index)
 
 QString QSpiAdaptor::GetName(int index)
 {
-    return ACTION_INTERFACE->name (index);
+    return ACTION_INTERFACE->name(index);
 }
 
 /* AT-SPI Application interface ---------------------------------------------*/
@@ -783,14 +676,10 @@ QSpiRangeList QSpiAdaptor::GetBoundedRanges(int x,
 					        uint xClipType,
 					        uint yClipType)
 {
-    // TODO
-    Q_UNUSED (x);
-    Q_UNUSED (y);
-    Q_UNUSED (width);
-    Q_UNUSED (height);
-    Q_UNUSED (coordType);
-    Q_UNUSED (xClipType);
-    Q_UNUSED (yClipType);
+    qWarning("Not implemented: QSpiAdaptor::GetBoundedRanges");
+    Q_UNUSED(x) Q_UNUSED (y) Q_UNUSED(width)
+    Q_UNUSED(height) Q_UNUSED(coordType)
+    Q_UNUSED(xClipType) Q_UNUSED(yClipType)
     QSpiRangeList out0;
     return out0;
 }
@@ -895,22 +784,25 @@ QString QSpiAdaptor::GetTextBeforeOffset(int offset, uint type, int &startOffset
 
 bool QSpiAdaptor::RemoveSelection(int selectionNum)
 {
-    // TODO
-    bool out0;
+    Q_UNUSED(selectionNum)
+    qWarning("Not implemented: QSpiAdaptor::RemoveSelection");
+    bool out0 = false;
     return out0;
 }
 
 bool QSpiAdaptor::SetCaretOffset(int offset)
 {
-    // TODO
-    bool out0;
+    Q_UNUSED(offset)
+    qWarning("Not implemented: QSpiAdaptor::SetCaretOffset");
+    bool out0 = false;
     return out0;
 }
 
 bool QSpiAdaptor::SetSelection(int selectionNum, int startOffset, int endOffset)
 {
-    // TODO
-    bool out0;
+    Q_UNUSED(selectionNum) Q_UNUSED(startOffset) Q_UNUSED(endOffset)
+    qWarning("Not implemented: QSpiAdaptor::SetSelection");
+    bool out0 = false;
     return out0;
 }
 

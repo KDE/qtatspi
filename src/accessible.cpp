@@ -44,12 +44,10 @@
 static QSpiObjectReference null_reference (QDBusConnection::sessionBus().baseService(),
                                            QDBusObjectPath (QSPI_OBJECT_PATH_NULL));
 
-/* QSpiAccessible ------------------------------------------------------*/
-
 QDBusObjectPath QSpiAccessible::getUnique ()
 {
     static int id = 1;
-    QString prefix (QSPI_OBJECT_PATH_PREFIX);
+    QString prefix(QSPI_OBJECT_PATH_PREFIX);
     QString num;
 
     if (id == 0)
@@ -57,49 +55,50 @@ QDBusObjectPath QSpiAccessible::getUnique ()
     return QDBusObjectPath(prefix + num.setNum(id++));
 }
 
-QSpiAccessible::QSpiAccessible (QSpiAccessibleCache  *cache,
-                                QAccessibleInterface *interface):QSpiAdaptor (cache, interface)
+QSpiAccessible::QSpiAccessible(QSpiAccessibleCache  *cache,
+                               QAccessibleInterface *interface)
+    :QSpiAdaptor (cache, interface)
 {
-    this->reference = new QSpiObjectReference (QDBusConnection::sessionBus().baseService(),
-                                               getUnique ());
+    reference = new QSpiObjectReference(QDBusConnection::sessionBus().baseService(),
+                                               getUnique());
 
     new AccessibleAdaptor(this);
-    supported << QSPI_INTERFACE_ACCESSIBLE;
+    supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;
     new ComponentAdaptor(this);
-    supported << QSPI_INTERFACE_COMPONENT;
+    supportedInterfaces << QSPI_INTERFACE_COMPONENT;
 
     if (interface->actionInterface())
     {
         new ActionAdaptor(this);
-        supported << QSPI_INTERFACE_ACTION;
+        supportedInterfaces << QSPI_INTERFACE_ACTION;
     }
     if (interface->textInterface())
     {
         new TextAdaptor(this);
-        supported << QSPI_INTERFACE_TEXT;
+        supportedInterfaces << QSPI_INTERFACE_TEXT;
     }
     if (interface->editableTextInterface())
     {
         new EditableTextAdaptor(this);
-        supported << QSPI_INTERFACE_EDITABLE_TEXT;
+        supportedInterfaces << QSPI_INTERFACE_EDITABLE_TEXT;
     }
     if (interface->valueInterface())
     {
         new ValueAdaptor(this);
-        supported << QSPI_INTERFACE_VALUE;
+        supportedInterfaces << QSPI_INTERFACE_VALUE;
     }
     if (interface->tableInterface())
     {
         new TableAdaptor(this);
-        supported << QSPI_INTERFACE_TABLE;
+        supportedInterfaces << QSPI_INTERFACE_TABLE;
     }
 
-    QDBusConnection::sessionBus().registerObject(this->reference->path.path(),
+    QDBusConnection::sessionBus().registerObject(reference->path.path(),
                                                  this,
                                                  QDBusConnection::ExportAdaptors);
 }
 
-QSpiObjectReference &QSpiAccessible::getParentReference () const
+QSpiObjectReference &QSpiAccessible::getParentReference() const
 {
     QAccessibleInterface *parentInterface = NULL;
     QSpiObject *parent;
@@ -107,7 +106,7 @@ QSpiObjectReference &QSpiAccessible::getParentReference () const
     interface->navigate (QAccessible::Ancestor, 1, &parentInterface);
     if (parentInterface)
     {
-        parent = cache->objectToAccessible (parentInterface->object());
+        parent = cache->objectToAccessible(parentInterface->object());
         delete parentInterface;
         if (parent)
         {
@@ -121,41 +120,38 @@ QSpiObjectReference &QSpiAccessible::getParentReference () const
 /* QSpiApplication ------------------------------------------------*/
 
 QSpiApplication::QSpiApplication (QSpiAccessibleCache  *cache,
-                                  QAccessibleInterface *interface):QSpiAdaptor (cache, interface)
+                                  QAccessibleInterface *interface)
+    :QSpiAdaptor (cache, interface)
 {
     SocketProxy *proxy;
     ApplicationAdaptor *app;
     QDBusPendingReply <QSpiObjectReference> reply;
 
-    this->reference = new QSpiObjectReference (QDBusConnection::sessionBus().baseService(),
+    reference = new QSpiObjectReference (QDBusConnection::sessionBus().baseService(),
                                                QDBusObjectPath (QSPI_OBJECT_PATH_ROOT));
 
     new AccessibleAdaptor(this);
-    supported << QSPI_INTERFACE_ACCESSIBLE;
+    supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;
     new ComponentAdaptor(this);
-    supported << QSPI_INTERFACE_COMPONENT;
+    supportedInterfaces << QSPI_INTERFACE_COMPONENT;
     app = new ApplicationAdaptor(this);
-    supported << QSPI_INTERFACE_APPLICATION;
+    supportedInterfaces << QSPI_INTERFACE_APPLICATION;
 
-    QDBusConnection::sessionBus().registerObject(this->reference->path.path(),
+    QDBusConnection::sessionBus().registerObject(reference->path.path(),
                                                  this,
                                                  QDBusConnection::ExportAdaptors);
-
 
     /* Plug in to the desktop socket */
     proxy = new SocketProxy (QSPI_REGISTRY_NAME,
                              QSPI_OBJECT_PATH_ROOT,
                              QDBusConnection::sessionBus());
-    reply = proxy->Embed (getReference());
-    reply.waitForFinished ();
-    if (reply.isValid ())
-    {
-        const QSpiObjectReference &socket = reply.value ();
-        this->socket = new QSpiObjectReference (socket); 
-    }
-    else
-    {
-        this->socket = new QSpiObjectReference ();
+    reply = proxy->Embed(getReference());
+    reply.waitForFinished();
+    if (reply.isValid ()) {
+        const QSpiObjectReference &_socket = reply.value();
+        socket = new QSpiObjectReference(_socket);
+    } else {
+        socket = new QSpiObjectReference();
         qDebug() << "Error in contacting registry";
         qDebug() << reply.error().name();
         qDebug() << reply.error().message();
@@ -163,9 +159,7 @@ QSpiApplication::QSpiApplication (QSpiAccessibleCache  *cache,
     delete proxy;
 }
 
-QSpiObjectReference &QSpiApplication::getParentReference () const
+QSpiObjectReference &QSpiApplication::getParentReference() const
 {
     return *socket;
 }
-
-/*END------------------------------------------------------------------------*/

@@ -44,6 +44,7 @@ Button::Button(const QString &text, QWidget *parent)
     : QToolButton(parent)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    setObjectName("Button: " + text);
     setText(text);
 }
 //! [0]

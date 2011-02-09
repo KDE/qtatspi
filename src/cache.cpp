@@ -42,132 +42,93 @@ QSpiAccessibleCache::QSpiAccessibleCache (QObject *root)
 {
     CacheAdaptor *adaptor;
 
-    /* TODO, should this be registered on the root object? */
-    QApplication::instance()->installEventFilter(this);
+    //QApplication::instance()->installEventFilter(this);
 
-    this->root = root;
-    cache.insert (root, new QSpiApplication (this, QAccessible::queryAccessibleInterface (root)));
-    registerChildren (QAccessible::queryAccessibleInterface(root));
+    rootObject = root;
+    cache.insert(root, new QSpiApplication (this, QAccessible::queryAccessibleInterface(root)));
+    registerChildren(QAccessible::queryAccessibleInterface(root));
 
-    adaptor = new CacheAdaptor (this);
+    adaptor = new CacheAdaptor(this);
     QDBusConnection::sessionBus().registerObject(QSPI_OBJECT_PATH_CACHE, this, QDBusConnection::ExportAdaptors);
 	
-    connect (this, SIGNAL(AddAccessible (const QSpiAccessibleCacheItem &)),
-             adaptor, SIGNAL(AddAccessible (const QSpiAccessibleCacheItem &)));
-    connect (this, SIGNAL(RemoveAccessible (const QSpiObjectReference &)),
-             adaptor, SIGNAL(RemoveAccessible (const QSpiObjectReference &)));
-
-    // Install global event filter.
-    QApplication::instance ()->installEventFilter (this);
+    connect (this, SIGNAL(AddAccessible(const QSpiAccessibleCacheItem &)),
+             adaptor, SIGNAL(AddAccessible(const QSpiAccessibleCacheItem &)));
+    connect (this, SIGNAL(RemoveAccessible(const QSpiObjectReference &)),
+             adaptor, SIGNAL(RemoveAccessible(const QSpiObjectReference &)));
 }
 
 /*---------------------------------------------------------------------------*/
 
 QObject *QSpiAccessibleCache::getRoot ()
 {
-    return root;
+    return rootObject;
 }
 
 /*---------------------------------------------------------------------------*/
 
-bool QSpiAccessibleCache::eventFilter(QObject *obj, QEvent *event)
-{
-    QSpiObject *accessible = NULL;
+//bool QSpiAccessibleCache::eventFilter(QObject *obj, QEvent *event)
+//{
+//    QSpiObject *accessible = NULL;
 
-    switch (event->type ())
-    {
-        case QEvent::Show:
-        {
-            accessible = objectToAccessible (obj);
-            break;
-        }
-        /*
-         * FIXME: No Idea what to do here, the ChildAdded signal is BROKEN
-         * for accessibility as the accessible interface is not ready when this signal
-         * is emmited.
-         */
-#if 0
-        case QEvent::ChildAdded:
-        {
-            QList <QSpiObject *> children;
-            QObject *child = static_cast<QChildEvent *>(event)->child();
+//    switch (event->type ())
+//    {
+//        case QEvent::Show:
+//        {
+//            accessible = objectToAccessible (obj);
+//            break;
+//        }
+//        /*
+//         * FIXME: No Idea what to do here, the ChildAdded signal is BROKEN
+//         * for accessibility as the accessible interface is not ready when this signal
+//         * is emmited.
+//         */
+//#if 0
+//        case QEvent::ChildAdded:
+//        {
+//            QList <QSpiObject *> children;
+//            QObject *child = static_cast<QChildEvent *>(event)->child();
 
-            qDebug ("QSpiAccessibleBridge : childAdded.\n\t%s\n\t%s\n\t%s\n",
-                    qPrintable(accessible->getReference().path()),
-                    qPrintable(accessible->getParentPath().path()),
-                    qPrintable (accessible->getInterface().text(QAccessible::Name, 0))
-                   );
+//            qDebug ("QSpiAccessibleBridge : childAdded.\n\t%s\n\t%s\n\t%s\n",
+//                    qPrintable(accessible->getReference().path()),
+//                    qPrintable(accessible->getParentPath().path()),
+//                    qPrintable (accessible->getInterface().text(QAccessible::Name, 0))
+//                   );
 
-            children = accessible->getChildren();
-            foreach (QSpiObject *chld, children)
-            {
-                qDebug ("\t\t%s", qPrintable(chld->getReference().path()));
-            }
+//            children = accessible->getChildren();
+//            foreach (QSpiObject *chld, children)
+//            {
+//                qDebug ("\t\t%s", qPrintable(chld->getReference().path()));
+//            }
                 
-            registerChildren (child);
-            emit accessibleUpdated (accessible);
-            break;
-            // TODO
-            Emit the child added signal
-        }
-#endif
-        default:
-            break;
-    }
-    /* Think false is the right thing to do, no need to block these events here. */
-    return false;
-}
+//            registerChildren(child);
+//            emit accessibleUpdated (accessible);
+//            break;
+//            // TODO
+//            Emit the child added signal
+//        }
+//#endif
+//        default:
+//            break;
+//    }
+//    /* Think false is the right thing to do, no need to block these events here. */
+//    return false;
+//}
 
 /*---------------------------------------------------------------------------*/
 
-void QSpiAccessibleCache::objectDestroyed (QObject *obj)
-{
-    if (cache.contains (obj))
-    {
-        QSpiObject *accessible = cache.take (obj);
-#if 0
-        qDebug("QSpiAccessibleBridge : Object Destroyed\n\t%s\n",
-               qPrintable(accessible->getReference().path()));
-#endif
-        emit RemoveAccessible (accessible->getReference());
-        delete accessible;
-    }
-}
-
-/*---------------------------------------------------------------------------*/
-
-QSpiObject *QSpiAccessibleCache::objectToAccessible (QObject *obj)
-{
-    if (cache.contains(obj))
-    {
-        return cache.value(obj);
-    }
-    else
-    {
-        QAccessibleInterface *interface = QAccessible::queryAccessibleInterface (obj);
-        QSpiObject *accessible = NULL;
-
-        if (interface)
-        {
-            accessible = new QSpiAccessible (this, interface);
-
-            connect(interface->object(), SIGNAL(destroyed(QObject *)), this, SLOT(objectDestroyed(QObject *)));
-            cache.insert (interface->object(), accessible);
-#if 0
-            qDebug ("QSpiAccessibleBridge : accessibleRegistered.\n\t%s\n\t%s\n\t%s\n",
-                     qPrintable(accessible->getReference().path()),
-                     qPrintable(accessible->getParentPath().path()),
-                     qPrintable (accessible->getInterface().text(QAccessible::Name, 0))
-                   );
-#endif
-
-            emit AddAccessible (accessible->getItem());
-        }
-        return accessible;
-    }
-}
-
-/*---------------------------------------------------------------------------*/
+//void QSpiAccessibleCache::objectDestroyed (QObject *obj)
+//{
+//    if (cache.contains (obj))
+//    {
+//        QSpiObject *accessible = cache.take (obj);
+//#if 0
+//        qDebug("QSpiAccessibleBridge : Object Destroyed\n\t%s\n",
+//               qPrintable(accessible->getReference().path()));
+//#endif
+//        emit RemoveAccessible (accessible->getReference());
+//        delete accessible;
+//    }
+//}
 
 /* 
  * Registers all descendants of the given accessible interface with the cache.
@@ -175,8 +136,10 @@ QSpiObject *QSpiAccessibleCache::objectToAccessible (QObject *obj)
  * No Idea about the threading implications here.
  * What is the equivalent of the GDK lock?
  */
-void QSpiAccessibleCache::registerChildren (QAccessibleInterface *interface)
+void QSpiAccessibleCache::registerChildren(QAccessibleInterface *interface)
 {
+    qDebug() << "QSpiAccessibleCache::registerChildren";
+
     QAccessibleInterface *current;
     QSpiObject *accessible = NULL;
     QStack <QAccessibleInterface *> stack;
@@ -189,7 +152,7 @@ void QSpiAccessibleCache::registerChildren (QAccessibleInterface *interface)
     while (!stack.empty())
     {
         current = stack.pop();
-        accessible = objectToAccessible (current->object());
+        accessible = objectToAccessible(current->object());
 
         for (int i = 1; i <= current->childCount (); i++)
         {
@@ -203,6 +166,36 @@ void QSpiAccessibleCache::registerChildren (QAccessibleInterface *interface)
     }
 }
 
+QSpiObject *QSpiAccessibleCache::objectToAccessible (QObject *obj)
+{
+    if (cache.contains(obj)) {
+        return cache.value(obj);
+    } else {
+        QAccessibleInterface *interface = QAccessible::queryAccessibleInterface(obj);
+        if (interface)
+        {
+            QSpiObject *accessible = new QSpiAccessible(this, interface);
+
+            cache.insert(interface->object(), accessible);
+
+#if 0
+            qDebug ("QSpiAccessibleBridge : accessibleRegistered.\n\t%s\n\t%s\n\t%s\n",
+                     qPrintable(accessible->getReference().path()),
+                     qPrintable(accessible->getParentPath().path()),
+                     qPrintable (accessible->getInterface().text(QAccessible::Name, 0))
+                   );
+#endif
+
+            qDebug() << "QSpiAccessibleCache::objectToAccessible AddAccessible";
+            emit AddAccessible(accessible->getCacheItem()); // this one actually works!!!
+            return accessible;
+        }
+    }
+    return 0;
+}
+
+
+
 /* AT-SPI Cache interface ---------------------------------------------------*/
 
 QSpiAccessibleCacheArray QSpiAccessibleCache::GetItems()
@@ -211,7 +204,7 @@ QSpiAccessibleCacheArray QSpiAccessibleCache::GetItems()
 
     foreach (QSpiObject *obj, cache.values())
     {
-        cacheArray << obj->getItem ();
+        cacheArray << obj->getCacheItem();
     }
     return cacheArray;
 }

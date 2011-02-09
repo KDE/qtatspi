@@ -35,27 +35,27 @@ AccessibleAdaptor::~AccessibleAdaptor()
 
 int AccessibleAdaptor::childCount() const
 {
-    // get the value of property childCount
-    return qvariant_cast< int >(parent()->property("childCount"));
+    // get the value of property ChildCount
+    return qvariant_cast< int >(parent()->property("ChildCount"));
 }
 
 QString AccessibleAdaptor::description() const
 {
-    // get the value of property description
-    return qvariant_cast< QString >(parent()->property("description"));
+    // get the value of property Description
+    return qvariant_cast< QString >(parent()->property("Description"));
 }
 
 QString AccessibleAdaptor::name() const
 {
-    // get the value of property name
-    return qvariant_cast< QString >(parent()->property("name"));
+    // get the value of property Name
+    return qvariant_cast< QString >(parent()->property("Name"));
 }
 
 //HAND-EDIT because parent() is a QObject method already...
 QSpiObjectReference AccessibleAdaptor::getParent() const
 {
-    // get the value of property parent
-    return qvariant_cast< QSpiObjectReference >(parent()->property("parent"));
+    // get the value of property Parent
+    return qvariant_cast< QSpiObjectReference >(parent()->property("Parent"));
 }
 
 QSpiObjectReference AccessibleAdaptor::GetApplication()

@@ -46,6 +46,7 @@
 Calculator::Calculator(QWidget *parent)
     : QDialog(parent)
 {
+    setObjectName("Calculator Dialog");
     sumInMemory = 0.0;
     sumSoFar = 0.0;
     factorSoFar = 0.0;
@@ -54,6 +55,10 @@ Calculator::Calculator(QWidget *parent)
 
 //! [1]
     display = new QLineEdit("0");
+    display->setObjectName("display line edit");
+    display->setAccessibleName("The calculator display");
+    display->setAccessibleDescription("The calculator display description");
+
 //! [1] //! [2]
     display->setReadOnly(true);
     display->setAlignment(Qt::AlignRight);

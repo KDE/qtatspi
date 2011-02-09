@@ -29,8 +29,7 @@
 
 #include "struct_marshallers.h"
 
-/* Role mapping */
-/*---------------------------------------------------------------------------*/
+#include <QAccessible>
 
 enum QSpiRole
 {
@@ -44,7 +43,7 @@ enum QSpiRole
     ROLE_CHECK_BOX,
     ROLE_CHECK_MENU_ITEM,
     ROLE_COLOR_CHOOSER,
-    ROLE_COLUMN_HEADER,
+    ROLE_COLUMN_HEADER, //10
     ROLE_COMBO_BOX,
     ROLE_DATE_EDITOR,
     ROLE_DESKTOP_ICON,
@@ -54,7 +53,7 @@ enum QSpiRole
     ROLE_DIRECTORY_PANE,
     ROLE_DRAWING_AREA,
     ROLE_FILE_CHOOSER,
-    ROLE_FILLER,
+    ROLE_FILLER, //20
     ROLE_FOCUS_TRAVERSABLE,
     ROLE_FONT_CHOOSER,
     ROLE_FRAME,
@@ -64,7 +63,7 @@ enum QSpiRole
     ROLE_IMAGE,
     ROLE_INTERNAL_FRAME,
     ROLE_LABEL,
-    ROLE_LAYERED_PANE,
+    ROLE_LAYERED_PANE, //30
     ROLE_LIST,
     ROLE_LIST_ITEM,
     ROLE_MENU,
@@ -74,7 +73,7 @@ enum QSpiRole
     ROLE_PAGE_TAB,
     ROLE_PAGE_TAB_LIST,
     ROLE_PANEL,
-    ROLE_PASSWORD_TEXT,
+    ROLE_PASSWORD_TEXT, //40
     ROLE_POPUP_MENU,
     ROLE_PROGRESS_BAR,
     ROLE_PUSH_BUTTON,
@@ -84,7 +83,7 @@ enum QSpiRole
     ROLE_ROW_HEADER,
     ROLE_SCROLL_BAR,
     ROLE_SCROLL_PANE,
-    ROLE_SEPARATOR,
+    ROLE_SEPARATOR, //50
     ROLE_SLIDER,
     ROLE_SPIN_BUTTON,
     ROLE_SPLIT_PANE,
@@ -94,7 +93,7 @@ enum QSpiRole
     ROLE_TABLE_COLUMN_HEADER,
     ROLE_TABLE_ROW_HEADER,
     ROLE_TEAROFF_MENU_ITEM,
-    ROLE_TERMINAL,
+    ROLE_TERMINAL, //60
     ROLE_TEXT,
     ROLE_TOGGLE_BUTTON,
     ROLE_TOOL_BAR,
@@ -104,7 +103,7 @@ enum QSpiRole
     ROLE_UNKNOWN,
     ROLE_VIEWPORT,
     ROLE_WINDOW,
-    ROLE_EXTENDED,
+    ROLE_EXTENDED, //70
     ROLE_HEADER,
     ROLE_FOOTER,
     ROLE_PARAGRAPH,
@@ -114,7 +113,7 @@ enum QSpiRole
     ROLE_EDITBAR,
     ROLE_EMBEDDED,
     ROLE_ENTRY,
-    ROLE_CHART,
+    ROLE_CHART, //80
     ROLE_CAPTION,
     ROLE_DOCUMENT_FRAME,
     ROLE_HEADING,
@@ -124,10 +123,26 @@ enum QSpiRole
     ROLE_FORM,
     ROLE_LINK,
     ROLE_INPUT_METHOD_WINDOW,
-    ROLE_LAST_DEFINED
+    ROLE_LAST_DEFINED //90
 };
 
-extern QHash <QAccessible::Role, QSpiRole> qSpiRoleMapping;
+struct RoleNames {
+    RoleNames() {}
+    RoleNames(QSpiRole r, const QString& n, const QString& ln)
+        :spiRole_(r), name_(n), localizedName_(ln)
+    {}
+
+    QSpiRole spiRole() const {return spiRole_;}
+    QString name() const {return name_;}
+    QString localizedName() const {return localizedName_;}
+
+private:
+    QSpiRole spiRole_;
+    QString name_;
+    QString localizedName_;
+};
+
+extern QHash <QAccessible::Role, RoleNames> qSpiRoleMapping;
 
 /* State mapping */
 /*---------------------------------------------------------------------------*/

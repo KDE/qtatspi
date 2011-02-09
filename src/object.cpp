@@ -29,36 +29,29 @@
 
 /* QSpiObject ------------------------------------------------------*/
 
-QSpiObject::QSpiObject (QSpiAccessibleCache  *cache,
-                        QAccessibleInterface *interface)
+QSpiObject::QSpiObject(QSpiAccessibleCache  *_cache,
+                        QAccessibleInterface *_interface)
+    :interface(_interface), cache(_cache)
 {
-    ObjectAdaptor *event;
-
-    this->cache     = cache;
-    this->interface = interface;
-    /*this->reference = new QSpiObjectReference ();*/
-
-    // Event set-up.
-    interface->object()->installEventFilter (this);
-    event = new ObjectAdaptor (this);
+    new ObjectAdaptor(this);
 }
 
-QSpiObjectReference &QSpiObject::getReference () const
+QSpiObjectReference &QSpiObject::getReference() const
 {
     return *reference;
 }
 
-QAccessibleInterface &QSpiObject::getInterface () const
+QAccessibleInterface &QSpiObject::getInterface() const
 {
     return *interface;
 }
 
-QStringList QSpiObject::getSupported () const
+QStringList QSpiObject::getSupportedInterfaces() const
 {
-    return supported;
+    return supportedInterfaces;
 }
 
-QSpiAccessibleCacheItem QSpiObject::getItem () const
+QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
 {
     QSpiAccessibleCacheItem item;
 
@@ -66,14 +59,14 @@ QSpiAccessibleCacheItem QSpiObject::getItem () const
     QList <QSpiObjectReference> childPaths;
 
     /* Path */
-    item.path = this->getReference();
+    item.path = getReference();
     /* Parent */
-    item.parent = this->getParentReference();
+    item.parent = getParentReference();
     /* Children */
-    for (int i = 1; i <= this->getInterface().childCount (); i++)
+    for (int i = 1; i <= getInterface().childCount(); i++)
     {
         QAccessibleInterface *child = NULL;
-        this->getInterface().navigate(QAccessible::Child, i, &child);
+        getInterface().navigate(QAccessible::Child, i, &child);
         if (child)
         {
             QSpiObject *current;
@@ -89,58 +82,36 @@ QSpiAccessibleCacheItem QSpiObject::getItem () const
     }
     item.children = childPaths;
     /* Supported interfaces */
-    item.supported = this->getSupported();
+    item.supported = getSupportedInterfaces();
     /* Name */
-    item.name = this->getInterface().text(QAccessible::Name, 0);
+    item.name = getInterface().text(QAccessible::Name, 0);
     /* Role */
-    item.role = qSpiRoleMapping.value(this->getInterface().role(0));
+    item.role = qSpiRoleMapping.value(getInterface().role(0)).spiRole();
+
     /* Description */
-    item.description = this->getInterface().text(QAccessible::Description, 0);
+    item.description = getInterface().text(QAccessible::Description, 0);
     /* State set */
-    qspi_stateset_from_qstate (this->getInterface().state(0), item.states);
+    qspi_stateset_from_qstate(getInterface().state(0), item.states);
     return item;
 }
 
-void QSpiObject::accessibleEvent (QAccessible::Event event)
+void QSpiObject::accessibleEvent(QAccessible::Event event)
 {
     /* TODO Create an event type and emit the event on the object */
     switch (event)
     {
+    case QAccessible::ObjectShow:
+        qDebug() << "ObjectShow";
+        // send signal ChildrenChanged
+        break;
+    case QAccessible::ObjectHide:
+        break;
     case QAccessible::DescriptionChanged:
     case QAccessible::NameChanged:
     case QAccessible::ParentChanged:
     case QAccessible::StateChanged:
     default:
-            break;
+        break;
     }
 }
 
-bool QSpiObject::eventFilter(QObject *obj, QEvent *event)
-{
-    Q_UNUSED (obj);
-    switch (event->type ())
-    {
-        case QEvent::Show:
-        {
-            break;
-        }
-        /*
-         * FIXME: No Idea what to do here, the ChildAdded signal is BROKEN
-         * for accessibility as the accessible interface is not ready when this signal
-         * is emmited.
-         */
-        case QEvent::ChildAdded:
-        {
-            break;
-        }
-        case QEvent::ChildRemoved:
-        {
-            break;
-        }
-        default:
-            break;
-    }
-    return false;
-}
-
-/*END------------------------------------------------------------------------*/

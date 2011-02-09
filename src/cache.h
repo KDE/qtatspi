@@ -37,23 +37,19 @@ class QSpiAccessibleCache : public QObject
     Q_OBJECT
 
 public:
-    QSpiAccessibleCache (QObject *root);
-    QSpiObject *objectToAccessible (QObject *);
+    QSpiAccessibleCache(QObject *rootObject);
+    QSpiObject *objectToAccessible(QObject *);
 
-    QObject *getRoot ();
-    bool eventFilter(QObject *obj, QEvent *event);
-
-public slots:
-    void objectDestroyed  (QObject *object);
+    QObject *getRoot();
 
 signals:
     void AddAccessible(const QSpiAccessibleCacheItem &nodeAdded);
     void RemoveAccessible(const QSpiObjectReference &nodeRemoved);
 
 private:
-    QObject *root;
+    QObject *rootObject;
     QHash <QObject *, QSpiObject *> cache;
-    void registerChildren  (QAccessibleInterface *interface);
+    void registerChildren(QAccessibleInterface *interface);
 
 /* AT-SPI Cache interface */
 public Q_SLOTS:

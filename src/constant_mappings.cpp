@@ -19,249 +19,256 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include <QtCore/QHash>
-#include <QAccessible>
-
 #include "constant_mappings.h"
+
+#include "object.h"
 
 #define BITARRAY_SEQ_TERM 0xffffffff
 
 #define BITARRAY_SET(p, n)   ( (p)[n>>5] |=  (1<<(n&31)) )
 #define BITARRAY_UNSET(p, n) ( (p)[n>>5] &= ~(1<<(n&31)) )
 
-/*---------------------------------------------------------------------------*/
 
-QHash <QAccessible::Role, QSpiRole> qSpiRoleMapping;
+
+// FIXME the assignment of roles is quite arbitrary, at some point go through this list and sort and check that it makes sense
+//  "calendar" "check menu item"  "color chooser" "column header"    "dateeditor"  "desktop icon"  "desktop frame"
+//  "directory pane"  "drawing area"  "file chooser" "fontchooser"  "frame"  "glass pane"  "html container"  "icon"
+//  "internal frame"  "option pane"  "password text" "radio menu item"  "root pane"  "row header"    "scroll pane"
+//  "tear off menu item"  "terminal" "toggle button" "tree table"  "unknown"  "viewport" "header"  "footer"  "paragraph"
+//  "ruler"    "autocomplete"  "edit bar" "embedded component"  "entry"    "caption"
+//  "heading"  "page"  "section"  "redundant object"  "form"  "input method window"  "menu"
+
+QHash <QAccessible::Role, RoleNames> qSpiRoleMapping;
 
 static void initialize_role_mapping ()
 {
-       qSpiRoleMapping.insert (QAccessible::NoRole, ROLE_INVALID);
-       qSpiRoleMapping.insert (QAccessible::TitleBar, ROLE_TEXT);
-       qSpiRoleMapping.insert (QAccessible::MenuBar, ROLE_MENU_BAR);
-       qSpiRoleMapping.insert (QAccessible::ScrollBar, ROLE_SCROLL_BAR);
-       qSpiRoleMapping.insert (QAccessible::Grip, ROLE_UNKNOWN);
-       qSpiRoleMapping.insert (QAccessible::Sound, ROLE_UNKNOWN);
-       qSpiRoleMapping.insert (QAccessible::Cursor, ROLE_ARROW);
-       qSpiRoleMapping.insert (QAccessible::Caret, ROLE_UNKNOWN);
-       qSpiRoleMapping.insert (QAccessible::AlertMessage, ROLE_ALERT);
-       qSpiRoleMapping.insert (QAccessible::Window, ROLE_WINDOW);
-       qSpiRoleMapping.insert (QAccessible::Client, ROLE_FILLER);
-       qSpiRoleMapping.insert (QAccessible::PopupMenu, ROLE_POPUP_MENU);
-       qSpiRoleMapping.insert (QAccessible::MenuItem, ROLE_MENU_ITEM);
-       qSpiRoleMapping.insert (QAccessible::ToolTip, ROLE_TOOL_TIP);
-       qSpiRoleMapping.insert (QAccessible::Application, ROLE_APPLICATION);
-       qSpiRoleMapping.insert (QAccessible::Document, ROLE_DOCUMENT_FRAME);
-       qSpiRoleMapping.insert (QAccessible::Pane, ROLE_PANEL);
-       qSpiRoleMapping.insert (QAccessible::Chart, ROLE_CHART);
-       qSpiRoleMapping.insert (QAccessible::Dialog, ROLE_DIALOG);
-       qSpiRoleMapping.insert (QAccessible::Border, ROLE_FRAME);
-       qSpiRoleMapping.insert (QAccessible::Grouping, ROLE_PANEL);
-       qSpiRoleMapping.insert (QAccessible::Separator, ROLE_SEPARATOR);
-       qSpiRoleMapping.insert (QAccessible::ToolBar, ROLE_TOOL_BAR);
-       qSpiRoleMapping.insert (QAccessible::StatusBar, ROLE_STATUS_BAR);
-       qSpiRoleMapping.insert (QAccessible::Table, ROLE_TABLE);
-       qSpiRoleMapping.insert (QAccessible::ColumnHeader, ROLE_TABLE_COLUMN_HEADER);
-       qSpiRoleMapping.insert (QAccessible::RowHeader, ROLE_TABLE_ROW_HEADER);
-       qSpiRoleMapping.insert (QAccessible::Column, ROLE_TABLE_CELL);
-       qSpiRoleMapping.insert (QAccessible::Row, ROLE_TABLE_CELL);
-       qSpiRoleMapping.insert (QAccessible::Cell, ROLE_TABLE_CELL);
-       qSpiRoleMapping.insert (QAccessible::Link, ROLE_LINK);
-       qSpiRoleMapping.insert (QAccessible::HelpBalloon, ROLE_DIALOG);
-       qSpiRoleMapping.insert (QAccessible::Assistant, ROLE_DIALOG);
-       qSpiRoleMapping.insert (QAccessible::List, ROLE_LIST);
-       qSpiRoleMapping.insert (QAccessible::ListItem, ROLE_LIST_ITEM);
-       qSpiRoleMapping.insert (QAccessible::Tree, ROLE_TREE);
-       qSpiRoleMapping.insert (QAccessible::TreeItem, ROLE_TABLE_CELL);
-       qSpiRoleMapping.insert (QAccessible::PageTab, ROLE_PAGE_TAB);
-       qSpiRoleMapping.insert (QAccessible::PropertyPage, ROLE_PAGE_TAB);
-       qSpiRoleMapping.insert (QAccessible::Indicator, ROLE_UNKNOWN);
-       qSpiRoleMapping.insert (QAccessible::Graphic, ROLE_IMAGE);
-       qSpiRoleMapping.insert (QAccessible::StaticText, ROLE_LABEL);
-       qSpiRoleMapping.insert (QAccessible::EditableText, ROLE_TEXT);
-       qSpiRoleMapping.insert (QAccessible::PushButton, ROLE_PUSH_BUTTON);
-       qSpiRoleMapping.insert (QAccessible::CheckBox, ROLE_CHECK_BOX);
-       qSpiRoleMapping.insert (QAccessible::RadioButton, ROLE_RADIO_BUTTON);
-       qSpiRoleMapping.insert (QAccessible::ComboBox, ROLE_COMBO_BOX);
-       qSpiRoleMapping.insert (QAccessible::ProgressBar, ROLE_PROGRESS_BAR);
-       qSpiRoleMapping.insert (QAccessible::Dial, ROLE_DIAL);
-       qSpiRoleMapping.insert (QAccessible::HotkeyField, ROLE_TEXT);
-       qSpiRoleMapping.insert (QAccessible::Slider, ROLE_SLIDER);
-       qSpiRoleMapping.insert (QAccessible::SpinBox, ROLE_SPIN_BUTTON);
-       qSpiRoleMapping.insert (QAccessible::Canvas, ROLE_CANVAS);
-       qSpiRoleMapping.insert (QAccessible::Animation, ROLE_ANIMATION);
-       qSpiRoleMapping.insert (QAccessible::Equation, ROLE_TEXT);
-       qSpiRoleMapping.insert (QAccessible::ButtonDropDown, ROLE_PUSH_BUTTON);
-       qSpiRoleMapping.insert (QAccessible::ButtonMenu, ROLE_PUSH_BUTTON);
-       qSpiRoleMapping.insert (QAccessible::ButtonDropGrid, ROLE_PUSH_BUTTON);
-       qSpiRoleMapping.insert (QAccessible::Whitespace, ROLE_FILLER);
-       qSpiRoleMapping.insert (QAccessible::PageTabList, ROLE_PAGE_TAB_LIST);
-       qSpiRoleMapping.insert (QAccessible::Clock, ROLE_UNKNOWN);
-       qSpiRoleMapping.insert (QAccessible::Splitter, ROLE_SPLIT_PANE);
-       qSpiRoleMapping.insert (QAccessible::LayeredPane, ROLE_LAYERED_PANE);
-       qSpiRoleMapping.insert (QAccessible::UserRole, ROLE_UNKNOWN);
+    qSpiRoleMapping.insert(QAccessible::NoRole, RoleNames(ROLE_INVALID, "invalid", QSpiObject::tr("invalid role")));
+    qSpiRoleMapping.insert(QAccessible::TitleBar, RoleNames(ROLE_TEXT, "text", QSpiObject::tr("title bar")));
+    qSpiRoleMapping.insert(QAccessible::MenuBar, RoleNames(ROLE_MENU_BAR, "menu bar", QSpiObject::tr("menu bar")));
+    qSpiRoleMapping.insert(QAccessible::ScrollBar, RoleNames(ROLE_SCROLL_BAR, "scroll bar", QSpiObject::tr("scroll bar")));
+    qSpiRoleMapping.insert(QAccessible::Grip, RoleNames(ROLE_UNKNOWN, "unknown", QSpiObject::tr("grip")));
+    qSpiRoleMapping.insert(QAccessible::Sound, RoleNames(ROLE_UNKNOWN, "unknown", QSpiObject::tr("sound")));
+    qSpiRoleMapping.insert(QAccessible::Cursor, RoleNames(ROLE_ARROW, "arrow", QSpiObject::tr("cursor")));
+    qSpiRoleMapping.insert(QAccessible::Caret, RoleNames(ROLE_UNKNOWN, "unknown", QSpiObject::tr("caret")));
+    qSpiRoleMapping.insert(QAccessible::AlertMessage, RoleNames(ROLE_ALERT, "alert", QSpiObject::tr("alert message")));
+    qSpiRoleMapping.insert(QAccessible::Window, RoleNames(ROLE_WINDOW, "window", QSpiObject::tr("window")));
+    qSpiRoleMapping.insert(QAccessible::Client, RoleNames(ROLE_FILLER, "filler", QSpiObject::tr("client")));
+    qSpiRoleMapping.insert(QAccessible::PopupMenu, RoleNames(ROLE_POPUP_MENU, "popup menu", QSpiObject::tr("popup menu")));
+    qSpiRoleMapping.insert(QAccessible::MenuItem, RoleNames(ROLE_MENU_ITEM, "menu item", QSpiObject::tr("menu item")));
+    qSpiRoleMapping.insert(QAccessible::ToolTip, RoleNames(ROLE_TOOL_TIP, "tool tip", QSpiObject::tr("tool tip")));
+    qSpiRoleMapping.insert(QAccessible::Application, RoleNames(ROLE_APPLICATION, "application", QSpiObject::tr("application")));
+    qSpiRoleMapping.insert(QAccessible::Document, RoleNames(ROLE_DOCUMENT_FRAME, "document frame", QSpiObject::tr("document")));
+    qSpiRoleMapping.insert(QAccessible::Pane, RoleNames(ROLE_PANEL, "panel", QSpiObject::tr("pane")));
+    qSpiRoleMapping.insert(QAccessible::Chart, RoleNames(ROLE_CHART, "chart", QSpiObject::tr("chart")));
+    qSpiRoleMapping.insert(QAccessible::Dialog, RoleNames(ROLE_DIALOG, "dialog", QSpiObject::tr("dialog")));
+    qSpiRoleMapping.insert(QAccessible::Border, RoleNames(ROLE_FRAME, "frame", QSpiObject::tr("border")));
+    qSpiRoleMapping.insert(QAccessible::Grouping, RoleNames(ROLE_PANEL, "panel", QSpiObject::tr("grouping")));
+    qSpiRoleMapping.insert(QAccessible::Separator, RoleNames(ROLE_SEPARATOR, "separator", QSpiObject::tr("separator")));
+    qSpiRoleMapping.insert(QAccessible::ToolBar, RoleNames(ROLE_TOOL_BAR, "tool bar", QSpiObject::tr("tool bar")));
+    qSpiRoleMapping.insert(QAccessible::StatusBar, RoleNames(ROLE_STATUS_BAR, "statusbar", QSpiObject::tr("status bar")));
+    qSpiRoleMapping.insert(QAccessible::Table, RoleNames(ROLE_TABLE, "table", QSpiObject::tr("table")));
+    qSpiRoleMapping.insert(QAccessible::ColumnHeader, RoleNames(ROLE_TABLE_COLUMN_HEADER, "column header", QSpiObject::tr("column header")));
+    qSpiRoleMapping.insert(QAccessible::RowHeader, RoleNames(ROLE_TABLE_ROW_HEADER, "row header", QSpiObject::tr("row header")));
+    qSpiRoleMapping.insert(QAccessible::Column, RoleNames(ROLE_TABLE_CELL, "table cell", QSpiObject::tr("column")));
+    qSpiRoleMapping.insert(QAccessible::Row, RoleNames(ROLE_TABLE_CELL, "table cell", QSpiObject::tr("row")));
+    qSpiRoleMapping.insert(QAccessible::Cell, RoleNames(ROLE_TABLE_CELL, "table cell", QSpiObject::tr("cell")));
+    qSpiRoleMapping.insert(QAccessible::Link, RoleNames(ROLE_LINK, "link" , QSpiObject::tr("link")));
+    qSpiRoleMapping.insert(QAccessible::HelpBalloon, RoleNames(ROLE_DIALOG, "dialog", QSpiObject::tr("help balloon")));
+    qSpiRoleMapping.insert(QAccessible::Assistant, RoleNames(ROLE_DIALOG, "dialog", QSpiObject::tr("assistant")));
+    qSpiRoleMapping.insert(QAccessible::List, RoleNames(ROLE_LIST, "list", QSpiObject::tr("list")));
+    qSpiRoleMapping.insert(QAccessible::ListItem, RoleNames(ROLE_LIST_ITEM, "list item", QSpiObject::tr("list item")));
+    qSpiRoleMapping.insert(QAccessible::Tree, RoleNames(ROLE_TREE, "tree", QSpiObject::tr("tree")));
+    qSpiRoleMapping.insert(QAccessible::TreeItem, RoleNames(ROLE_TABLE_CELL, "table cell", QSpiObject::tr("tree item")));
+    qSpiRoleMapping.insert(QAccessible::PageTab, RoleNames(ROLE_PAGE_TAB, "page tab", QSpiObject::tr("page tab")));
+    qSpiRoleMapping.insert(QAccessible::PropertyPage, RoleNames(ROLE_PAGE_TAB, "page tab", QSpiObject::tr("property page")));
+    qSpiRoleMapping.insert(QAccessible::Indicator, RoleNames(ROLE_UNKNOWN, "unknown", QSpiObject::tr("indicator")));
+    qSpiRoleMapping.insert(QAccessible::Graphic, RoleNames(ROLE_IMAGE, "image", QSpiObject::tr("graphic")));
+    qSpiRoleMapping.insert(QAccessible::StaticText, RoleNames(ROLE_LABEL, "label", QSpiObject::tr("static text")));
+    qSpiRoleMapping.insert(QAccessible::EditableText, RoleNames(ROLE_TEXT, "text", QSpiObject::tr("editable text")));
+    qSpiRoleMapping.insert(QAccessible::PushButton, RoleNames(ROLE_PUSH_BUTTON, "push button", QSpiObject::tr("push button")));
+    qSpiRoleMapping.insert(QAccessible::CheckBox, RoleNames(ROLE_CHECK_BOX, "check box", QSpiObject::tr("check box")));
+    qSpiRoleMapping.insert(QAccessible::RadioButton, RoleNames(ROLE_RADIO_BUTTON, "radio button", QSpiObject::tr("radio box")));
+    qSpiRoleMapping.insert(QAccessible::ComboBox, RoleNames(ROLE_COMBO_BOX, "combo box", QSpiObject::tr("combo box")));
+    qSpiRoleMapping.insert(QAccessible::ProgressBar, RoleNames(ROLE_PROGRESS_BAR, "progress bar", QSpiObject::tr("progress bar")));
+    qSpiRoleMapping.insert(QAccessible::Dial, RoleNames(ROLE_DIAL, "accelerator label", QSpiObject::tr("dial")));
+    qSpiRoleMapping.insert(QAccessible::HotkeyField, RoleNames(ROLE_TEXT, "text", QSpiObject::tr("hotkey field"))); //FIXME text?
+    qSpiRoleMapping.insert(QAccessible::Slider, RoleNames(ROLE_SLIDER, "slider", QSpiObject::tr("slider")));
+    qSpiRoleMapping.insert(QAccessible::SpinBox, RoleNames(ROLE_SPIN_BUTTON, "spin button", QSpiObject::tr("spin box")));
+    qSpiRoleMapping.insert(QAccessible::Canvas, RoleNames(ROLE_CANVAS, "canvas", QSpiObject::tr("canvas")));
+    qSpiRoleMapping.insert(QAccessible::Animation, RoleNames(ROLE_ANIMATION, "animation", QSpiObject::tr("animation")));
+    qSpiRoleMapping.insert(QAccessible::Equation, RoleNames(ROLE_TEXT, "text", QSpiObject::tr("equation")));
+    qSpiRoleMapping.insert(QAccessible::ButtonDropDown, RoleNames(ROLE_PUSH_BUTTON, "push button", QSpiObject::tr("button drop down")));
+    qSpiRoleMapping.insert(QAccessible::ButtonMenu, RoleNames(ROLE_PUSH_BUTTON, "push button", QSpiObject::tr("button menu")));
+    qSpiRoleMapping.insert(QAccessible::ButtonDropGrid, RoleNames(ROLE_PUSH_BUTTON, "push button", QSpiObject::tr("button drop grid")));
+    qSpiRoleMapping.insert(QAccessible::Whitespace, RoleNames(ROLE_FILLER, "filler", QSpiObject::tr("whitespace")));
+    qSpiRoleMapping.insert(QAccessible::PageTabList, RoleNames(ROLE_PAGE_TAB_LIST, "page tab list", QSpiObject::tr("page tab list")));
+    qSpiRoleMapping.insert(QAccessible::Clock, RoleNames(ROLE_UNKNOWN, "unknown", QSpiObject::tr("clock")));
+    qSpiRoleMapping.insert(QAccessible::Splitter, RoleNames(ROLE_SPLIT_PANE, "split pane", QSpiObject::tr("splitter")));
+    qSpiRoleMapping.insert(QAccessible::LayeredPane, RoleNames(ROLE_LAYERED_PANE, "layered pane", QSpiObject::tr("layered pane")));
+    qSpiRoleMapping.insert(QAccessible::UserRole, RoleNames(ROLE_UNKNOWN, "unknown", QSpiObject::tr("user role")));
 }
 
 /*---------------------------------------------------------------------------*/
 
 void qspi_stateset_from_qstate (QAccessible::State state, QSpiIntList &set)
 {
-       int array[2] = {0, 0};
+    int array[2] = {0, 0};
 
-       /* We may need to take the role of the object into account when
+    /* We may need to take the role of the object into account when
         * mapping between the state sets
         */
-       BITARRAY_SET (array, STATE_EDITABLE);
-       BITARRAY_SET (array, STATE_ENABLED);
-       BITARRAY_SET (array, STATE_SHOWING);
-       BITARRAY_SET (array, STATE_VISIBLE);
-       BITARRAY_SET (array, STATE_SENSITIVE);
+    BITARRAY_SET (array, STATE_EDITABLE);
+    BITARRAY_SET (array, STATE_ENABLED);
+    BITARRAY_SET (array, STATE_SHOWING);
+    BITARRAY_SET (array, STATE_VISIBLE);
+    BITARRAY_SET (array, STATE_SENSITIVE);
 
-       for (int mask = 1; mask <= int(QAccessible::HasInvokeExtension); mask <<= 1)
-       {
-           switch (state & mask)
-           {
-                 case QAccessible::Unavailable:
-                 {
-                         BITARRAY_UNSET (array, STATE_ENABLED);
-                         BITARRAY_UNSET (array, STATE_SHOWING);
-                         BITARRAY_UNSET (array, STATE_VISIBLE);
-                         BITARRAY_UNSET (array, STATE_SENSITIVE);
-                         break;
-                 }
-                 case QAccessible::Selected:
-                 {
-                         BITARRAY_SET (array, STATE_SELECTED);
-                         break;
-                 }
-                 case QAccessible::Focused:
-                 {
-                         BITARRAY_SET (array, STATE_FOCUSED);
-                         break;
-                 }
-                 case QAccessible::Pressed:
-                 {
-                         BITARRAY_SET (array, STATE_PRESSED);
-                         break;
-                 }
-                 case QAccessible::Checked:
-                 {
-                         BITARRAY_SET (array, STATE_CHECKED);
-                         break;
-                 }
-                 case QAccessible::Mixed:
-                 {
-                         BITARRAY_SET (array, STATE_INDETERMINATE);
-                         break;
-                 }
-                 case QAccessible::ReadOnly:
-                 {
-                         BITARRAY_UNSET (array, STATE_EDITABLE);
-                         break;
-                 }
-                 case QAccessible::HotTracked:
-                 {
-                         break;
-                 }
-                 case QAccessible::DefaultButton:
-                 {
-                         BITARRAY_SET (array, STATE_IS_DEFAULT);
-                         break;
-                 }
-                 case QAccessible::Expanded:
-                 {
-                         BITARRAY_SET (array, STATE_EXPANDED);
-                         break;
-                 }
-                 case QAccessible::Collapsed:
-                 {
-                         BITARRAY_SET (array, STATE_COLLAPSED);
-                         break;
-                 }
-                 case QAccessible::Busy:
-                 {
-                         BITARRAY_SET (array, STATE_BUSY);
-                         break;
-                 }
-                 case QAccessible::Marqueed:
-                 case QAccessible::Animated:
-                 {
-                         BITARRAY_SET (array, STATE_ANIMATED);
-                         break;
-                 }
-                 case QAccessible::Invisible:
-                 case QAccessible::Offscreen:
-                 {
-                         BITARRAY_UNSET (array, STATE_SHOWING);
-                         break;
-                 }
-                 case QAccessible::Sizeable:
-                 {
-                         BITARRAY_SET (array, STATE_RESIZABLE);
-                         break;
-                 }
-                 case QAccessible::Movable:
-                 case QAccessible::SelfVoicing:
-                 {
-                         break;
-                 }
-                 case QAccessible::Focusable:
-                 {
-                         BITARRAY_SET (array, STATE_FOCUSABLE);
-                         break;
-                 }
-                 case QAccessible::Selectable:
-                 {
-                         BITARRAY_SET (array, STATE_SELECTABLE);
-                         break;
-                 }
-                 case QAccessible::Linked:
-                 {
-                         break;
-                 }
-                 case QAccessible::Traversed:
-                 {
-                         BITARRAY_SET (array, STATE_VISITED);
-                         break;
-                 }
-                 case QAccessible::MultiSelectable:
-                 {
-                         BITARRAY_SET (array, STATE_MULTISELECTABLE);
-                         break;
-                 }
-                 case QAccessible::ExtSelectable:
-                 {
-                         BITARRAY_SET (array, STATE_SELECTABLE);
-                         break;
-                 }
-                 case QAccessible::Protected:
-                 case QAccessible::HasPopup:
-                 {
-                         break;
-                 }
-                 case QAccessible::Modal:
-                 {
-                         BITARRAY_SET (array, STATE_MODAL);
-                         break;
-                 }
-                 case QAccessible::HasInvokeExtension:
-                 {
-                         break;
-                 }
-                 default:
-                 {
-                         break;
-                 }
-           }
-       }
-       set << array[0];
-       set << array[1];
+    for (int mask = 1; mask <= int(QAccessible::HasInvokeExtension); mask <<= 1)
+    {
+        switch (state & mask)
+        {
+        case QAccessible::Unavailable:
+        {
+            BITARRAY_UNSET (array, STATE_ENABLED);
+            BITARRAY_UNSET (array, STATE_SHOWING);
+            BITARRAY_UNSET (array, STATE_VISIBLE);
+            BITARRAY_UNSET (array, STATE_SENSITIVE);
+            break;
+        }
+        case QAccessible::Selected:
+        {
+            BITARRAY_SET (array, STATE_SELECTED);
+            break;
+        }
+        case QAccessible::Focused:
+        {
+            BITARRAY_SET (array, STATE_FOCUSED);
+            break;
+        }
+        case QAccessible::Pressed:
+        {
+            BITARRAY_SET (array, STATE_PRESSED);
+            break;
+        }
+        case QAccessible::Checked:
+        {
+            BITARRAY_SET (array, STATE_CHECKED);
+            break;
+        }
+        case QAccessible::Mixed:
+        {
+            BITARRAY_SET (array, STATE_INDETERMINATE);
+            break;
+        }
+        case QAccessible::ReadOnly:
+        {
+            BITARRAY_UNSET (array, STATE_EDITABLE);
+            break;
+        }
+        case QAccessible::HotTracked:
+        {
+            break;
+        }
+        case QAccessible::DefaultButton:
+        {
+            BITARRAY_SET (array, STATE_IS_DEFAULT);
+            break;
+        }
+        case QAccessible::Expanded:
+        {
+            BITARRAY_SET (array, STATE_EXPANDED);
+            break;
+        }
+        case QAccessible::Collapsed:
+        {
+            BITARRAY_SET (array, STATE_COLLAPSED);
+            break;
+        }
+        case QAccessible::Busy:
+        {
+            BITARRAY_SET (array, STATE_BUSY);
+            break;
+        }
+        case QAccessible::Marqueed:
+        case QAccessible::Animated:
+        {
+            BITARRAY_SET (array, STATE_ANIMATED);
+            break;
+        }
+        case QAccessible::Invisible:
+        case QAccessible::Offscreen:
+        {
+            BITARRAY_UNSET (array, STATE_SHOWING);
+            break;
+        }
+        case QAccessible::Sizeable:
+        {
+            BITARRAY_SET (array, STATE_RESIZABLE);
+            break;
+        }
+        case QAccessible::Movable:
+        case QAccessible::SelfVoicing:
+        {
+            break;
+        }
+        case QAccessible::Focusable:
+        {
+            BITARRAY_SET (array, STATE_FOCUSABLE);
+            break;
+        }
+        case QAccessible::Selectable:
+        {
+            BITARRAY_SET (array, STATE_SELECTABLE);
+            break;
+        }
+        case QAccessible::Linked:
+        {
+            break;
+        }
+        case QAccessible::Traversed:
+        {
+            BITARRAY_SET (array, STATE_VISITED);
+            break;
+        }
+        case QAccessible::MultiSelectable:
+        {
+            BITARRAY_SET (array, STATE_MULTISELECTABLE);
+            break;
+        }
+        case QAccessible::ExtSelectable:
+        {
+            BITARRAY_SET (array, STATE_SELECTABLE);
+            break;
+        }
+        case QAccessible::Protected:
+        case QAccessible::HasPopup:
+        {
+            break;
+        }
+        case QAccessible::Modal:
+        {
+            BITARRAY_SET (array, STATE_MODAL);
+            break;
+        }
+        case QAccessible::HasInvokeExtension:
+        {
+            break;
+        }
+        default:
+        {
+            break;
+        }
+        }
+    }
+    set << array[0];
+    set << array[1];
 }
 
 /*---------------------------------------------------------------------------*/
 
 void qspi_initialize_constant_mappings ()
 {
-       initialize_role_mapping ();
+    initialize_role_mapping ();
 }
 
 /*END------------------------------------------------------------------------*/

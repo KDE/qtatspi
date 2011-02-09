@@ -38,13 +38,13 @@ Q_DECLARE_METATYPE (QSpiIntList);
 
 struct QSpiObjectReference
 {
-    QString         name;
+    QString name;
     QDBusObjectPath path;
 
-    /*QSpiObjectReference &operator= (const QSpiObjectReference &other);*/
-
-    QSpiObjectReference (): name (""), path (QDBusObjectPath ("/")) {}
-    QSpiObjectReference (QString name, QDBusObjectPath path): name (name), path (path) {}
+    QSpiObjectReference()
+        : path(QDBusObjectPath("/")) {}
+    QSpiObjectReference(QString name, QDBusObjectPath path)
+        : name(name), path(path) {}
 };
 
 Q_DECLARE_METATYPE (QSpiObjectReference);
@@ -100,15 +100,22 @@ Q_DECLARE_METATYPE (QSpiActionArray);
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAction &action);
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAction &action);
 
-/* QSpiRelationArray TODO */
+/* QSpiRelationArray */
 /*---------------------------------------------------------------------------*/
 
-typedef int QSpiRelationArray;
+typedef QMap < unsigned int, QMap < QString, QSpiObjectReference > > QSpiRelationArray;
 
-/* QSpiRangeList TODO */
+/* QSpiRangeList */
 /*---------------------------------------------------------------------------*/
 
-typedef int QSpiRangeList;
+//a(iisv)
+struct QSpiTextRange {
+    int startOffset;
+    int endOffset;
+    QString contents;
+    QVariant v; // TODO: check
+};
+typedef QList <QSpiTextRange> QSpiRangeList;
 
 /* QSpiRect */
 /*---------------------------------------------------------------------------*/
@@ -137,13 +144,13 @@ Q_DECLARE_METATYPE (QSpiAttributeSet);
 /*---------------------------------------------------------------------------*/
 
 enum QSpiAppUpdateType {
-        QSPI_APP_UPDATE_ADDED = 0,
-        QSPI_APP_UPDATE_REMOVED = 1
+    QSPI_APP_UPDATE_ADDED = 0,
+    QSPI_APP_UPDATE_REMOVED = 1
 };
 
 struct QSpiAppUpdate {
-        int type; /* Is an application added or removed */
-        QString address; /* D-Bus address of application added or removed */
+    int type; /* Is an application added or removed */
+    QString address; /* D-Bus address of application added or removed */
 };
 
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAppUpdate &update);
@@ -155,13 +162,13 @@ Q_DECLARE_METATYPE (QSpiAppUpdate)
 /*---------------------------------------------------------------------------*/
 
 struct QSpiDeviceEvent {
-        unsigned int type;
-        int id;
-        short int hw_code;
-        short int modifiers;
-        short int timestamp;
-        QString event_string;
-        bool is_text;
+    unsigned int type;
+    int id;
+    short int hw_code;
+    short int modifiers;
+    short int timestamp;
+    QString event_string;
+    bool is_text;
 };
 
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiDeviceEvent &event);

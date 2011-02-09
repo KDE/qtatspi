@@ -14,6 +14,7 @@ HEADERS += \
            generated/table_adaptor.h \
            generated/text_adaptor.h \
            generated/value_adaptor.h \
+           bridge.h \
            cache.h  \
            object.h \
            adaptor.h \
@@ -40,14 +41,18 @@ SOURCES += \
            adaptor.cpp \
            struct_marshallers.cpp \
            constant_mappings.cpp \
-           accessible.cpp
+           accessible.cpp \
+           main.cpp
 
 DEFINES += QT_ACCESSIBILITY
 
+QMAKE_CFLAGS+=-Werror
+QMAKE_CXXFLAGS+=-Werror
+
 CONFIG += qdbus plugin debug
 
-OBJECTS_DIR = tmp
-MOC_DIR = tmp
+OBJECTS_DIR = .obj
+MOC_DIR = .moc
 
 TARGET = qspiaccessiblebridge
 target.path = $$[QT_INSTALL_PLUGINS]/accessiblebridge
