@@ -26,6 +26,7 @@
 #include <QtGui/QApplication>
 #include <QAccessibleInterface>
 #include <QAccessibleBridge>
+#include <QDBusConnection>
 
 class DeviceEventControllerProxy;
 class QSpiAccessibleCache;
@@ -35,8 +36,7 @@ class QSpiAccessibleBridge: public QObject, public QAccessibleBridge
 {
         Q_OBJECT
 public:
-        QSpiAccessibleBridge(): cache(0), rootInterface(0)
-        {}
+        QSpiAccessibleBridge();
 
         virtual ~QSpiAccessibleBridge ();
         virtual void setRootObject(QAccessibleInterface *obj);
@@ -49,10 +49,15 @@ Q_SIGNALS:
         void ChildrenChanged();
 
 private:
+        QString getAccessibilityBusAddress() const;
+        QDBusConnection dbusConnection() const;
+
         QSpiAccessibleCache *cache;
         DeviceEventControllerProxy *dec;
 
         QAccessibleInterface* rootInterface;
+
+        QString accessibilityDBusAddress;
 };
 
 /*---------------------------------------------------------------------------*/

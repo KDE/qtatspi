@@ -72,7 +72,7 @@ QSpiObjectReference QSpiAdaptor::parent() const
 
 QSpiObjectReference QSpiAdaptor::GetApplication()
 {
-    return cache->objectToAccessible (cache->getRoot())->getReference();
+    return cache->objectToAccessible(cache->getRoot())->getReference();
 }
 
 QSpiAttributeSet QSpiAdaptor::GetAttributes()
@@ -305,14 +305,11 @@ bool QSpiAdaptor::Contains(int x, int y, uint coord_type)
 
 QSpiObjectReference QSpiAdaptor::GetAccessibleAtPoint(int x, int y, uint coord_type)
 {
-    // TODO Return a null path. This is a silly function, may take some time to work out.
-    // It should be done on the client side.
-    Q_UNUSED (x);
-    Q_UNUSED (y);
-    Q_UNUSED (coord_type);
+    Q_UNUSED (x) Q_UNUSED (y) Q_UNUSED (coord_type)
+            qWarning("Not implemented: QSpiAdaptor::GetAccessibleAtPoint");
     QSpiObjectReference ref;
-    ref.name = QDBusConnection::sessionBus().baseService();
-    ref.path = QDBusObjectPath (QSPI_OBJECT_PATH_NULL);
+    ref.name = QDBusConnection::sessionBus().baseService(); //FIXME
+    ref.path = QDBusObjectPath(QSPI_OBJECT_PATH_NULL);
     return ref;
 }
 

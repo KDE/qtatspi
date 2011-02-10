@@ -43,12 +43,14 @@ class QSpiAccessible : public QSpiAdaptor
 
 public:
     QSpiAccessible(QSpiAccessibleCache  *cache,
-                   QAccessibleInterface *interface);
+                   QAccessibleInterface *interface,
+                   QDBusConnection c);
 
     virtual QSpiObjectReference& getParentReference () const;
 
 private:
-    static QDBusObjectPath getUnique ();
+    static QDBusObjectPath getUnique();
+    QDBusConnection dbusConnection;
 };
 
 /*
@@ -62,12 +64,14 @@ class QSpiApplication : public QSpiAdaptor
 
 public:
     QSpiApplication(QSpiAccessibleCache  *cache,
-                    QAccessibleInterface *interface);
+                    QAccessibleInterface *interface,
+                    QDBusConnection c);
 
     virtual QSpiObjectReference& getParentReference() const;
 
 private:
     QSpiObjectReference *socket;
+    QDBusConnection dbusConnection;
 };
 
 #endif /* Q_SPI_ACCESSIBLE_H */

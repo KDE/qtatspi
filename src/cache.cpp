@@ -38,19 +38,20 @@
 
 /*---------------------------------------------------------------------------*/
 
-QSpiAccessibleCache::QSpiAccessibleCache (QObject *root)
+QSpiAccessibleCache::QSpiAccessibleCache(QObject *root, QDBusConnection c)
+    : dbusConnection(c)
 {
     CacheAdaptor *adaptor;
 
     //QApplication::instance()->installEventFilter(this);
 
     rootObject = root;
-    cache.insert(root, new QSpiApplication (this, QAccessible::queryAccessibleInterface(root)));
+    cache.insert(root, new QSpiApplication(this, QAccessible::queryAccessibleInterface(root), dbusConnection));
     registerChildren(QAccessible::queryAccessibleInterface(root));
 
     adaptor = new CacheAdaptor(this);
-    QDBusConnection::sessionBus().registerObject(QSPI_OBJECT_PATH_CACHE, this, QDBusConnection::ExportAdaptors);
-	
+    c.registerObject(QSPI_OBJECT_PATH_CACHE, this, QDBusConnection::ExportAdaptors);
+
     connect (this, SIGNAL(AddAccessible(const QSpiAccessibleCacheItem &)),
              adaptor, SIGNAL(AddAccessible(const QSpiAccessibleCacheItem &)));
     connect (this, SIGNAL(RemoveAccessible(const QSpiObjectReference &)),
@@ -174,7 +175,7 @@ QSpiObject *QSpiAccessibleCache::objectToAccessible (QObject *obj)
         QAccessibleInterface *interface = QAccessible::queryAccessibleInterface(obj);
         if (interface)
         {
-            QSpiObject *accessible = new QSpiAccessible(this, interface);
+            QSpiObject *accessible = new QSpiAccessible(this, interface, dbusConnection);
 
             cache.insert(interface->object(), accessible);
 

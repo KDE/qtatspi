@@ -28,23 +28,73 @@
 #include "struct_marshallers.h"
 
 #include "generated/dec_proxy.h"
+#include "generated/event_adaptor.h"
+
+#include <QX11Info>
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
 
 #define QSPI_DEC_NAME        "/org/a11y/atspi/registry"
 #define QSPI_DEC_OBJECT_PATH "/org/a11y/atspi/registry/deviceeventcontroller"
 
-#include "generated/event_adaptor.h"
+
+QSpiAccessibleBridge::QSpiAccessibleBridge()
+    : cache(0), rootInterface(0)
+{
+    accessibilityDBusAddress = getAccessibilityBusAddress();
+}
+
+QString QSpiAccessibleBridge::getAccessibilityBusAddress() const
+{
+    Display* bridge_display = QX11Info::display();
+
+    Atom actualType;
+    int actualFormat;
+    char *propData = 0;
+    unsigned long nItems;
+    unsigned long leftOver;
+    Atom AT_SPI_BUS = XInternAtom (bridge_display, "AT_SPI_BUS", False);
+    XGetWindowProperty (bridge_display,
+                        XDefaultRootWindow (bridge_display),
+                        AT_SPI_BUS, 0L,
+                        (long) BUFSIZ, False,
+                        (Atom) 31, &actualType, &actualFormat,
+                        &nItems, &leftOver,
+                        (unsigned char **) (void *) &propData);
+
+    QString busAddress = QString::fromLocal8Bit(propData);
+    XFree(propData);
+    return busAddress;
+}
+
+QDBusConnection QSpiAccessibleBridge::dbusConnection() const
+{
+    if (!accessibilityDBusAddress.isEmpty()) {
+        QDBusConnection c = QDBusConnection::connectToBus(accessibilityDBusAddress, "a11y");
+        if (c.isConnected()) {
+            return c;
+        }
+        qWarning("Found Accessibility DBus address but cannot connect. Falling back to session bus.");
+    } else {
+        qWarning("Accessibility DBus not found. Falling back to session bus.");
+    }
+
+    QDBusConnection c = QDBusConnection::sessionBus();
+    if (!c.isConnected()) {
+        qWarning("Could not connect to DBus.");
+    }
+    return QDBusConnection::sessionBus();
+}
 
 void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *inter)
 {
     // the interface we get will be for the QApplication object.
 
     qDebug() << "QSpiAccessibleBridge : Initializing bridge";
-    /* Connect to the session bus and register with the AT-SPI registry daemon */
-    if (!QDBusConnection::sessionBus().isConnected())
-    {
-        qWarning() << "QSpiAccessibleBridge : Failed to connect to session bus";
+
+    QDBusConnection c = dbusConnection();
+    if (!c.isConnected())
         return;
-    }
 
     rootInterface = inter;
     qDebug() << "  got a11y root object. children: " << inter->childCount();
@@ -53,7 +103,7 @@ void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *inter)
     qspi_initialize_constant_mappings();
 
     /* Create the cache of accessible objects */
-    cache = new QSpiAccessibleCache(rootInterface->object());
+    cache = new QSpiAccessibleCache(rootInterface->object(), c);
 
     // FIXME: notify about children here
     ObjectAdaptor* atspiEvent = new ObjectAdaptor(this);
@@ -62,7 +112,7 @@ void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *inter)
 
     dec = new DeviceEventControllerProxy(QSPI_DEC_NAME,
                                          QSPI_DEC_OBJECT_PATH,
-                                         QDBusConnection::sessionBus());
+                                         c);
 
 
 }

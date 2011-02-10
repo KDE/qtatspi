@@ -41,10 +41,7 @@
 
 #define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
 
-static QSpiObjectReference null_reference (QDBusConnection::sessionBus().baseService(),
-                                           QDBusObjectPath (QSPI_OBJECT_PATH_NULL));
-
-QDBusObjectPath QSpiAccessible::getUnique ()
+QDBusObjectPath QSpiAccessible::getUnique()
 {
     static int id = 1;
     QString prefix(QSPI_OBJECT_PATH_PREFIX);
@@ -56,10 +53,11 @@ QDBusObjectPath QSpiAccessible::getUnique ()
 }
 
 QSpiAccessible::QSpiAccessible(QSpiAccessibleCache  *cache,
-                               QAccessibleInterface *interface)
-    :QSpiAdaptor (cache, interface)
+                               QAccessibleInterface *interface,
+                               QDBusConnection c)
+    : QSpiAdaptor(cache, interface), dbusConnection(c)
 {
-    reference = new QSpiObjectReference(QDBusConnection::sessionBus().baseService(),
+    reference = new QSpiObjectReference(dbusConnection.baseService(),
                                                getUnique());
 
     new AccessibleAdaptor(this);
@@ -93,7 +91,7 @@ QSpiAccessible::QSpiAccessible(QSpiAccessibleCache  *cache,
         supportedInterfaces << QSPI_INTERFACE_TABLE;
     }
 
-    QDBusConnection::sessionBus().registerObject(reference->path.path(),
+    dbusConnection.registerObject(reference->path.path(),
                                                  this,
                                                  QDBusConnection::ExportAdaptors);
 }
@@ -114,20 +112,24 @@ QSpiObjectReference &QSpiAccessible::getParentReference() const
         }
     }
 
+    static QSpiObjectReference null_reference(dbusConnection.baseService(),
+                                              QDBusObjectPath(QSPI_OBJECT_PATH_NULL));
+
     return null_reference;
 }
 
 /* QSpiApplication ------------------------------------------------*/
 
-QSpiApplication::QSpiApplication (QSpiAccessibleCache  *cache,
-                                  QAccessibleInterface *interface)
-    :QSpiAdaptor (cache, interface)
+QSpiApplication::QSpiApplication(QSpiAccessibleCache  *cache,
+                                 QAccessibleInterface *interface,
+                                 QDBusConnection c)
+    :QSpiAdaptor(cache, interface), dbusConnection(c)
 {
     SocketProxy *proxy;
     ApplicationAdaptor *app;
     QDBusPendingReply <QSpiObjectReference> reply;
 
-    reference = new QSpiObjectReference (QDBusConnection::sessionBus().baseService(),
+    reference = new QSpiObjectReference (dbusConnection.baseService(),
                                                QDBusObjectPath (QSPI_OBJECT_PATH_ROOT));
 
     new AccessibleAdaptor(this);
@@ -137,14 +139,14 @@ QSpiApplication::QSpiApplication (QSpiAccessibleCache  *cache,
     app = new ApplicationAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_APPLICATION;
 
-    QDBusConnection::sessionBus().registerObject(reference->path.path(),
+    dbusConnection.registerObject(reference->path.path(),
                                                  this,
                                                  QDBusConnection::ExportAdaptors);
 
     /* Plug in to the desktop socket */
     proxy = new SocketProxy (QSPI_REGISTRY_NAME,
                              QSPI_OBJECT_PATH_ROOT,
-                             QDBusConnection::sessionBus());
+                             dbusConnection);
     reply = proxy->Embed(getReference());
     reply.waitForFinished();
     if (reply.isValid ()) {
