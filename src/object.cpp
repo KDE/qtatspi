@@ -62,6 +62,9 @@ QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
     item.path = getReference();
     /* Parent */
     item.parent = getParentReference();
+
+    item.application = cache->objectToAccessible(cache->getRoot())->getReference();
+
     /* Children */
     for (int i = 1; i <= getInterface().childCount(); i++)
     {
