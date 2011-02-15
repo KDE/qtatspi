@@ -110,7 +110,7 @@ static void initialize_role_mapping ()
 
 /*---------------------------------------------------------------------------*/
 
-void qspi_stateset_from_qstate (QAccessible::State state, QSpiIntList &set)
+void qspi_stateset_from_qstate(QAccessible::State state, QSpiUIntList &set)
 {
     int array[2] = {0, 0};
 

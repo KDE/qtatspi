@@ -58,7 +58,7 @@ public Q_SLOTS:
     QSpiRelationArray GetRelationSet();
     uint GetRole();
     QString GetRoleName();
-    QSpiIntList GetState();
+    QSpiUIntList GetState();
 
 /* AT-SPI Action interface */
 public:

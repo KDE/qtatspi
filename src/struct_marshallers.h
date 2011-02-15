@@ -30,8 +30,10 @@
 /*---------------------------------------------------------------------------*/
 
 typedef QList <int> QSpiIntList;
-
 Q_DECLARE_METATYPE (QSpiIntList);
+
+typedef QList <uint> QSpiUIntList;
+Q_DECLARE_METATYPE (QSpiUIntList);
 
 /* QSpiObjectReference */
 /*---------------------------------------------------------------------------*/
@@ -47,10 +49,24 @@ struct QSpiObjectReference
         : name(name), path(path) {}
 };
 
-Q_DECLARE_METATYPE (QSpiObjectReference);
+Q_DECLARE_METATYPE(QSpiObjectReference);
 
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiObjectReference &address);
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiObjectReference &address);
+
+
+struct QSpiEvent
+{
+    QString type;
+    unsigned int detail1;
+    unsigned int detail2; // mostly unused?
+    QSpiObjectReference data; // fixme: should be a variant really
+};
+
+Q_DECLARE_METATYPE(QSpiEvent);
+QDBusArgument &operator<<(QDBusArgument &argument, const QSpiEvent &event);
+const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiEvent &event);
+
 
 /* QSpiObjectReferenceArray */
 /*---------------------------------------------------------------------------*/
@@ -66,9 +82,9 @@ struct QSpiAccessibleCacheItem
     QSpiObjectReference         path;
     QSpiObjectReference         application;
     QSpiObjectReference         parent;
-    int                         role;
+    uint                        role;
     QString                     description;
-    QSpiIntList                 states;
+    QSpiUIntList                 states;
     QList <QSpiObjectReference> children;
     QStringList                 supported;
     QString                     name;

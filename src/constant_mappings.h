@@ -195,10 +195,10 @@ enum QSpiState {
 
 extern QHash <int, QSpiState> qSpiStateMapping;
 
-void qspi_stateset_from_qstate (QAccessible::State state, QSpiIntList &set);
+void qspi_stateset_from_qstate(QAccessible::State state, QSpiUIntList &set);
 
 /*---------------------------------------------------------------------------*/
 
-void qspi_initialize_constant_mappings ();
+void qspi_initialize_constant_mappings();
 
 #endif /* Q_SPI_CONSTANT_MAPPINGS_H */

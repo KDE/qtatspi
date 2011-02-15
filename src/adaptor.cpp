@@ -156,9 +156,9 @@ QString QSpiAdaptor::GetRoleName()
     return qSpiRoleMapping[ACCESSIBLE_INTERFACE.role(0)].name();
 }
 
-QSpiIntList QSpiAdaptor::GetState()
+QSpiUIntList QSpiAdaptor::GetState()
 {
-    QSpiIntList set;
+    QSpiUIntList set;
     qspi_stateset_from_qstate (ACCESSIBLE_INTERFACE.state(0), set);
     return set;
 }
