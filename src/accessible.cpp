@@ -101,7 +101,7 @@ QSpiObjectReference &QSpiAccessible::getParentReference() const
     QAccessibleInterface *parentInterface = NULL;
     QSpiObject *parent;
 
-    interface->navigate (QAccessible::Ancestor, 1, &parentInterface);
+    interface->navigate(QAccessible::Ancestor, 1, &parentInterface);
     if (parentInterface)
     {
         parent = cache->objectToAccessible(parentInterface->object());

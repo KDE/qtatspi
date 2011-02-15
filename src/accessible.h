@@ -46,7 +46,7 @@ public:
                    QAccessibleInterface *interface,
                    QDBusConnection c);
 
-    virtual QSpiObjectReference& getParentReference () const;
+    virtual QSpiObjectReference& getParentReference() const;
 
 private:
     static QDBusObjectPath getUnique();

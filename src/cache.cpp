@@ -167,7 +167,7 @@ void QSpiAccessibleCache::registerChildren(QAccessibleInterface *interface)
     }
 }
 
-QSpiObject *QSpiAccessibleCache::objectToAccessible (QObject *obj)
+QSpiObject *QSpiAccessibleCache::objectToAccessible(QObject *obj)
 {
     if (cache.contains(obj)) {
         return cache.value(obj);
