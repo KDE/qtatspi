@@ -48,6 +48,13 @@ public:
 
     virtual QSpiObjectReference& getParentReference() const;
 
+    virtual void accessibleEvent(QAccessible::Event event);
+
+    void signalChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data);
+
+Q_SIGNALS:
+    void ChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+
 private:
     static QDBusObjectPath getUnique();
     QDBusConnection dbusConnection;
@@ -68,6 +75,9 @@ public:
                     QDBusConnection c);
 
     virtual QSpiObjectReference& getParentReference() const;
+
+    // TODO: do we care about events here?
+    virtual void accessibleEvent(QAccessible::Event event) { Q_UNUSED(event) }
 
 private:
     QSpiObjectReference *socket;

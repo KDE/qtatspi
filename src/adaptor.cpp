@@ -127,12 +127,12 @@ int QSpiAdaptor::GetIndexInParent()
     // TODO
     // Not handling for now. indexInParent can now be calculated just as
     // easily on the client side.
+    qWarning("Not implemented: QSpiAdaptor::GetIndexInParent");
     return 0;
 }
 
 QString QSpiAdaptor::GetLocalizedRoleName()
 {
-    // TODO
     QString out0;
     out0 = qSpiRoleMapping.value(getInterface().role(0)).localizedName();
     return out0;
@@ -140,7 +140,7 @@ QString QSpiAdaptor::GetLocalizedRoleName()
 
 QSpiRelationArray QSpiAdaptor::GetRelationSet()
 {
-    // TODO
+    qWarning("Not implemented: QSpiAdaptor::GetRelationSet");
     QSpiRelationArray out0;
     return out0;
 }

@@ -54,18 +54,17 @@
 #define QSPI_OBJECT_PATH_NULL    QSPI_OBJECT_PATH_PREFIX "null"
 #define QSPI_OBJECT_PATH_ROOT    QSPI_OBJECT_PATH_PREFIX "root"
 
-/*---------------------------------------------------------------------------*/
 
 class QSpiAccessibleCache;
+class ObjectAdaptor;
 
-/*
+/**
  * This class is the virtual base class for all accessible objects.
  *
  * These are objects that are resident within this program and have a 
  * QAccessibleInterface backing them.
  * 
  */
-
 class QSpiObject : public QObject
 {
     Q_OBJECT
@@ -81,7 +80,7 @@ public:
     virtual QSpiObjectReference &getReference() const;
     virtual QSpiObjectReference &getParentReference() const = 0;
 
-    void accessibleEvent (QAccessible::Event event);
+    virtual void accessibleEvent(QAccessible::Event event) = 0;
 
 protected:
     QAccessibleInterface *interface;

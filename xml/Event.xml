@@ -14,8 +14,13 @@
 	<signal name="StateChanged"><arg direction="in" type="(suuv)"/>
           <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
         </signal>
-	<signal name="ChildrenChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="ChildrenChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
 	<signal name="VisibleDataChanged"><arg direction="in" type="(suuv)"/>
           <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>

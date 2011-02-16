@@ -30,14 +30,15 @@
 #include "struct_marshallers.h"
 
 #include "generated/accessible_adaptor.h"
-#include "generated/application_adaptor.h"
-#include "generated/text_adaptor.h"
-#include "generated/editable_text_adaptor.h"
-#include "generated/value_adaptor.h"
-#include "generated/component_adaptor.h"
 #include "generated/action_adaptor.h"
-#include "generated/table_adaptor.h"
+#include "generated/application_adaptor.h"
+#include "generated/component_adaptor.h"
+#include "generated/editable_text_adaptor.h"
+#include "generated/event_adaptor.h"
 #include "generated/socket_proxy.h"
+#include "generated/table_adaptor.h"
+#include "generated/text_adaptor.h"
+#include "generated/value_adaptor.h"
 
 #define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
 
@@ -64,6 +65,8 @@ QSpiAccessible::QSpiAccessible(QSpiAccessibleCache  *cache,
     supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;
     new ComponentAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_COMPONENT;
+
+    new ObjectAdaptor(this);
 
     if (interface->actionInterface())
     {
@@ -116,6 +119,32 @@ QSpiObjectReference &QSpiAccessible::getParentReference() const
                                               QDBusObjectPath(QSPI_OBJECT_PATH_NULL));
 
     return null_reference;
+}
+
+
+void QSpiAccessible::signalChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data)
+{
+    qDebug() << "Children Changed...";
+
+    QSpiObjectReference rootRef = QSpiObjectReference(dbusConnection.baseService(),
+        QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
+
+    emit ChildrenChanged(type, detail1, detail2, data, rootRef);
+}
+
+
+void QSpiAccessible::accessibleEvent(QAccessible::Event event)
+{
+    switch (event) {
+    case QAccessible::ObjectShow:
+    case QAccessible::ObjectHide:
+    case QAccessible::DescriptionChanged:
+    case QAccessible::NameChanged:
+    case QAccessible::ParentChanged:
+    case QAccessible::StateChanged:
+    default:
+        break;
+    }
 }
 
 /* QSpiApplication ------------------------------------------------*/

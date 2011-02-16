@@ -55,19 +55,6 @@ QDBusArgument &operator<<(QDBusArgument &argument, const QSpiObjectReference &ad
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiObjectReference &address);
 
 
-struct QSpiEvent
-{
-    QString type;
-    unsigned int detail1;
-    unsigned int detail2; // mostly unused?
-    QSpiObjectReference data; // fixme: should be a variant really
-};
-
-Q_DECLARE_METATYPE(QSpiEvent);
-QDBusArgument &operator<<(QDBusArgument &argument, const QSpiEvent &event);
-const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiEvent &event);
-
-
 /* QSpiObjectReferenceArray */
 /*---------------------------------------------------------------------------*/
 typedef QList <QSpiObjectReference> QSpiObjectReferenceArray;

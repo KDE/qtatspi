@@ -22,9 +22,10 @@
 
 #include "bridge.h"
 
-#include "object.h"
+#include "accessible.h"
 #include "cache.h"
 #include "constant_mappings.h"
+#include "object.h"
 #include "struct_marshallers.h"
 
 #include "generated/dec_proxy.h"
@@ -72,6 +73,7 @@ QDBusConnection QSpiAccessibleBridge::dbusConnection() const
     if (!accessibilityDBusAddress.isEmpty()) {
         QDBusConnection c = QDBusConnection::connectToBus(accessibilityDBusAddress, "a11y");
         if (c.isConnected()) {
+            qDebug() << "Connected to accessibility bus at: " << accessibilityDBusAddress;
             return c;
         }
         qWarning("Found Accessibility DBus address but cannot connect. Falling back to session bus.");
@@ -105,16 +107,9 @@ void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *inter)
     /* Create the cache of accessible objects */
     cache = new QSpiAccessibleCache(rootInterface->object(), c);
 
-    // FIXME: notify about children here
-    ObjectAdaptor* atspiEvent = new ObjectAdaptor(this);
-    connect(this, SIGNAL(ChildrenChanged()), atspiEvent, SIGNAL(ChildrenChanged()));
-    emit ChildrenChanged();
-
     dec = new DeviceEventControllerProxy(QSPI_DEC_NAME,
                                          QSPI_DEC_OBJECT_PATH,
                                          c);
-
-
 }
 
 void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface, int index)
@@ -123,22 +118,35 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
 
     if (!cache) {
         qWarning("QSpi::notifyAccessibilityUpdate: no cache, returning");
-        return; // why?
+        return;
     }
 
-    if (reason == QAccessible::ObjectShow) {
-        qDebug() << "Object Show event";
-    }
 
-    QSpiObject *accessible = NULL;
+    QSpiObject *accessible = 0;
 
     if (index > 0) {
-        QAccessibleInterface *child = NULL;
+        QAccessibleInterface *child = 0;
 
         interface->navigate(QAccessible::Child, index, &child);
         accessible = cache->objectToAccessible(child->object());
     } else {
+
         accessible = cache->objectToAccessible(interface->object());
+
+        if (reason == QAccessible::ObjectShow) {
+            qDebug() << "Object Show event, notify parent...";
+            QAccessibleInterface *parent = 0;
+            interface->navigate(QAccessible::Ancestor, 1, &parent);
+            if (parent) {
+                QSpiObject *parentAccessible = cache->objectToAccessible(parent->object());
+                QSpiAccessible* acc = qobject_cast<QSpiAccessible*>(parentAccessible);
+                QSpiObjectReference r = accessible->getReference();
+                QDBusVariant data;
+                data.setVariant(QVariant::fromValue(r));
+                acc->signalChildrenChanged("add", parent->childCount(), 0, data);
+            }
+        }
+
     }
     accessible->accessibleEvent((QAccessible::Event) reason);
 }

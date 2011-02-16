@@ -27,13 +27,11 @@
 
 #include "generated/event_adaptor.h"
 
-/* QSpiObject ------------------------------------------------------*/
-
 QSpiObject::QSpiObject(QSpiAccessibleCache  *_cache,
-                        QAccessibleInterface *_interface)
-    :interface(_interface), cache(_cache)
+                       QAccessibleInterface *_interface)
+    : interface(_interface),
+      cache(_cache)
 {
-    new ObjectAdaptor(this);
 }
 
 QSpiObjectReference &QSpiObject::getReference() const
@@ -56,7 +54,7 @@ QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
     QSpiAccessibleCacheItem item;
 
     QList<QSpiObject *> children;
-    QList <QSpiObjectReference> childPaths;
+    QList<QSpiObjectReference> childPaths;
 
     /* Path */
     item.path = getReference();
@@ -68,12 +66,12 @@ QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
     /* Children */
     for (int i = 1; i <= getInterface().childCount(); i++)
     {
-        QAccessibleInterface *child = NULL;
+        QAccessibleInterface *child = 0;
         getInterface().navigate(QAccessible::Child, i, &child);
         if (child)
         {
             QSpiObject *current;
-            current = cache->objectToAccessible (child->object ());
+            current = cache->objectToAccessible(child->object());
             if (current)
                 children << current;
             delete child;
@@ -96,25 +94,5 @@ QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
     /* State set */
     qspi_stateset_from_qstate(getInterface().state(0), item.states);
     return item;
-}
-
-void QSpiObject::accessibleEvent(QAccessible::Event event)
-{
-    /* TODO Create an event type and emit the event on the object */
-    switch (event)
-    {
-    case QAccessible::ObjectShow:
-        qDebug() << "ObjectShow";
-        // send signal ChildrenChanged
-        break;
-    case QAccessible::ObjectHide:
-        break;
-    case QAccessible::DescriptionChanged:
-    case QAccessible::NameChanged:
-    case QAccessible::ParentChanged:
-    case QAccessible::StateChanged:
-    default:
-        break;
-    }
 }
 
