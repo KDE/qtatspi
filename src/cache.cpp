@@ -51,11 +51,6 @@ QSpiAccessibleCache::QSpiAccessibleCache(QObject *root, QDBusConnection c)
 
     adaptor = new CacheAdaptor(this);
     c.registerObject(QSPI_OBJECT_PATH_CACHE, this, QDBusConnection::ExportAdaptors);
-
-    connect (this, SIGNAL(AddAccessible(QSpiAccessibleCacheItem)),
-             adaptor, SIGNAL(AddAccessible(QSpiAccessibleCacheItem)));
-    connect (this, SIGNAL(RemoveAccessible(QSpiObjectReference)),
-             adaptor, SIGNAL(RemoveAccessible(QSpiObjectReference)));
 }
 
 /*---------------------------------------------------------------------------*/
