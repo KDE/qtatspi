@@ -9,8 +9,6 @@ QT       += core gui
 TARGET = simple
 TEMPLATE = app
 
-#DEFINES      += QT_ACCESSIBILITY
-
 OBJECTS_DIR = .obj
 MOC_DIR = .moc
 
