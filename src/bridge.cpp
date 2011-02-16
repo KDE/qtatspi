@@ -138,17 +138,23 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
             QAccessibleInterface *parent = 0;
             interface->navigate(QAccessible::Ancestor, 1, &parent);
             if (parent) {
-                QSpiObject *parentAccessible = cache->objectToAccessible(parent->object());
-                QSpiAccessible* acc = qobject_cast<QSpiAccessible*>(parentAccessible);
+                QSpiObject *parentAccessibleObject = cache->objectToAccessible(parent->object());
+                QSpiAccessible* parentAccessible = qobject_cast<QSpiAccessible*>(parentAccessibleObject);
+                if (!parentAccessible) {
+                    qWarning() << "Invalid parent accessible";
+                    return;
+                }
+
                 QSpiObjectReference r = accessible->getReference();
                 QDBusVariant data;
                 data.setVariant(QVariant::fromValue(r));
-                acc->signalChildrenChanged("add", parent->childCount(), 0, data);
+                parentAccessible->signalChildrenChanged("add", parent->childCount(), 0, data);
             }
         }
 
     }
-    accessible->accessibleEvent((QAccessible::Event) reason);
+    if (accessible)
+        accessible->accessibleEvent((QAccessible::Event) reason);
 }
 
 //enum QSpiKeyEventType
