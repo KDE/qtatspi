@@ -33,7 +33,9 @@
 #include <QAccessibleActionInterface>
 #include <QAccessibleValueInterface>
 
-#include <QtDebug>
+#include <QtCore/QtDebug>
+#include <QtGui/QApplication>
+#include <QtGui/QWidget>
 
 #include "object.h"
 #include "adaptor.h"
@@ -316,12 +318,18 @@ bool QSpiAdaptor::Contains(int x, int y, uint coord_type)
 
 QSpiObjectReference QSpiAdaptor::GetAccessibleAtPoint(int x, int y, uint coord_type)
 {
-    Q_UNUSED (x) Q_UNUSED (y) Q_UNUSED (coord_type)
-            qWarning("Not implemented: QSpiAdaptor::GetAccessibleAtPoint");
-    QSpiObjectReference ref;
-    ref.name = QDBusConnection::sessionBus().baseService(); //FIXME
-    ref.path = QDBusObjectPath(QSPI_OBJECT_PATH_NULL);
-    return ref;
+    Q_UNUSED (coord_type)
+
+    QWidget* w = qApp->widgetAt(x,y);
+    qDebug() << "QSpiAdaptor::GetAccessibleAtPoint: " << w;
+    if (w) {
+        return cache->objectToAccessible(w)->getReference();
+    } else {
+        QSpiObjectReference ref;
+        ref.name = QDBusConnection::sessionBus().baseService();
+        ref.path = QDBusObjectPath(QSPI_OBJECT_PATH_NULL);
+        return ref;
+    }
 }
 
 double QSpiAdaptor::GetAlpha()
