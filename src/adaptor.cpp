@@ -112,7 +112,7 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren()
         interface->navigate(QAccessible::Child, i, &child);
         if (child) {
             QSpiObject *current;
-            current = cache->objectToAccessible (child->object ());
+            current = cache->objectToAccessible(child->object ());
             if (current)
                 children << current->getReference();
             delete child;
@@ -127,8 +127,19 @@ int QSpiAdaptor::GetIndexInParent()
     // TODO
     // Not handling for now. indexInParent can now be calculated just as
     // easily on the client side.
-    qWarning("Not implemented: QSpiAdaptor::GetIndexInParent");
-    return 0;
+    qDebug() << "QSpiAdaptor::GetIndexInParent" << interface->text(QAccessible::Name, 0);
+    qDebug() << "  obj: " << interface->object();
+
+    QAccessibleInterface* parent;
+    interface->navigate(QAccessible::Ancestor, 1, &parent);
+    if (parent) {
+        qDebug() << "QSpiAdaptor::GetIndexInParent" << parent->text(QAccessible::Name, 0);
+        int index = parent->indexOfChild(interface);
+        delete parent;
+        qDebug() << "Index: " << index;
+        return index;
+    }
+    return -1;
 }
 
 QString QSpiAdaptor::GetLocalizedRoleName()
@@ -142,6 +153,7 @@ QSpiRelationArray QSpiAdaptor::GetRelationSet()
 {
     qWarning("Not implemented: QSpiAdaptor::GetRelationSet");
     QSpiRelationArray out0;
+
     return out0;
 }
 
@@ -254,7 +266,7 @@ static QAccessibleInterface *getWindow (QAccessibleInterface &interface)
 {
     QAccessibleInterface *current=NULL, *tmp=NULL;
 
-    interface.navigate (QAccessible::Ancestor, 0, &current);
+    interface.navigate(QAccessible::Ancestor, 0, &current);
 
     while (current &&
            current->role(0) != QAccessible::Window &&
