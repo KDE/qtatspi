@@ -2,7 +2,7 @@
 # ----------------------------------------------------------------------------
 
 # binary app
-test/test
+test/calculator/calculator
 test/simple/simple
 
 callgrind.out.*
