@@ -54,9 +54,12 @@ public:
 
 Q_SIGNALS:
     void ChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void StateChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void PropertyChange(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
 
 private:
     static QDBusObjectPath getUnique();
+    QSpiObjectReference getRootReference() const;
     QDBusConnection dbusConnection;
 };
 

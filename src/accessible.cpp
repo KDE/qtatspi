@@ -121,28 +121,50 @@ QSpiObjectReference &QSpiAccessible::getParentReference() const
     return null_reference;
 }
 
+QSpiObjectReference QSpiAccessible::getRootReference() const
+{
+    return QSpiObjectReference(dbusConnection.baseService(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
+}
 
 void QSpiAccessible::signalChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data)
 {
-    qDebug() << "Children Changed...";
-
-    QSpiObjectReference rootRef = QSpiObjectReference(dbusConnection.baseService(),
-        QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
-
-    emit ChildrenChanged(type, detail1, detail2, data, rootRef);
+    emit ChildrenChanged(type, detail1, detail2, data, getRootReference());
 }
-
 
 void QSpiAccessible::accessibleEvent(QAccessible::Event event)
 {
     switch (event) {
+    case QAccessible::NameChanged: {
+        QSpiObjectReference r = getReference();
+        QDBusVariant data;
+        data.setVariant(QVariant::fromValue(r));
+        emit PropertyChange("accessible-name", 0, 0, data, getRootReference());
+        break;
+    }
+    case QAccessible::DescriptionChanged: {
+        QSpiObjectReference r = getReference();
+        QDBusVariant data;
+        data.setVariant(QVariant::fromValue(r));
+        emit PropertyChange("accessible-description", 0, 0, data, getRootReference());
+        break;
+    }
+    case QAccessible::Focus: {
+        QSpiObjectReference r = getReference();
+        QDBusVariant data;
+        data.setVariant(QVariant::fromValue(r));
+        emit StateChanged("focused", 0, 0, data, getRootReference());
+        break;
+    }
     case QAccessible::ObjectShow:
+        // handled in bridge
+        break;
     case QAccessible::ObjectHide:
-    case QAccessible::DescriptionChanged:
-    case QAccessible::NameChanged:
     case QAccessible::ParentChanged:
     case QAccessible::StateChanged:
     default:
+        qWarning() << "QSpiAccessible::accessibleEvent not handled: " << QString::number(event, 16)
+                   << " obj: " << interface->object()
+                   << interface->object()->objectName() ;
         break;
     }
 }

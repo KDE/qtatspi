@@ -9,8 +9,8 @@
  * before re-generating it.
  */
 
-#ifndef EVENT_ADAPTOR_H_1297864636
-#define EVENT_ADAPTOR_H_1297864636
+#ifndef EVENT_ADAPTOR_H_1297967175
+#define EVENT_ADAPTOR_H_1297967175
 
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
@@ -32,24 +32,44 @@ class DocumentAdaptor: public QDBusAbstractAdaptor
     Q_CLASSINFO("D-Bus Introspection", ""
 "  <interface name=\"org.a11y.atspi.Event.Document\">\n"
 "    <signal name=\"LoadComplete\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Reload\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"LoadStopped\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"ContentChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"AttributesChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "  </interface>\n"
         "")
@@ -60,11 +80,11 @@ public:
 public: // PROPERTIES
 public Q_SLOTS: // METHODS
 Q_SIGNALS: // SIGNALS
-    void AttributesChanged();
-    void ContentChanged();
-    void LoadComplete();
-    void LoadStopped();
-    void Reload();
+    void AttributesChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void ContentChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void LoadComplete(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void LoadStopped(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Reload(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
 };
 
 /*
@@ -77,8 +97,12 @@ class FocusAdaptor: public QDBusAbstractAdaptor
     Q_CLASSINFO("D-Bus Introspection", ""
 "  <interface name=\"org.a11y.atspi.Event.Focus\">\n"
 "    <signal name=\"Focus\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "  </interface>\n"
         "")
@@ -89,7 +113,7 @@ public:
 public: // PROPERTIES
 public Q_SLOTS: // METHODS
 Q_SIGNALS: // SIGNALS
-    void Focus();
+    void Focus(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
 };
 
 /*
@@ -102,8 +126,12 @@ class KeyboardAdaptor: public QDBusAbstractAdaptor
     Q_CLASSINFO("D-Bus Introspection", ""
 "  <interface name=\"org.a11y.atspi.Event.Keyboard\">\n"
 "    <signal name=\"Modifiers\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "  </interface>\n"
         "")
@@ -114,7 +142,7 @@ public:
 public: // PROPERTIES
 public Q_SLOTS: // METHODS
 Q_SIGNALS: // SIGNALS
-    void Modifiers();
+    void Modifiers(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
 };
 
 /*
@@ -127,16 +155,28 @@ class MouseAdaptor: public QDBusAbstractAdaptor
     Q_CLASSINFO("D-Bus Introspection", ""
 "  <interface name=\"org.a11y.atspi.Event.Mouse\">\n"
 "    <signal name=\"Abs\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Rel\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Button\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "  </interface>\n"
         "")
@@ -147,9 +187,9 @@ public:
 public: // PROPERTIES
 public Q_SLOTS: // METHODS
 Q_SIGNALS: // SIGNALS
-    void Abs();
-    void Button();
-    void Rel();
+    void Abs(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Button(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Rel(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
 };
 
 /*
@@ -162,20 +202,36 @@ class ObjectAdaptor: public QDBusAbstractAdaptor
     Q_CLASSINFO("D-Bus Introspection", ""
 "  <interface name=\"org.a11y.atspi.Event.Object\">\n"
 "    <signal name=\"PropertyChange\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"BoundsChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"LinkSelected\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"StateChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"ChildrenChanged\">\n"
 "      <arg type=\"s\" name=\"type\"/>\n"
@@ -186,68 +242,132 @@ class ObjectAdaptor: public QDBusAbstractAdaptor
 "      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"VisibleDataChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"SelectionChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"ModelChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"ActiveDescendantChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"RowInserted\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"RowReordered\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"RowDeleted\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"ColumnInserted\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"ColumnReordered\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"ColumnDeleted\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"TextBoundsChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"TextSelectionChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"TextChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"TextAttributesChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"TextCaretMoved\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"AttributesChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "  </interface>\n"
         "")
@@ -258,27 +378,27 @@ public:
 public: // PROPERTIES
 public Q_SLOTS: // METHODS
 Q_SIGNALS: // SIGNALS
-    void ActiveDescendantChanged();
-    void AttributesChanged();
-    void BoundsChanged();
+    void ActiveDescendantChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void AttributesChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void BoundsChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
     void ChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
-    void ColumnDeleted();
-    void ColumnInserted();
-    void ColumnReordered();
-    void LinkSelected();
-    void ModelChanged();
-    void PropertyChange();
-    void RowDeleted();
-    void RowInserted();
-    void RowReordered();
-    void SelectionChanged();
-    void StateChanged();
-    void TextAttributesChanged();
-    void TextBoundsChanged();
-    void TextCaretMoved();
-    void TextChanged();
-    void TextSelectionChanged();
-    void VisibleDataChanged();
+    void ColumnDeleted(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void ColumnInserted(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void ColumnReordered(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void LinkSelected(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void ModelChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void PropertyChange(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void RowDeleted(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void RowInserted(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void RowReordered(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void SelectionChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void StateChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void TextAttributesChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void TextBoundsChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void TextCaretMoved(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void TextChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void TextSelectionChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void VisibleDataChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
 };
 
 /*
@@ -291,24 +411,44 @@ class TerminalAdaptor: public QDBusAbstractAdaptor
     Q_CLASSINFO("D-Bus Introspection", ""
 "  <interface name=\"org.a11y.atspi.Event.Terminal\">\n"
 "    <signal name=\"LineChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"ColumncountChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"LinecountChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"ApplicationChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"CharwidthChanged\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "  </interface>\n"
         "")
@@ -319,11 +459,11 @@ public:
 public: // PROPERTIES
 public Q_SLOTS: // METHODS
 Q_SIGNALS: // SIGNALS
-    void ApplicationChanged();
-    void CharwidthChanged();
-    void ColumncountChanged();
-    void LineChanged();
-    void LinecountChanged();
+    void ApplicationChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void CharwidthChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void ColumncountChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void LineChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void LinecountChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
 };
 
 /*
@@ -336,80 +476,156 @@ class WindowAdaptor: public QDBusAbstractAdaptor
     Q_CLASSINFO("D-Bus Introspection", ""
 "  <interface name=\"org.a11y.atspi.Event.Window\">\n"
 "    <signal name=\"PropertyChange\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Minimize\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Maximize\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Restore\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Close\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Create\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Reparent\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"DesktopCreate\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"DesktopDestroy\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Destroy\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Activate\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Deactivate\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Raise\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Lower\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Move\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Resize\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Shade\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
-"    <signal name=\"uUshade\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"    <signal name=\"Unshade\">\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "    <signal name=\"Restyle\">\n"
-"      <arg direction=\"in\" type=\"(suuv)\"/>\n"
-"      <annotation value=\"QSpiEvent\" name=\"com.trolltech.QtDBus.QtTypeName.In0\"/>\n"
+"      <arg type=\"s\" name=\"type\"/>\n"
+"      <arg type=\"i\" name=\"detail1\"/>\n"
+"      <arg type=\"i\" name=\"detail2\"/>\n"
+"      <arg type=\"v\" name=\"data\"/>\n"
+"      <arg type=\"(so)\" name=\"parent\"/>\n"
+"      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.In4\"/>\n"
 "    </signal>\n"
 "  </interface>\n"
         "")
@@ -420,25 +636,25 @@ public:
 public: // PROPERTIES
 public Q_SLOTS: // METHODS
 Q_SIGNALS: // SIGNALS
-    void Activate();
-    void Close();
-    void Create();
-    void Deactivate();
-    void DesktopCreate();
-    void DesktopDestroy();
-    void Destroy();
-    void Lower();
-    void Maximize();
-    void Minimize();
-    void Move();
-    void PropertyChange();
-    void Raise();
-    void Reparent();
-    void Resize();
-    void Restore();
-    void Restyle();
-    void Shade();
-    void uUshade();
+    void Activate(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Close(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Create(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Deactivate(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void DesktopCreate(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void DesktopDestroy(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Destroy(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Lower(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Maximize(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Minimize(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Move(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void PropertyChange(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Raise(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Reparent(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Resize(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Restore(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Restyle(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Shade(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Unshade(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
 };
 
 #endif

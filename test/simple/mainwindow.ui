@@ -17,6 +17,9 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QLabel" name="label">
+      <property name="accessibleDescription">
+       <string>Accessible description for &quot;Some Text&quot; label</string>
+      </property>
       <property name="text">
        <string>Some Text</string>
       </property>
@@ -39,7 +42,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit"/>
+       <widget class="QLineEdit" name="lineEdit">
+        <property name="accessibleName">
+         <string>Name line edit</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -67,7 +74,7 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuMenu">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
@@ -75,7 +82,15 @@
     <addaction name="action_Remove_Button"/>
     <addaction name="action_Quit"/>
    </widget>
-   <addaction name="menuMenu"/>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionNom_nom_nom"/>
+    <addaction name="actionBlah"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionNew_Button">
@@ -91,6 +106,16 @@
   <action name="action_Quit">
    <property name="text">
     <string>&amp;Quit</string>
+   </property>
+  </action>
+  <action name="actionNom_nom_nom">
+   <property name="text">
+    <string>Nom nom nom</string>
+   </property>
+  </action>
+  <action name="actionBlah">
+   <property name="text">
+    <string>Blah</string>
    </property>
   </action>
  </widget>

@@ -2,17 +2,37 @@
 <node name="/node">
 
 <interface name="org.a11y.atspi.Event.Object">
-	<signal name="PropertyChange"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="PropertyChange">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="BoundsChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="BoundsChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="LinkSelected"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="LinkSelected">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="StateChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+	<signal name="StateChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
         <signal name="ChildrenChanged">
           <arg name="type" type="s"/>
@@ -22,173 +42,423 @@
           <arg name="parent" type="(so)"/>
           <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="VisibleDataChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="VisibleDataChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="SelectionChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="SelectionChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="ModelChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="ModelChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="ActiveDescendantChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="ActiveDescendantChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="RowInserted"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="RowInserted">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="RowReordered"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="RowReordered">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="RowDeleted"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="RowDeleted">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="ColumnInserted"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="ColumnInserted">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="ColumnReordered"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="ColumnReordered">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="ColumnDeleted"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="ColumnDeleted">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="TextBoundsChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="TextBoundsChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="TextSelectionChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="TextSelectionChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="TextChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="TextChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="TextAttributesChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="TextAttributesChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="TextCaretMoved"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="TextCaretMoved">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="AttributesChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="AttributesChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
 </interface>
 
 <interface name="org.a11y.atspi.Event.Window">
-	<signal name="PropertyChange"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="PropertyChange">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Minimize"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Minimize">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Maximize"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Maximize">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Restore"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Restore">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Close"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Close">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Create"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Create">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Reparent"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Reparent">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="DesktopCreate"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="DesktopCreate">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="DesktopDestroy"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="DesktopDestroy">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Destroy"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Destroy">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Activate"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Activate">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Deactivate"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Deactivate">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Raise"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Raise">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Lower"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Lower">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Move"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Move">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Resize"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Resize">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Shade"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Shade">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="uUshade"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Unshade">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Restyle"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Restyle">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
 </interface>
 
 <interface name="org.a11y.atspi.Event.Mouse">
-	<signal name="Abs"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Abs">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Rel"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Rel">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Button"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Button">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
 </interface>
 
 <interface name="org.a11y.atspi.Event.Keyboard">
-	<signal name="Modifiers"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Modifiers">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
 </interface>
 
 <interface name="org.a11y.atspi.Event.Terminal">
-	<signal name="LineChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="LineChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="ColumncountChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="ColumncountChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="LinecountChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="LinecountChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="ApplicationChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="ApplicationChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="CharwidthChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="CharwidthChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
 </interface>
 
 <interface name="org.a11y.atspi.Event.Document">
-	<signal name="LoadComplete"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="LoadComplete">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="Reload"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Reload">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="LoadStopped"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="LoadStopped">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="ContentChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="ContentChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
-	<signal name="AttributesChanged"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="AttributesChanged">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
 </interface>
 
 <interface name="org.a11y.atspi.Event.Focus">
-	<signal name="Focus"><arg direction="in" type="(suuv)"/>
-          <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QSpiEvent"/>
+        <signal name="Focus">
+          <arg name="type" type="s"/>
+          <arg name="detail1" type="i"/>
+          <arg name="detail2" type="i"/>
+          <arg name="data" type="v"/>
+          <arg name="parent" type="(so)"/>
+          <annotation name="com.trolltech.QtDBus.QtTypeName.In4" value="QSpiObjectReference"/>
         </signal>
 </interface>
 

@@ -106,7 +106,8 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAction &actio
 /* QSpiRelationArray */
 /*---------------------------------------------------------------------------*/
 
-typedef QMap < unsigned int, QMap < QString, QSpiObjectReference > > QSpiRelationArray;
+typedef QList < QMap < unsigned int, QSpiObjectReference > > QSpiRelationArray;
+Q_DECLARE_METATYPE(QSpiRelationArray);
 
 /* QSpiRangeList */
 /*---------------------------------------------------------------------------*/

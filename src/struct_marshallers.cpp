@@ -182,6 +182,7 @@ void qspi_initialize_struct_types ()
     qDBusRegisterMetaType<QSpiActionArray>();
     qDBusRegisterMetaType<QSpiDeviceEvent>();
     qDBusRegisterMetaType<QSpiAppUpdate>();
+//    qDBusRegisterMetaType<QSpiRelationArray>();
 }
 
 /*END------------------------------------------------------------------------*/

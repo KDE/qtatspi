@@ -112,13 +112,17 @@ void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *inter)
                                          c);
 }
 
+#include <QMenuBar>
+
 void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface, int index)
 {
-    qDebug() << "QSpi::notifyAccessibilityUpdate " << QString::number(reason, 16) << " obj: " << interface->object()->objectName() << index;
-
     if (!cache) {
         qWarning("QSpi::notifyAccessibilityUpdate: no cache, returning");
         return;
+    }
+
+    if (qobject_cast<QMenuBar*>(interface->object())) {
+        qDebug() << "got menu";
     }
 
     QSpiObject *accessible = 0;
@@ -137,7 +141,7 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
         accessible = cache->objectToAccessible(interface->object());
 
         if (reason == QAccessible::ObjectShow) {
-            qDebug() << "Object Show event, notify parent...";
+            qDebug() << "Object Show event, notify parent..." << interface->object();
             QAccessibleInterface *parent = 0;
             interface->navigate(QAccessible::Ancestor, 1, &parent);
             if (parent) {
@@ -154,10 +158,12 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
                 parentAccessible->signalChildrenChanged("add", parent->childCount(), 0, data);
             }
         }
-
     }
-    if (accessible)
+    if (accessible) {
         accessible->accessibleEvent((QAccessible::Event) reason);
+    } else {
+        qWarning() << "QSpiAccessibleBridge::notifyAccessibilityUpdate: invalid accessible";
+    }
 }
 
 //enum QSpiKeyEventType

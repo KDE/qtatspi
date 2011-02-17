@@ -86,13 +86,12 @@ QSpiObjectReference QSpiAdaptor::GetChildAtIndex(int index)
 {
     QList<QSpiObject *> children;
 
-    qDebug() << "Getting child out of " << interface->childCount() << " possible children";
-    for (int i = 1; i <= interface->childCount (); i++)
-    {
+    qDebug() << "QSpiAdaptor::GetChildAtIndex get child " << index << " of " << interface->childCount();
+    qDebug() << interface->text(QAccessible::Name, 0);
+    for (int i = 1; i <= interface->childCount (); i++) {
         QAccessibleInterface *child = NULL;
         interface->navigate(QAccessible::Child, i, &child);
-        if (child)
-        {
+        if (child) {
             QSpiObject *current;
             current = cache->objectToAccessible (child->object ());
             if (current)

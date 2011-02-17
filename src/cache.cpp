@@ -171,18 +171,7 @@ QSpiObject *QSpiAccessibleCache::objectToAccessible(QObject *obj)
         if (interface)
         {
             QSpiObject *accessible = new QSpiAccessible(this, interface, dbusConnection);
-
             cache.insert(interface->object(), accessible);
-
-#if 0
-            qDebug ("QSpiAccessibleBridge : accessibleRegistered.\n\t%s\n\t%s\n\t%s\n",
-                     qPrintable(accessible->getReference().path()),
-                     qPrintable(accessible->getParentPath().path()),
-                     qPrintable (accessible->getInterface().text(QAccessible::Name, 0))
-                   );
-#endif
-
-            qDebug() << "QSpiAccessibleCache::objectToAccessible AddAccessible";
             emit AddAccessible(accessible->getCacheItem()); // this one actually works!!!
             return accessible;
         }
