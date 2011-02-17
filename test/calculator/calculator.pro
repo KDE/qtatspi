@@ -4,9 +4,7 @@ SOURCES       = button.cpp \
                 calculator.cpp \
                 main.cpp
 
-TARGET        = test
-
-DEFINES      += QT_ACCESSIBILITY
+TARGET        = calculator
 
 CONFIG       += debug
 
