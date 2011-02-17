@@ -121,14 +121,17 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
         return;
     }
 
-
     QSpiObject *accessible = 0;
 
     if (index > 0) {
-        QAccessibleInterface *child = 0;
-
+        QAccessibleInterface *child;
         interface->navigate(QAccessible::Child, index, &child);
+        if (!child) {
+            qWarning() << "WARNING: Implement: QSpiAccessibleBridge::notifyAccessibilityUpdate for child of " << interface->object() << index;
+            return;
+        }
         accessible = cache->objectToAccessible(child->object());
+        delete child;
     } else {
 
         accessible = cache->objectToAccessible(interface->object());
