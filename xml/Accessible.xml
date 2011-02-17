@@ -46,7 +46,7 @@
 
   <method name="GetState">
     <arg direction="out" type="au"/>
-    <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiIntList"/>
+    <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QSpiUIntList"/>
   </method>
 
   <method name="GetAttributes">

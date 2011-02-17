@@ -130,11 +130,11 @@ QString AccessibleAdaptor::GetRoleName()
     return out0;
 }
 
-QSpiIntList AccessibleAdaptor::GetState()
+QSpiUIntList AccessibleAdaptor::GetState()
 {
     // handle method call org.a11y.atspi.Accessible.GetState
-    QSpiIntList out0;
-    QMetaObject::invokeMethod(parent(), "GetState", Q_RETURN_ARG(QSpiIntList, out0));
+    QSpiUIntList out0;
+    QMetaObject::invokeMethod(parent(), "GetState", Q_RETURN_ARG(QSpiUIntList, out0));
     return out0;
 }
 
