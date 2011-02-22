@@ -23,13 +23,6 @@
 
 #include "object.h"
 
-#define BITARRAY_SEQ_TERM 0xffffffff
-
-#define BITARRAY_SET(p, n)   ( (p)[n>>5] |=  (1<<(n&31)) )
-#define BITARRAY_UNSET(p, n) ( (p)[n>>5] &= ~(1<<(n&31)) )
-
-
-
 // FIXME the assignment of roles is quite arbitrary, at some point go through this list and sort and check that it makes sense
 //  "calendar" "check menu item"  "color chooser" "column header"    "dateeditor"  "desktop icon"  "desktop frame"
 //  "directory pane"  "drawing area"  "file chooser" "fontchooser"  "frame"  "glass pane"  "html container"  "icon"
@@ -40,7 +33,7 @@
 
 QHash <QAccessible::Role, RoleNames> qSpiRoleMapping;
 
-static void initialize_role_mapping ()
+static void initializeRoleMapping ()
 {
     qSpiRoleMapping.insert(QAccessible::NoRole, RoleNames(ROLE_INVALID, "invalid", QSpiObject::tr("invalid role")));
     qSpiRoleMapping.insert(QAccessible::TitleBar, RoleNames(ROLE_TEXT, "text", QSpiObject::tr("title bar")));
@@ -108,15 +101,18 @@ static void initialize_role_mapping ()
     qSpiRoleMapping.insert(QAccessible::UserRole, RoleNames(ROLE_UNKNOWN, "unknown", QSpiObject::tr("user role")));
 }
 
-/*---------------------------------------------------------------------------*/
+// split the enum into 2 32 bit integers
+// if n > 31 bits, put it in array[1]
+// use the last 31 bits as value
+#define BITARRAY_SET(p, n)   ( (p)[n>>5] |=  (1<<(n&31)) )
+#define BITARRAY_UNSET(p, n) ( (p)[n>>5] &= ~(1<<(n&31)) )
 
-void qspi_stateset_from_qstate(QAccessible::State state, QSpiUIntList &set)
+QSpiUIntList qSpiStatesetFromQState(QAccessible::State state)
 {
     int array[2] = {0, 0};
 
-    /* We may need to take the role of the object into account when
-        * mapping between the state sets
-        */
+    // We may need to take the role of the object into account when
+    // mapping between the state sets
     BITARRAY_SET (array, STATE_EDITABLE);
     BITARRAY_SET (array, STATE_ENABLED);
     BITARRAY_SET (array, STATE_SHOWING);
@@ -260,15 +256,14 @@ void qspi_stateset_from_qstate(QAccessible::State state, QSpiUIntList &set)
         }
         }
     }
-    set << array[0];
-    set << array[1];
+
+    QSpiUIntList stateSet;
+    stateSet << array[0];
+    stateSet << array[1];
+    return stateSet;
 }
 
-/*---------------------------------------------------------------------------*/
-
-void qspi_initialize_constant_mappings ()
+void qSpiInitializeConstantMappings()
 {
-    initialize_role_mapping ();
+    initializeRoleMapping();
 }
-
-/*END------------------------------------------------------------------------*/

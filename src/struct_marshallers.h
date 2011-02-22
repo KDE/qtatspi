@@ -71,7 +71,7 @@ struct QSpiAccessibleCacheItem
     QSpiObjectReference         parent;
     uint                        role;
     QString                     description;
-    QSpiUIntList                 states;
+    QSpiUIntList                states;
     QList <QSpiObjectReference> children;
     QStringList                 supported;
     QString                     name;

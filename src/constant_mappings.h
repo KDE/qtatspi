@@ -157,7 +157,7 @@ enum QSpiState {
     STATE_DEFUNCT,
     STATE_EDITABLE,
     STATE_ENABLED,
-    STATE_EXPANDABLE,
+    STATE_EXPANDABLE, //10
     STATE_EXPANDED,
     STATE_FOCUSABLE,
     STATE_FOCUSED,
@@ -167,7 +167,7 @@ enum QSpiState {
     STATE_MODAL,
     STATE_MULTI_LINE,
     STATE_MULTISELECTABLE,
-    STATE_OPAQUE,
+    STATE_OPAQUE, //20
     STATE_PRESSED,
     STATE_RESIZABLE,
     STATE_SELECTABLE,
@@ -177,7 +177,7 @@ enum QSpiState {
     STATE_SINGLE_LINE,
     STATE_STALE,
     STATE_TRANSIENT,
-    STATE_VERTICAL,
+    STATE_VERTICAL, //30
     STATE_VISIBLE,
     STATE_MANAGES_DESCENDANTS,
     STATE_INDETERMINATE,
@@ -187,7 +187,7 @@ enum QSpiState {
     STATE_INVALID_ENTRY,
     STATE_SUPPORTS_AUTOCOMPLETION,
     STATE_SELECTABLE_TEXT,
-    STATE_IS_DEFAULT,
+    STATE_IS_DEFAULT, //40
     STATE_VISITED,
     STATE_UNKNOWN,
     STATE_LAST_DEFINED
@@ -195,10 +195,10 @@ enum QSpiState {
 
 extern QHash <int, QSpiState> qSpiStateMapping;
 
-void qspi_stateset_from_qstate(QAccessible::State state, QSpiUIntList &set);
+QSpiUIntList qSpiStatesetFromQState(QAccessible::State state);
 
 /*---------------------------------------------------------------------------*/
 
-void qspi_initialize_constant_mappings();
+void qSpiInitializeConstantMappings();
 
 #endif /* Q_SPI_CONSTANT_MAPPINGS_H */

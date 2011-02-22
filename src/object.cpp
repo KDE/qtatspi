@@ -92,7 +92,7 @@ QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
     /* Description */
     item.description = getInterface().text(QAccessible::Description, 0);
     /* State set */
-    qspi_stateset_from_qstate(getInterface().state(0), item.states);
+    item.states = qSpiStatesetFromQState(getInterface().state(0));
     return item;
 }
 

@@ -171,9 +171,7 @@ QString QSpiAdaptor::GetRoleName()
 
 QSpiUIntList QSpiAdaptor::GetState()
 {
-    QSpiUIntList set;
-    qspi_stateset_from_qstate (ACCESSIBLE_INTERFACE.state(0), set);
-    return set;
+    return qSpiStatesetFromQState(ACCESSIBLE_INTERFACE.state(0));
 }
 
 int QSpiAdaptor::nActions() const
@@ -289,7 +287,7 @@ static QAccessibleInterface *getWindow (QAccessibleInterface &interface)
     }
 }
 
-static QRect getRelativeRect (QAccessibleInterface &interface)
+static QRect getRelativeRect(QAccessibleInterface &interface)
 {
     QAccessibleInterface *window;
     QRect wr, cr;

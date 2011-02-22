@@ -36,14 +36,11 @@
 
 #define QSPI_OBJECT_PATH_CACHE "/org/a11y/atspi/cache"
 
-/*---------------------------------------------------------------------------*/
 
 QSpiAccessibleCache::QSpiAccessibleCache(QObject *root, QDBusConnection c)
     : dbusConnection(c)
 {
     CacheAdaptor *adaptor;
-
-    //QApplication::instance()->installEventFilter(this);
 
     rootObject = root;
     cache.insert(root, new QSpiApplication(this, QAccessible::queryAccessibleInterface(root), dbusConnection));
@@ -53,78 +50,12 @@ QSpiAccessibleCache::QSpiAccessibleCache(QObject *root, QDBusConnection c)
     c.registerObject(QSPI_OBJECT_PATH_CACHE, this, QDBusConnection::ExportAdaptors);
 }
 
-/*---------------------------------------------------------------------------*/
 
 QObject *QSpiAccessibleCache::getRoot ()
 {
     return rootObject;
 }
 
-/*---------------------------------------------------------------------------*/
-
-//bool QSpiAccessibleCache::eventFilter(QObject *obj, QEvent *event)
-//{
-//    QSpiObject *accessible = NULL;
-
-//    switch (event->type ())
-//    {
-//        case QEvent::Show:
-//        {
-//            accessible = objectToAccessible (obj);
-//            break;
-//        }
-//        /*
-//         * FIXME: No Idea what to do here, the ChildAdded signal is BROKEN
-//         * for accessibility as the accessible interface is not ready when this signal
-//         * is emmited.
-//         */
-//#if 0
-//        case QEvent::ChildAdded:
-//        {
-//            QList <QSpiObject *> children;
-//            QObject *child = static_cast<QChildEvent *>(event)->child();
-
-//            qDebug ("QSpiAccessibleBridge : childAdded.\n\t%s\n\t%s\n\t%s\n",
-//                    qPrintable(accessible->getReference().path()),
-//                    qPrintable(accessible->getParentPath().path()),
-//                    qPrintable (accessible->getInterface().text(QAccessible::Name, 0))
-//                   );
-
-//            children = accessible->getChildren();
-//            foreach (QSpiObject *chld, children)
-//            {
-//                qDebug ("\t\t%s", qPrintable(chld->getReference().path()));
-//            }
-                
-//            registerChildren(child);
-//            emit accessibleUpdated (accessible);
-//            break;
-//            // TODO
-//            Emit the child added signal
-//        }
-//#endif
-//        default:
-//            break;
-//    }
-//    /* Think false is the right thing to do, no need to block these events here. */
-//    return false;
-//}
-
-/*---------------------------------------------------------------------------*/
-
-//void QSpiAccessibleCache::objectDestroyed (QObject *obj)
-//{
-//    if (cache.contains (obj))
-//    {
-//        QSpiObject *accessible = cache.take (obj);
-//#if 0
-//        qDebug("QSpiAccessibleBridge : Object Destroyed\n\t%s\n",
-//               qPrintable(accessible->getReference().path()));
-//#endif
-//        emit RemoveAccessible (accessible->getReference());
-//        delete accessible;
-//    }
-//}
 
 /* 
  * Registers all descendants of the given accessible interface with the cache.
@@ -172,16 +103,13 @@ QSpiObject *QSpiAccessibleCache::objectToAccessible(QObject *obj)
         {
             QSpiObject *accessible = new QSpiAccessible(this, interface, dbusConnection);
             cache.insert(interface->object(), accessible);
-            emit AddAccessible(accessible->getCacheItem()); // this one actually works!!!
+            emit AddAccessible(accessible->getCacheItem());
             return accessible;
         }
     }
     return 0;
 }
 
-
-
-/* AT-SPI Cache interface ---------------------------------------------------*/
 
 QSpiAccessibleCacheArray QSpiAccessibleCache::GetItems()
 {
@@ -193,5 +121,3 @@ QSpiAccessibleCacheArray QSpiAccessibleCache::GetItems()
     }
     return cacheArray;
 }
-
-/*END------------------------------------------------------------------------*/

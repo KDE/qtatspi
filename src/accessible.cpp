@@ -63,8 +63,14 @@ QSpiAccessible::QSpiAccessible(QSpiAccessibleCache  *cache,
 
     new AccessibleAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;
-    new ComponentAdaptor(this);
-    supportedInterfaces << QSPI_INTERFACE_COMPONENT;
+
+    if (interface->object()->isWidgetType()) {
+        qDebug() << "ComponentAdaptor for: " << interface->object();
+        new ComponentAdaptor(this);
+        supportedInterfaces << QSPI_INTERFACE_COMPONENT;
+    } else {
+        qDebug() << "NO ComponentAdaptor for: " << interface->object();
+    }
 
     new ObjectAdaptor(this);
 
@@ -152,7 +158,8 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         QSpiObjectReference r = getReference();
         QDBusVariant data;
         data.setVariant(QVariant::fromValue(r));
-        emit StateChanged("focused", 0, 0, data, getRootReference());
+        emit StateChanged("focused", 1, 0, data, getRootReference());
+        emit StateChanged("active", 1, 0, data, getRootReference());
         break;
     }
     case QAccessible::ObjectShow:

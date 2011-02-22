@@ -102,7 +102,7 @@ void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *inter)
     qDebug() << "  got a11y root object. children: " << inter->childCount();
 
     qspi_initialize_struct_types();
-    qspi_initialize_constant_mappings();
+    qSpiInitializeConstantMappings();
 
     /* Create the cache of accessible objects */
     cache = new QSpiAccessibleCache(rootInterface->object(), c);
@@ -120,6 +120,8 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
         qWarning("QSpi::notifyAccessibilityUpdate: no cache, returning");
         return;
     }
+
+    qDebug() << "notifyAccessibilityUpdate" << interface->object() << " i: " << index;
 
     if (qobject_cast<QMenuBar*>(interface->object())) {
         qDebug() << "got menu";
