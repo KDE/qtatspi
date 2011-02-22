@@ -112,8 +112,6 @@ void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *inter)
                                          c);
 }
 
-#include <QMenuBar>
-
 void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface, int index)
 {
     if (!cache) {
@@ -122,11 +120,6 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
     }
 
     qDebug() << "notifyAccessibilityUpdate" << interface->object() << " i: " << index;
-
-    if (qobject_cast<QMenuBar*>(interface->object())) {
-        qDebug() << "got menu";
-    }
-
     QSpiObject *accessible = 0;
 
     if (index > 0) {

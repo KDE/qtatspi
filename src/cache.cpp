@@ -31,6 +31,7 @@
 #include "object.h"
 #include "adaptor.h"
 #include "accessible.h"
+#include "application.h"
 
 #include "generated/cache_adaptor.h"
 

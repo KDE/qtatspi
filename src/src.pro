@@ -14,6 +14,7 @@ HEADERS += \
            generated/table_adaptor.h \
            generated/text_adaptor.h \
            generated/value_adaptor.h \
+           application.h \
            bridge.h \
            cache.h  \
            object.h \
@@ -35,6 +36,7 @@ SOURCES += \
            generated/table_adaptor.cpp \
            generated/text_adaptor.cpp \
            generated/value_adaptor.cpp \
+           application.cpp \
            bridge.cpp \
            cache.cpp  \
            object.cpp \

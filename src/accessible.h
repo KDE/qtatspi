@@ -63,28 +63,4 @@ private:
     QDBusConnection dbusConnection;
 };
 
-/*
- * Used for the root object.
- *
- * Uses the root object reference and reports its parent as the desktop object.
- */
-class QSpiApplication : public QSpiAdaptor
-{
-    Q_OBJECT
-
-public:
-    QSpiApplication(QSpiAccessibleCache  *cache,
-                    QAccessibleInterface *interface,
-                    QDBusConnection c);
-
-    virtual QSpiObjectReference& getParentReference() const;
-
-    // TODO: do we care about events here?
-    virtual void accessibleEvent(QAccessible::Event event) { Q_UNUSED(event) }
-
-private:
-    QSpiObjectReference *socket;
-    QDBusConnection dbusConnection;
-};
-
 #endif /* Q_SPI_ACCESSIBLE_H */
