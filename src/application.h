@@ -49,7 +49,7 @@ public:
     virtual void accessibleEvent(QAccessible::Event event) { Q_UNUSED(event) }
 
 private:
-    QSpiObjectReference *socket;
+    QSpiObjectReference *accessibilityRegistry;
     QDBusConnection dbusConnection;
 };
 
