@@ -26,12 +26,8 @@
 #include "accessible.h"
 #include "cache.h"
 
-#include "constant_mappings.h"
-#include "struct_marshallers.h"
-
 #include "generated/accessible_adaptor.h"
 #include "generated/action_adaptor.h"
-#include "generated/application_adaptor.h"
 #include "generated/component_adaptor.h"
 #include "generated/editable_text_adaptor.h"
 #include "generated/event_adaptor.h"

@@ -22,24 +22,13 @@
 #include <QDBusPendingReply>
 #include <QDebug>
 
-#include "adaptor.h"
 #include "accessible.h"
 #include "application.h"
 #include "cache.h"
 
-#include "constant_mappings.h"
-#include "struct_marshallers.h"
-
 #include "generated/accessible_adaptor.h"
-#include "generated/action_adaptor.h"
 #include "generated/application_adaptor.h"
-#include "generated/component_adaptor.h"
-#include "generated/editable_text_adaptor.h"
-#include "generated/event_adaptor.h"
 #include "generated/socket_proxy.h"
-#include "generated/table_adaptor.h"
-#include "generated/text_adaptor.h"
-#include "generated/value_adaptor.h"
 
 #define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
 
@@ -49,8 +38,7 @@ QSpiApplication::QSpiApplication(QSpiAccessibleCache  *cache,
                                  QDBusConnection c)
     :QSpiAdaptor(cache, interface), dbusConnection(c)
 {
-    SocketProxy *proxy;
-    ApplicationAdaptor *app;
+    SocketProxy *registry;
     QDBusPendingReply <QSpiObjectReference> reply;
 
     reference = new QSpiObjectReference (dbusConnection.baseService(),
@@ -58,9 +46,8 @@ QSpiApplication::QSpiApplication(QSpiAccessibleCache  *cache,
 
     new AccessibleAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;
-    new ComponentAdaptor(this);
-    supportedInterfaces << QSPI_INTERFACE_COMPONENT;
-    app = new ApplicationAdaptor(this);
+
+    new ApplicationAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_APPLICATION;
 
     dbusConnection.registerObject(reference->path.path(),
@@ -68,24 +55,24 @@ QSpiApplication::QSpiApplication(QSpiAccessibleCache  *cache,
                                                  QDBusConnection::ExportAdaptors);
 
     /* Plug in to the desktop socket */
-    proxy = new SocketProxy (QSPI_REGISTRY_NAME,
+    registry = new SocketProxy (QSPI_REGISTRY_NAME,
                              QSPI_OBJECT_PATH_ROOT,
                              dbusConnection);
-    reply = proxy->Embed(getReference());
+    reply = registry->Embed(getReference());
     reply.waitForFinished();
     if (reply.isValid ()) {
         const QSpiObjectReference &_socket = reply.value();
-        socket = new QSpiObjectReference(_socket);
+        registryReference = new QSpiObjectReference(_socket);
     } else {
-        socket = new QSpiObjectReference();
+        registryReference = new QSpiObjectReference();
         qDebug() << "Error in contacting registry";
         qDebug() << reply.error().name();
         qDebug() << reply.error().message();
     }
-    delete proxy;
+    delete registry;
 }
 
 QSpiObjectReference &QSpiApplication::getParentReference() const
 {
-    return *socket;
+    return *registryReference;
 }
