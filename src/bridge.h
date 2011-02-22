@@ -38,12 +38,9 @@ class QSpiAccessibleBridge: public QObject, public QAccessibleBridge
 public:
         QSpiAccessibleBridge();
 
-        virtual ~QSpiAccessibleBridge ();
+        virtual ~QSpiAccessibleBridge();
         virtual void setRootObject(QAccessibleInterface *obj);
         virtual void notifyAccessibilityUpdate(int reason, QAccessibleInterface *obj, int child);
-
-public Q_SLOTS:
-        void aboutToQuit();
 
 private:
         QString getAccessibilityBusAddress() const;
@@ -56,8 +53,5 @@ private:
 
         QString accessibilityDBusAddress;
 };
-
-/*---------------------------------------------------------------------------*/
-
 
 #endif
