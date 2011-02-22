@@ -45,9 +45,6 @@ public:
 public Q_SLOTS:
         void aboutToQuit();
 
-Q_SIGNALS:
-        void ChildrenChanged();
-
 private:
         QString getAccessibilityBusAddress() const;
         QDBusConnection dbusConnection() const;
