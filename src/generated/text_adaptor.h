@@ -182,7 +182,6 @@ public Q_SLOTS: // METHODS
     QSpiAttributeSet GetDefaultAttributeSet();
     QSpiAttributeSet GetDefaultAttributes();
     int GetNSelections();
-    int GetNSelections(int blubb);
     int GetOffsetAtPoint(int x, int y, uint coordType);
     int GetRangeExtents(int startOffset, int endOffset, uint coordType, int &y, int &width, int &height);
     int GetSelection(int selectionNum, int &endOffset);

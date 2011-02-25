@@ -105,13 +105,6 @@ int TextAdaptor::GetNSelections()
     return parent()->GetNSelections();
 }
 
-int TextAdaptor::GetNSelections(int blubb)
-{
-    qDebug() << "TextAdaptor::GetNSelections Got called with parameter: " << blubb;
-    // handle method call org.a11y.atspi.Text.GetNSelections
-    return parent()->GetNSelections();
-}
-
 int TextAdaptor::GetOffsetAtPoint(int x, int y, uint coordType)
 {
     // handle method call org.a11y.atspi.Text.GetOffsetAtPoint
