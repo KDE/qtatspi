@@ -31,11 +31,18 @@
 #include "generated/dec_proxy.h"
 #include "generated/event_adaptor.h"
 
+#include <QEvent>
+#include <QKeyEvent>
+
 #include <QX11Info>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 
-#define QSPI_DEC_NAME        "/org/a11y/atspi/registry"
+// these get defined in X headers and conflict with Qt::KeyPress etc
+#undef KeyPress
+#undef KeyRelease
+
+#define QSPI_DEC_NAME        "/org/a11y/atspi/Registry"
 #define QSPI_DEC_OBJECT_PATH "/org/a11y/atspi/registry/deviceeventcontroller"
 
 
@@ -43,6 +50,7 @@ QSpiAccessibleBridge::QSpiAccessibleBridge()
     : cache(0), rootInterface(0)
 {
     accessibilityDBusAddress = getAccessibilityBusAddress();
+    qApp->installEventFilter(this);
 }
 
 QString QSpiAccessibleBridge::getAccessibilityBusAddress() const
@@ -107,9 +115,10 @@ void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *inter)
     /* Create the cache of accessible objects */
     cache = new QSpiAccessibleCache(rootInterface->object(), c);
 
-    dec = new DeviceEventControllerProxy(QSPI_DEC_NAME,
-                                         QSPI_DEC_OBJECT_PATH,
-                                         c);
+    dec = new DeviceEventControllerProxy(this);
+
+    bool reg = c.registerObject(QSPI_DEC_OBJECT_PATH, this, QDBusConnection::ExportAdaptors);
+    qDebug() << "Registered DEC: " << reg;
 }
 
 void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface, int index)
@@ -155,62 +164,93 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
         }
     }
     if (accessible) {
+        if (reason == QAccessible::Focus) {
+            static QSpiAccessible *lastFocused = 0;
+            if (lastFocused) {
+                QDBusVariant data;
+                data.setVariant(QVariant::fromValue(lastFocused->getReference()));
+                qDebug() << "last focus: " << lastFocused;
+                emit lastFocused->StateChanged("focused", 0, 0, data, lastFocused->getRootReference());
+            }
+            lastFocused = qobject_cast<QSpiAccessible*>(accessible);
+        }
+
         accessible->accessibleEvent((QAccessible::Event) reason);
     } else {
         qWarning() << "QSpiAccessibleBridge::notifyAccessibilityUpdate: invalid accessible";
     }
 }
 
-//enum QSpiKeyEventType
-//{
-//      QSPI_KEY_EVENT_PRESS,
-//      QSPI_KEY_EVENT_RELEASE,
-//      QSPI_KEY_EVENT_LAST_DEFINED
-//};
+enum QSpiKeyEventType
+{
+      QSPI_KEY_EVENT_PRESS,
+      QSPI_KEY_EVENT_RELEASE,
+      QSPI_KEY_EVENT_LAST_DEFINED
+};
 
-//bool QSpiAccessibleBridge::eventFilter(QObject *obj, QEvent *event)
-//{
-//    Q_UNUSED (obj);
-//    switch (event->type ())
-//    {
-//        case QEvent::KeyPress:
-//        case QEvent::KeyRelease:
-//        {
-//            QKeyEvent *key_event = static_cast <QKeyEvent *>(event);
-//            QSpiDeviceEvent de;
 
-//            if (event->type() == QEvent::KeyPress)
-//                de.type = QSPI_KEY_EVENT_PRESS;
-//            else
-//                de.type = QSPI_KEY_EVENT_RELEASE;
-           
-//            de.id = key_event->key();
-//            de.hw_code = 0; /* What is a keyval and what is a keycode */
-//            /* TODO Insert the keyboard modifiers here */
-//            de.modifiers = 0;
-//            de.timestamp = QTime::currentTime().elapsed();
-//            de.event_string =  key_event->text();
-//            /* TODO Work out if there is an easy equivalent of "is_text" */
-//            de.is_text = false;
+bool QSpiAccessibleBridge::eventFilter(QObject *obj, QEvent *event)
+{
+    Q_UNUSED(obj)
 
-//#if 0
-//            qDebug ("QSpiAccessibleBridge : keyEvent.\n\t%s",
-//                    qPrintable (de.event_string)
-//                   );
-//#endif
+    if (!event->spontaneous()) {
+        return false;
+    }
 
-//            /* TODO Work through the sync issues with key event notifications.
-//             * How can we block the events here?
-//             */
-//            /*return dec->NotifyListenersSync(de);*/
-//            return false;
-//            break;
-//        }
-//        default:
-//            break;
-//    }
-//    return false;
-//}
+    //FIXME: with X includes these are defined: KeyPress
+    switch (event->type())
+    {
+        case QEvent::KeyPress:
+        case QEvent::KeyRelease:
+        {
+            QKeyEvent *keyEvent = static_cast <QKeyEvent *>(event);
+            QSpiDeviceEvent de;
+
+            if (event->type() == QEvent::KeyPress)
+                de.type = QSPI_KEY_EVENT_PRESS;
+            else
+                de.type = QSPI_KEY_EVENT_RELEASE;
+
+            de.id = keyEvent->nativeVirtualKey();
+            de.hardwareCode = keyEvent->nativeScanCode();
+
+            de.modifiers = keyEvent->nativeModifiers();
+            de.timestamp = QDateTime::currentMSecsSinceEpoch();
+
+            if (keyEvent->key() == Qt::Key_Tab) {
+                de.text = "Tab";
+            } else {
+                de.text = keyEvent->text();
+            }
+
+            de.isText = !keyEvent->text().isEmpty();
+
+            qDebug() << "Key event text: " << de.isText << " " << de.text
+                     << " modifiers: " << keyEvent->modifiers()
+                     << " hardware code: " << de.hardwareCode
+                     << " native sc: " << keyEvent->nativeScanCode()
+                     << " native mod: " << keyEvent->nativeModifiers()
+                     << "native virt: " << keyEvent->nativeVirtualKey();
+
+            /* TODO Work through the sync issues with key event notifications.
+             * How can we block the events here?
+             */
+//            bool ret = dec->NotifyListenersSync(de);
+  //          qDebug() << "Notify: " << key_event->key() << " return: " << ret;
+
+            QDBusMessage m = QDBusMessage::createMethodCall("org.a11y.atspi.Registry",
+                                                            "/org/a11y/atspi/registry/deviceeventcontroller",
+                                                            "org.a11y.atspi.DeviceEventController", "NotifyListenersSync");
+            m.setArguments(QVariantList() <<QVariant::fromValue(de));
+            QDBusMessage reply = dbusConnection().call(m);
+            qDebug() << "Got REPLY: " << reply.errorMessage() << reply.errorName();
+            break;
+        }
+        default:
+            break;
+    }
+    return false;
+}
 
 QSpiAccessibleBridge::~QSpiAccessibleBridge ()
 {

@@ -21,6 +21,7 @@
 
 #include <QDBusPendingReply>
 #include <QDebug>
+#include <QtGui/QWidget>
 
 #include "adaptor.h"
 #include "accessible.h"
@@ -37,6 +38,7 @@
 #include "generated/value_adaptor.h"
 
 #define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
+
 
 QDBusObjectPath QSpiAccessible::getUnique()
 {
@@ -64,11 +66,19 @@ QSpiAccessible::QSpiAccessible(QSpiAccessibleCache  *cache,
         qDebug() << "ComponentAdaptor for: " << interface->object();
         new ComponentAdaptor(this);
         supportedInterfaces << QSPI_INTERFACE_COMPONENT;
+
+        QWidget *w = qobject_cast<QWidget*>(interface->object());
+        if (w->isWindow()) {
+            new WindowAdaptor(this);
+            qDebug() << "Created Window adaptor for: " << interface->object();
+        }
+
     } else {
         qDebug() << "NO ComponentAdaptor for: " << interface->object();
     }
 
     new ObjectAdaptor(this);
+    new FocusAdaptor(this);
 
     if (interface->actionInterface())
     {
@@ -151,11 +161,11 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         break;
     }
     case QAccessible::Focus: {
-        QSpiObjectReference r = getReference();
+        qDebug() << "Focus event";
         QDBusVariant data;
-        data.setVariant(QVariant::fromValue(r));
+        data.setVariant(QVariant::fromValue(getReference()));
         emit StateChanged("focused", 1, 0, data, getRootReference());
-        emit StateChanged("active", 1, 0, data, getRootReference());
+        emit Focus("", 0, 0, data, getRootReference());
         break;
     }
     case QAccessible::ObjectShow:
@@ -172,3 +182,11 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
     }
 }
 
+void QSpiAccessible::windowActivated()
+{
+    QDBusVariant data;
+    data.setVariant(QString());
+    emit Create("", 0, 0, data, getRootReference());
+    emit Restore("", 0, 0, data, getRootReference());
+    emit Activate("", 0, 0, data, getRootReference());
+}

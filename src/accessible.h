@@ -52,15 +52,26 @@ public:
 
     void signalChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data);
 
+    void windowActivated();
+
 Q_SIGNALS:
     void ChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
     void StateChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
     void PropertyChange(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Focus(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+
+    // window
+    void Activate(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Create(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Restore(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+
 
 private:
     static QDBusObjectPath getUnique();
     QSpiObjectReference getRootReference() const;
     QDBusConnection dbusConnection;
+
+    friend class QSpiAccessibleBridge;
 };
 
 #endif /* Q_SPI_ACCESSIBLE_H */

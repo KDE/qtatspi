@@ -42,6 +42,9 @@ public:
         virtual void setRootObject(QAccessibleInterface *obj);
         virtual void notifyAccessibilityUpdate(int reason, QAccessibleInterface *obj, int child);
 
+protected:
+        bool eventFilter(QObject *obj, QEvent *event);
+
 private:
         QString getAccessibilityBusAddress() const;
         QDBusConnection dbusConnection() const;

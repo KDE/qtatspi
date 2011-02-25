@@ -45,8 +45,10 @@ public:
 
     virtual QSpiObjectReference& getParentReference() const;
 
-    // TODO: do we care about events here?
-    virtual void accessibleEvent(QAccessible::Event event) { Q_UNUSED(event) }
+    virtual void accessibleEvent(QAccessible::Event event);
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event);
 
 private:
     QSpiObjectReference *accessibilityRegistry;

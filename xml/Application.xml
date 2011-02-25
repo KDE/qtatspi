@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <node name="/node">
 <interface name="org.a11y.atspi.Application">
@@ -6,7 +7,7 @@
 
   <property name="Version" type="s" access="read"/>
 
-  <property name="Id" type="i" access="read"/>
+  <property name="Id" type="i" access="readwrite"/>
 
   <method name="GetLocale">
     <arg direction="in" name="lctype" type="u"/>

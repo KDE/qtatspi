@@ -168,11 +168,11 @@ Q_DECLARE_METATYPE (QSpiAppUpdate)
 struct QSpiDeviceEvent {
     unsigned int type;
     int id;
-    short int hw_code;
-    short int modifiers;
-    short int timestamp;
-    QString event_string;
-    bool is_text;
+    int hardwareCode;
+    int modifiers;
+    int timestamp;
+    QString text;
+    bool isText;
 };
 
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiDeviceEvent &event);

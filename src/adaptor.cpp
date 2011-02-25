@@ -238,12 +238,14 @@ QString QSpiAdaptor::GetName(int index)
 
 int QSpiAdaptor::id() const
 {
-    return 0;
+    return property("Id").toInt();
 }
 
 QString QSpiAdaptor::toolkitName() const
 {
-    return QLatin1String("Qt");
+    qWarning() << "QSpiAdaptor::toolkitName FIXME: We pretend to be GAIL as toolkit. This is evil and needs fixing.";
+//    return QLatin1String("Qt");
+    return QLatin1String("GAIL");
 }
 
 QString QSpiAdaptor::version() const
@@ -319,7 +321,6 @@ QSpiObjectReference QSpiAdaptor::GetAccessibleAtPoint(int x, int y, uint coord_t
     Q_UNUSED (coord_type)
 
     QWidget* w = qApp->widgetAt(x,y);
-    qDebug() << "QSpiAdaptor::GetAccessibleAtPoint: " << w;
     if (w) {
         return cache->objectToAccessible(w)->getReference();
     } else {

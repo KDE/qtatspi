@@ -39,6 +39,12 @@ int ApplicationAdaptor::id() const
     return qvariant_cast< int >(parent()->property("Id"));
 }
 
+void ApplicationAdaptor::setId(int value)
+{
+    // set the value of property Id
+    parent()->setProperty("Id", qVariantFromValue(value));
+}
+
 QString ApplicationAdaptor::toolkitName() const
 {
     // get the value of property ToolkitName

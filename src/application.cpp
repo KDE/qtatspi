@@ -70,9 +70,31 @@ QSpiApplication::QSpiApplication(QSpiAccessibleCache  *cache,
         qDebug() << reply.error().message();
     }
     delete registry;
+
+    qApp->installEventFilter(this);
 }
 
 QSpiObjectReference &QSpiApplication::getParentReference() const
 {
     return *accessibilityRegistry;
+}
+
+void QSpiApplication::accessibleEvent(QAccessible::Event event)
+{
+    qDebug() << "Event in QSpiApplication: " << QString::number(event, 16);
+}
+
+bool QSpiApplication::eventFilter(QObject *obj, QEvent *event)
+{
+    if (!event->spontaneous())
+        return false;
+
+    if (event->type() == QEvent::WindowActivate) {
+        qDebug() << " Window activate: " << event->spontaneous() << obj;
+        QSpiObject* a = cache->objectToAccessible(obj);
+        QSpiAccessible* acc = static_cast<QSpiAccessible*>(a);
+        acc->windowActivated();
+    }
+
+    return false;
 }

@@ -9,8 +9,8 @@
  * before re-generating it.
  */
 
-#ifndef APPLICATION_ADAPTOR_H_1297240343
-#define APPLICATION_ADAPTOR_H_1297240343
+#ifndef APPLICATION_ADAPTOR_H_1298637724
+#define APPLICATION_ADAPTOR_H_1298637724
 
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
@@ -33,7 +33,7 @@ class ApplicationAdaptor: public QDBusAbstractAdaptor
 "  <interface name=\"org.a11y.atspi.Application\">\n"
 "    <property access=\"read\" type=\"s\" name=\"ToolkitName\"/>\n"
 "    <property access=\"read\" type=\"s\" name=\"Version\"/>\n"
-"    <property access=\"read\" type=\"i\" name=\"Id\"/>\n"
+"    <property access=\"readwrite\" type=\"i\" name=\"Id\"/>\n"
 "    <method name=\"GetLocale\">\n"
 "      <arg direction=\"in\" type=\"u\" name=\"lctype\"/>\n"
 "      <arg direction=\"out\" type=\"s\"/>\n"
@@ -57,8 +57,9 @@ public:
     { return static_cast<QSpiAdaptor *>(QObject::parent()); }
 
 public: // PROPERTIES
-    Q_PROPERTY(int Id READ id)
+    Q_PROPERTY(int Id READ id WRITE setId)
     int id() const;
+    void setId(int value);
 
     Q_PROPERTY(QString ToolkitName READ toolkitName)
     QString toolkitName() const;
