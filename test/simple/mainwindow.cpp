@@ -23,8 +23,5 @@ void MainWindow::createButton()
     button->setText("I am a new button");
     button->setAccessibleDescription("This is an accessible description for a button.");
     ui->centralWidget->layout()->addWidget(button);
-
-
-    qDebug() << "label child count: " << ui->label->children().count();
 }
 
