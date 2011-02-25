@@ -84,17 +84,70 @@ void QSpiApplication::accessibleEvent(QAccessible::Event event)
     qDebug() << "Event in QSpiApplication: " << QString::number(event, 16);
 }
 
+enum QSpiKeyEventType
+{
+      QSPI_KEY_EVENT_PRESS,
+      QSPI_KEY_EVENT_RELEASE,
+      QSPI_KEY_EVENT_LAST_DEFINED
+};
+
 bool QSpiApplication::eventFilter(QObject *obj, QEvent *event)
 {
     if (!event->spontaneous())
         return false;
 
-    if (event->type() == QEvent::WindowActivate) {
+    switch (event->type()) {
+        case QEvent::WindowActivate: {
         qDebug() << " Window activate: " << event->spontaneous() << obj;
         QSpiObject* a = cache->objectToAccessible(obj);
         QSpiAccessible* acc = static_cast<QSpiAccessible*>(a);
         acc->windowActivated();
+        break;
     }
 
+        case QEvent::KeyPress:
+        case QEvent::KeyRelease: {
+            QKeyEvent *keyEvent = static_cast <QKeyEvent *>(event);
+            QSpiDeviceEvent de;
+
+            if (event->type() == QEvent::KeyPress)
+                de.type = QSPI_KEY_EVENT_PRESS;
+            else
+                de.type = QSPI_KEY_EVENT_RELEASE;
+
+            de.id = keyEvent->nativeVirtualKey();
+            de.hardwareCode = keyEvent->nativeScanCode();
+
+            de.modifiers = keyEvent->nativeModifiers();
+            de.timestamp = QDateTime::currentMSecsSinceEpoch();
+
+            // FIXME: how to generate key strings?
+            if (keyEvent->key() == Qt::Key_Tab) {
+                de.text = "Tab";
+            } else {
+                de.text = keyEvent->text();
+            }
+
+            de.isText = !keyEvent->text().isEmpty();
+
+            qDebug() << "Key event text: " << de.isText << " " << de.text
+                     << " modifiers: " << keyEvent->modifiers()
+                     << " hardware code: " << de.hardwareCode
+                     << " native sc: " << keyEvent->nativeScanCode()
+                     << " native mod: " << keyEvent->nativeModifiers()
+                     << "native virt: " << keyEvent->nativeVirtualKey();
+
+            QDBusMessage m = QDBusMessage::createMethodCall("org.a11y.atspi.Registry",
+                                                            "/org/a11y/atspi/registry/deviceeventcontroller",
+                                                            "org.a11y.atspi.DeviceEventController", "NotifyListenersSync");
+            m.setArguments(QVariantList() <<QVariant::fromValue(de));
+            QDBusMessage reply = dbusConnection.call(m);
+
+            qDebug() << "QSpiApplication::eventFilter Key reply: " << reply.errorMessage() << reply.errorName() << reply.arguments();
+            break;
+    }
+        default:
+            break;
+    }
     return false;
 }
