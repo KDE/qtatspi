@@ -42,29 +42,20 @@
 #include "cache.h"
 #include "constant_mappings.h"
 
-/* --------------------------------------------------------------------------*/
-
-#define ACCESSIBLE_INTERFACE    getInterface()
-#define ACTION_INTERFACE        getInterface().actionInterface()
-#define TEXT_INTERFACE          getInterface().textInterface()
-#define EDITABLE_TEXT_INTERFACE getInterface().editableTextInterface()
-#define TABLE_INTERFACE         getInterface().tableInterface()
-#define VALUE_INTERFACE         getInterface().valueInterface()
-
 
 int QSpiAdaptor::childCount() const
 {
-    return ACCESSIBLE_INTERFACE.childCount();
+    return getInterface().childCount();
 }
 
 QString QSpiAdaptor::description() const
 {
-    return ACCESSIBLE_INTERFACE.text(QAccessible::Description, 0);
+    return getInterface().text(QAccessible::Description, 0);
 }
 
 QString QSpiAdaptor::name() const
 {
-    return ACCESSIBLE_INTERFACE.text(QAccessible::Name, 0);
+    return getInterface().text(QAccessible::Name, 0);
 }
 
 QSpiObjectReference QSpiAdaptor::parent() const
@@ -160,28 +151,28 @@ QSpiRelationArray QSpiAdaptor::GetRelationSet()
 
 uint QSpiAdaptor::GetRole()
 {
-    QAccessible::Role role = ACCESSIBLE_INTERFACE.role(0);
+    QAccessible::Role role = getInterface().role(0);
     return qSpiRoleMapping[role].spiRole();
 }
 
 QString QSpiAdaptor::GetRoleName()
 {
-    return qSpiRoleMapping[ACCESSIBLE_INTERFACE.role(0)].name();
+    return qSpiRoleMapping[getInterface().role(0)].name();
 }
 
 QSpiUIntList QSpiAdaptor::GetState()
 {
-    return qSpiStatesetFromQState(ACCESSIBLE_INTERFACE.state(0));
+    return qSpiStatesetFromQState(getInterface().state(0));
 }
 
 int QSpiAdaptor::nActions() const
 {
-    return ACTION_INTERFACE->actionCount();
+    return getInterface().actionInterface()->actionCount();
 }
 
 bool QSpiAdaptor::DoAction(int index)
 {
-    ACTION_INTERFACE->doAction(index);
+    getInterface().actionInterface()->doAction(index);
     return TRUE;
 }
 
@@ -191,15 +182,15 @@ bool QSpiAdaptor::DoAction(int index)
 QSpiActionArray QSpiAdaptor::GetActions()
 {
     QSpiActionArray index;
-    for (int i = 0; i < ACTION_INTERFACE->actionCount(); i++)
+    for (int i = 0; i < getInterface().actionInterface()->actionCount(); i++)
     {
         QSpiAction action;
         QStringList keyBindings;
 
-        action.name = ACTION_INTERFACE->name (i);
-        action.description = ACTION_INTERFACE->description (i);
+        action.name = getInterface().actionInterface()->name (i);
+        action.description = getInterface().actionInterface()->description (i);
 
-        keyBindings = ACTION_INTERFACE->keyBindings (i);
+        keyBindings = getInterface().actionInterface()->keyBindings (i);
 
         if (keyBindings.length() > 0)
                 action.keyBinding = keyBindings[0];
@@ -213,14 +204,14 @@ QSpiActionArray QSpiAdaptor::GetActions()
 
 QString QSpiAdaptor::GetDescription(int index)
 {
-    return ACTION_INTERFACE->description (index);
+    return getInterface().actionInterface()->description (index);
 }
 
 QString QSpiAdaptor::GetKeyBinding(int index)
 {
     QStringList keyBindings;
 
-    keyBindings = ACTION_INTERFACE->keyBindings (index);
+    keyBindings = getInterface().actionInterface()->keyBindings (index);
     /* Might as well return the first key binding, what are the other options? */
     if (keyBindings.length() > 0)
         return keyBindings[0];
@@ -230,7 +221,7 @@ QString QSpiAdaptor::GetKeyBinding(int index)
 
 QString QSpiAdaptor::GetName(int index)
 {
-    return ACTION_INTERFACE->name(index);
+    return getInterface().actionInterface()->name(index);
 }
 
 /* AT-SPI Application interface ---------------------------------------------*/
@@ -311,9 +302,9 @@ static QRect getRelativeRect(QAccessibleInterface &interface)
 bool QSpiAdaptor::Contains(int x, int y, uint coord_type)
 {
     if (coord_type == 0)
-        return ACCESSIBLE_INTERFACE.rect(0).contains(x, y);
+        return getInterface().rect(0).contains(x, y);
     else
-        return getRelativeRect(ACCESSIBLE_INTERFACE).contains(x, y);
+        return getRelativeRect(getInterface()).contains(x, y);
 }
 
 QSpiObjectReference QSpiAdaptor::GetAccessibleAtPoint(int x, int y, uint coord_type)
@@ -343,9 +334,9 @@ QSpiRect QSpiAdaptor::GetExtents(uint coord_type)
     QSpiRect val;
 
     if (coord_type == 0)
-        rect = ACCESSIBLE_INTERFACE.rect(0);
+        rect = getInterface().rect(0);
     else
-        rect = getRelativeRect (ACCESSIBLE_INTERFACE);
+        rect = getRelativeRect (getInterface());
 
     val.x = rect.x ();
     val.y = rect.y ();
@@ -370,16 +361,16 @@ int QSpiAdaptor::GetPosition(uint coord_type, int &y)
 {
     QRect rect;
     if (coord_type == 0)
-        rect = ACCESSIBLE_INTERFACE.rect(0);
+        rect = getInterface().rect(0);
     else
-        rect = getRelativeRect (ACCESSIBLE_INTERFACE);
+        rect = getRelativeRect (getInterface());
     y = rect.y ();
     return rect.x ();
 }
 
 int QSpiAdaptor::GetSize(int &height)
 {
-    QRect rect = ACCESSIBLE_INTERFACE.rect(0);
+    QRect rect = getInterface().rect(0);
     height = rect.height ();
     return rect.width ();
 }
@@ -396,18 +387,18 @@ bool QSpiAdaptor::GrabFocus()
 
 void QSpiAdaptor::CopyText(int startPos, int endPos)
 {
-    return EDITABLE_TEXT_INTERFACE->copyText (startPos, endPos);
+    return getInterface().editableTextInterface()->copyText (startPos, endPos);
 }
 
 bool QSpiAdaptor::CutText(int startPos, int endPos)
 {
-    EDITABLE_TEXT_INTERFACE->cutText (startPos, endPos);
+    getInterface().editableTextInterface()->cutText (startPos, endPos);
     return TRUE;
 }
 
 bool QSpiAdaptor::DeleteText(int startPos, int endPos)
 {
-    EDITABLE_TEXT_INTERFACE->deleteText (startPos, endPos);
+    getInterface().editableTextInterface()->deleteText (startPos, endPos);
     return TRUE;
 }
 
@@ -415,19 +406,19 @@ bool QSpiAdaptor::InsertText(int position, const QString &text, int length)
 {
     QString resized (text);
     resized.resize(length);
-    EDITABLE_TEXT_INTERFACE->insertText (position, text);
+    getInterface().editableTextInterface()->insertText (position, text);
     return TRUE;
 }
 
 bool QSpiAdaptor::PasteText(int position)
 {
-    EDITABLE_TEXT_INTERFACE->pasteText (position);
+    getInterface().editableTextInterface()->pasteText (position);
     return TRUE;
 }
 
 bool QSpiAdaptor::SetTextContents(const QString &newContents)
 {
-    EDITABLE_TEXT_INTERFACE->replaceText (0, TEXT_INTERFACE->characterCount(), newContents);
+    getInterface().editableTextInterface()->replaceText (0, getInterface().textInterface()->characterCount(), newContents);
     return TRUE;
 }
 
@@ -439,76 +430,76 @@ bool QSpiAdaptor::SetTextContents(const QString &newContents)
 
 QSpiObjectReference QSpiAdaptor::caption() const
 {
-    return cache->objectToAccessible (TABLE_INTERFACE->caption()->object())->getReference();
+    return cache->objectToAccessible (getInterface().tableInterface()->caption()->object())->getReference();
 }
 
 int QSpiAdaptor::nColumns() const
 {
-    return TABLE_INTERFACE->columnCount ();
+    return getInterface().tableInterface()->columnCount ();
 }
 
 int QSpiAdaptor::nRows() const
 {
-    return TABLE_INTERFACE->rowCount ();
+    return getInterface().tableInterface()->rowCount ();
 }
 
 int QSpiAdaptor::nSelectedColumns() const
 {
-    return TABLE_INTERFACE->selectedColumnCount ();
+    return getInterface().tableInterface()->selectedColumnCount ();
 }
 
 int QSpiAdaptor::nSelectedRows() const
 {
-    return TABLE_INTERFACE->selectedRowCount ();
+    return getInterface().tableInterface()->selectedRowCount ();
 }
 
 QSpiObjectReference QSpiAdaptor::summary() const
 {
-    return cache->objectToAccessible (TABLE_INTERFACE->summary()->object())->getReference();
+    return cache->objectToAccessible (getInterface().tableInterface()->summary()->object())->getReference();
 }
 
 bool QSpiAdaptor::AddColumnSelection(int column)
 {
-    TABLE_INTERFACE->selectColumn (column);
+    getInterface().tableInterface()->selectColumn (column);
     return TRUE;
 }
 
 bool QSpiAdaptor::AddRowSelection(int row)
 {
-    TABLE_INTERFACE->selectRow (row);
+    getInterface().tableInterface()->selectRow (row);
     return TRUE;
 }
 
 QSpiObjectReference QSpiAdaptor::GetAccessibleAt(int row, int column)
 {
-    return cache->objectToAccessible (TABLE_INTERFACE->accessibleAt(row, column)->object())->getReference();
+    return cache->objectToAccessible (getInterface().tableInterface()->accessibleAt(row, column)->object())->getReference();
 }
 
 int QSpiAdaptor::GetColumnAtIndex(int index)
 {
-    return TABLE_INTERFACE->columnIndex (index);
+    return getInterface().tableInterface()->columnIndex (index);
 }
 
 QString QSpiAdaptor::GetColumnDescription(int column)
 {
-    return TABLE_INTERFACE->columnDescription (column);
+    return getInterface().tableInterface()->columnDescription (column);
 }
 
 int QSpiAdaptor::GetColumnExtentAt(int row, int column)
 {
-    return TABLE_INTERFACE->columnSpan (row, column);
+    return getInterface().tableInterface()->columnSpan (row, column);
 }
 
 QSpiObjectReference QSpiAdaptor::GetColumnHeader(int column)
 {
     Q_UNUSED (column);
     // TODO There should be a column param in this function right?
-    return cache->objectToAccessible (TABLE_INTERFACE->columnHeader()->object())->getReference();
+    return cache->objectToAccessible (getInterface().tableInterface()->columnHeader()->object())->getReference();
 }
 
 int QSpiAdaptor::GetIndexAt(int row, int column)
 {
-    return TABLE_INTERFACE->childIndex (row, column);
+    return getInterface().tableInterface()->childIndex (row, column);
 }
 
 int QSpiAdaptor::GetRowAtIndex(int index)
@@ -516,7 +507,7 @@ int QSpiAdaptor::GetRowAtIndex(int index)
     int row, column, rowSpan, columnSpan;
     bool isSelected;
 
-    TABLE_INTERFACE->cellAtIndex (index, &row, &column, &rowSpan, &columnSpan, &isSelected);
+    getInterface().tableInterface()->cellAtIndex (index, &row, &column, &rowSpan, &columnSpan, &isSelected);
     return row;
 }
 
@@ -530,13 +521,13 @@ bool QSpiAdaptor::GetRowColumnExtentsAtIndex(int index,
     int row0, column, rowSpan, columnSpan;
     bool isSelected;
 
-    TABLE_INTERFACE->cellAtIndex (index, &row0, &column, &rowSpan, &columnSpan, &isSelected);
+    getInterface().tableInterface()->cellAtIndex (index, &row0, &column, &rowSpan, &columnSpan, &isSelected);
     row = row0;
     col = column;
     row_extents = rowSpan;
     col_extents = columnSpan;
     is_selected = isSelected;
-    if (index < ACCESSIBLE_INTERFACE.childCount())
+    if (index < getInterface().childCount())
         return TRUE;
     else
         return FALSE;
@@ -544,59 +535,59 @@ bool QSpiAdaptor::GetRowColumnExtentsAtIndex(int index,
 
 QString QSpiAdaptor::GetRowDescription(int row)
 {
-    return TABLE_INTERFACE->rowDescription (row);
+    return getInterface().tableInterface()->rowDescription (row);
 }
 
 int QSpiAdaptor::GetRowExtentAt(int row, int column)
 {
-    return TABLE_INTERFACE->rowSpan (row, column);
+    return getInterface().tableInterface()->rowSpan (row, column);
 }
 
 QSpiObjectReference QSpiAdaptor::GetRowHeader(int row)
 {
     Q_UNUSED (row);
     // TODO There should be a row param here right?
-    return cache->objectToAccessible (TABLE_INTERFACE->rowHeader()->object())->getReference();
+    return cache->objectToAccessible (getInterface().tableInterface()->rowHeader()->object())->getReference();
 }
 
 QSpiIntList QSpiAdaptor::GetSelectedColumns()
 {
     QSpiIntList columns;
-    TABLE_INTERFACE->selectedColumns (MAX_SELECTED_COLUMNS, &columns);
+    getInterface().tableInterface()->selectedColumns (MAX_SELECTED_COLUMNS, &columns);
     return columns;
 }
 
 QSpiIntList QSpiAdaptor::GetSelectedRows()
 {
     QSpiIntList rows;
-    TABLE_INTERFACE->selectedRows (MAX_SELECTED_ROWS, &rows);
+    getInterface().tableInterface()->selectedRows (MAX_SELECTED_ROWS, &rows);
     return rows;
 }
 
 bool QSpiAdaptor::IsColumnSelected(int column)
 {
-    return TABLE_INTERFACE->isColumnSelected (column);
+    return getInterface().tableInterface()->isColumnSelected (column);
 }
 
 bool QSpiAdaptor::IsRowSelected(int row)
 {
-    return TABLE_INTERFACE->isRowSelected (row);
+    return getInterface().tableInterface()->isRowSelected (row);
 }
 
 bool QSpiAdaptor::IsSelected(int row, int column)
 {
-    return TABLE_INTERFACE->isSelected (row, column);
+    return getInterface().tableInterface()->isSelected (row, column);
 }
 
 bool QSpiAdaptor::RemoveColumnSelection(int column)
 {
-    TABLE_INTERFACE->unselectColumn (column);
+    getInterface().tableInterface()->unselectColumn (column);
     return TRUE;
 }
 
 bool QSpiAdaptor::RemoveRowSelection(int row)
 {
-    TABLE_INTERFACE->unselectRow (row);
+    getInterface().tableInterface()->unselectRow (row);
     return TRUE;
 }
 
@@ -605,18 +596,18 @@ bool QSpiAdaptor::RemoveRowSelection(int row)
 
 int QSpiAdaptor::caretOffset() const
 {
-    return TEXT_INTERFACE->cursorPosition();
+    return getInterface().textInterface()->cursorPosition();
 }
 
 int QSpiAdaptor::characterCount() const
 {
-    return TEXT_INTERFACE->cursorPosition();
+    return getInterface().textInterface()->cursorPosition();
 }
 
 bool QSpiAdaptor::AddSelection(int startOffset, int endOffset)
 {
-    int lastSelection = TEXT_INTERFACE->selectionCount ();
-    TEXT_INTERFACE->setSelection (lastSelection, startOffset, endOffset);
+    int lastSelection = getInterface().textInterface()->selectionCount ();
+    getInterface().textInterface()->setSelection (lastSelection, startOffset, endOffset);
     return true;
 }
 
@@ -643,7 +634,7 @@ QString QSpiAdaptor::GetAttributeValue(int offset,
 
     endOffsetCopy = endOffset;
     startOffsetCopy = startOffset;
-    joined = TEXT_INTERFACE->attributes(offset, &startOffsetCopy, &endOffsetCopy);
+    joined = getInterface().textInterface()->attributes(offset, &startOffsetCopy, &endOffsetCopy);
     attributes = joined.split (';', QString::SkipEmptyParts, Qt::CaseSensitive);
     foreach (QString attr, attributes)
     {
@@ -670,7 +661,7 @@ QSpiAttributeSet QSpiAdaptor::GetAttributes(int offset, int &startOffset, int &e
 
     endOffsetCopy = endOffset;
     startOffsetCopy = startOffset;
-    joined = TEXT_INTERFACE->attributes(offset, &startOffset, &endOffsetCopy);
+    joined = getInterface().textInterface()->attributes(offset, &startOffset, &endOffsetCopy);
     attributes = joined.split (';', QString::SkipEmptyParts, Qt::CaseSensitive);
     foreach (QString attr, attributes)
     {
@@ -703,7 +694,7 @@ int QSpiAdaptor::GetCharacterAtOffset(int offset)
 {
     int start=offset, end=offset+1;
     QString result;
-    result = TEXT_INTERFACE->textAtOffset(offset, QAccessible2::CharBoundary, &start, &end);
+    result = getInterface().textInterface()->textAtOffset(offset, QAccessible2::CharBoundary, &start, &end);
     return *(qPrintable (result));
 }
 
@@ -734,12 +725,12 @@ QSpiAttributeSet QSpiAdaptor::GetDefaultAttributes()
 
 int QSpiAdaptor::GetNSelections()
 {
-    return TEXT_INTERFACE->selectionCount();
+    return getInterface().textInterface()->selectionCount();
 }
 
 int QSpiAdaptor::GetOffsetAtPoint(int x, int y, uint coordType)
 {
-    return TEXT_INTERFACE->offsetAtPoint (QPoint (x, y), static_cast <QAccessible2::CoordinateType> (coordType));
+    return getInterface().textInterface()->offsetAtPoint (QPoint (x, y), static_cast <QAccessible2::CoordinateType> (coordType));
 }
 
 int QSpiAdaptor::GetRangeExtents(int startOffset, int endOffset, uint coordType, int &y, int &width, int &height)
@@ -757,68 +748,52 @@ int QSpiAdaptor::GetRangeExtents(int startOffset, int endOffset, uint coordType,
 int QSpiAdaptor::GetSelection(int selectionNum, int &endOffset)
 {
     int start, end;
-    TEXT_INTERFACE->selection (selectionNum, &start, &end);
+    getInterface().textInterface()->selection (selectionNum, &start, &end);
     endOffset = end;
     return start;
 }
 
 QString QSpiAdaptor::GetText(int startOffset, int endOffset)
 {
-    return TEXT_INTERFACE->text (startOffset, endOffset);
+    return getInterface().textInterface()->text(startOffset, endOffset);
 }
 
 QString QSpiAdaptor::GetTextAfterOffset(int offset, uint type, int &startOffset, int &endOffset)
 {
-    // TODO
-    Q_UNUSED (type);
-    Q_UNUSED (startOffset);
-    Q_UNUSED (offset)
-    Q_UNUSED (endOffset);
-    return 0;
+    // FIXME find out if IA2 types are the same as the ones in at-spi
+    return getInterface().textInterface()->textAfterOffset(offset, (QAccessible2::BoundaryType)type, &startOffset, &endOffset);
 }
 
 QString QSpiAdaptor::GetTextAtOffset(int offset, uint type, int &startOffset, int &endOffset)
 {
-    // TODO
-    Q_UNUSED (type);
-    Q_UNUSED (startOffset);
-    Q_UNUSED (offset)
-    Q_UNUSED (endOffset);
-    return 0;
+    // FIXME find out if IA2 types are the same as the ones in at-spi
+    QAccessibleTextInterface * t = getInterface().textInterface();
+    QString text = t->textAtOffset(offset, (QAccessible2::BoundaryType)type, &startOffset, &endOffset);
+    return text;
 }
 
 QString QSpiAdaptor::GetTextBeforeOffset(int offset, uint type, int &startOffset, int &endOffset)
 {
-    // TODO
-    Q_UNUSED (type);
-    Q_UNUSED (startOffset);
-    Q_UNUSED (offset)
-    Q_UNUSED (endOffset);
-    return 0;
+    // FIXME find out if IA2 types are the same as the ones in at-spi
+    return getInterface().textInterface()->textBeforeOffset(offset, (QAccessible2::BoundaryType)type, &startOffset, &endOffset);
 }
 
 bool QSpiAdaptor::RemoveSelection(int selectionNum)
 {
-    Q_UNUSED(selectionNum)
-    qWarning("Not implemented: QSpiAdaptor::RemoveSelection");
-    bool out0 = false;
-    return out0;
+    getInterface().textInterface()->removeSelection(selectionNum);
+    return true;
 }
 
 bool QSpiAdaptor::SetCaretOffset(int offset)
 {
-    Q_UNUSED(offset)
-    qWarning("Not implemented: QSpiAdaptor::SetCaretOffset");
-    bool out0 = false;
-    return out0;
+    getInterface().textInterface()->setCursorPosition(offset);
+    return true;
 }
 
 bool QSpiAdaptor::SetSelection(int selectionNum, int startOffset, int endOffset)
 {
-    Q_UNUSED(selectionNum) Q_UNUSED(startOffset) Q_UNUSED(endOffset)
-    qWarning("Not implemented: QSpiAdaptor::SetSelection");
-    bool out0 = false;
-    return out0;
+    getInterface().textInterface()->setSelection(selectionNum, startOffset, endOffset);
+    return true;
 }
 
 /* AT-SPI Value interface ---------------------------------------------------*/
@@ -828,7 +803,7 @@ double QSpiAdaptor::currentValue() const
 {
     double val;
     bool success;
-    val = VALUE_INTERFACE->currentValue().toDouble (&success);
+    val = getInterface().valueInterface()->currentValue().toDouble (&success);
     if (success)
     {
         return val;
@@ -842,14 +817,14 @@ double QSpiAdaptor::currentValue() const
 
 void QSpiAdaptor::setCurrentValue(double value)
 {
-    VALUE_INTERFACE->setCurrentValue(QVariant (value));
+    getInterface().valueInterface()->setCurrentValue(QVariant (value));
 }
 
 double QSpiAdaptor::maximumValue() const
 {
     double val;
     bool success;
-    val = VALUE_INTERFACE->maximumValue().toDouble (&success);
+    val = getInterface().valueInterface()->maximumValue().toDouble (&success);
     if (success)
     {
         return val;
@@ -870,7 +845,7 @@ double QSpiAdaptor::minimumValue() const
 {
     double val;
     bool success;
-    val = VALUE_INTERFACE->minimumValue().toDouble (&success);
+    val = getInterface().valueInterface()->minimumValue().toDouble (&success);
     if (success)
     {
         return val;
