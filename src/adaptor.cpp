@@ -718,9 +718,8 @@ QSpiAttributeSet QSpiAdaptor::GetDefaultAttributeSet()
 
 QSpiAttributeSet QSpiAdaptor::GetDefaultAttributes()
 {
-    // TODO This function should be removed. It is deprecated in favour of default attribute set.
-    QSpiAttributeSet attributes;
-    return attributes;
+    // Deprecated in favour of default attribute set.
+    return GetDefaultAttributeSet();
 }
 
 int QSpiAdaptor::GetNSelections()
