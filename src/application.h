@@ -50,6 +50,10 @@ public:
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
 
+private Q_SLOTS:
+    void keyEventCallback(const QDBusMessage& message);
+    void keyEventError(const QDBusError& error, const QDBusMessage& message);
+
 private:
     QSpiObjectReference *accessibilityRegistry;
     QDBusConnection dbusConnection;

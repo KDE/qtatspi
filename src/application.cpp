@@ -104,7 +104,6 @@ bool QSpiApplication::eventFilter(QObject *obj, QEvent *event)
         acc->windowActivated();
         break;
     }
-
         case QEvent::KeyPress:
         case QEvent::KeyRelease: {
             QKeyEvent *keyEvent = static_cast <QKeyEvent *>(event);
@@ -128,10 +127,10 @@ bool QSpiApplication::eventFilter(QObject *obj, QEvent *event)
                 de.text = keyEvent->text();
             }
 
+            // FIXME
             de.isText = !keyEvent->text().isEmpty();
 
-            qDebug() << "Key event text: " << de.isText << " " << de.text
-                     << " modifiers: " << keyEvent->modifiers()
+            qDebug() << "Key event text: " << event->type() << de.isText << " " << de.text
                      << " hardware code: " << de.hardwareCode
                      << " native sc: " << keyEvent->nativeScanCode()
                      << " native mod: " << keyEvent->nativeModifiers()
@@ -141,13 +140,36 @@ bool QSpiApplication::eventFilter(QObject *obj, QEvent *event)
                                                             "/org/a11y/atspi/registry/deviceeventcontroller",
                                                             "org.a11y.atspi.DeviceEventController", "NotifyListenersSync");
             m.setArguments(QVariantList() <<QVariant::fromValue(de));
-            QDBusMessage reply = dbusConnection.call(m);
 
-            qDebug() << "QSpiApplication::eventFilter Key reply: " << reply.errorMessage() << reply.errorName() << reply.arguments();
+            // FIXME: this is critical, the timeout should probably be pretty low to allow normal processing
+            int timeout = -1;
+            bool sent = dbusConnection.callWithCallback(m, this, SLOT(notifyKeyboardListenerCallback(QDBusMessage)),
+                                                        SLOT(notifyKeyboardListenerError(QDBusError, QDBusMessage)), timeout);
+            if (!sent)
+                return false;
+
+            //queue the event and send it after callback
+            //return true;
             break;
     }
         default:
             break;
     }
     return false;
+}
+
+void QSpiApplication::notifyKeyboardListenerCallback(const QDBusMessage& message)
+{
+    qDebug() << "QSpiApplication::keyEventCallback" << message.arguments().at(0).toBool();
+    Q_ASSERT(message.arguments().length() == 1);
+    if (message.arguments().at(0).toBool() == true) {
+        qDebug() << " Special key, INTERRUPT processing!";
+    } else {
+        // send pending key events
+    }
+}
+
+void QSpiApplication::notifyKeyboardListenerError(const QDBusError&, const QDBusMessage& message)
+{
+    qWarning() << "QSpiApplication::keyEventError " << message.errorName() << message.errorMessage();
 }
