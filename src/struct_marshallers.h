@@ -30,10 +30,10 @@
 /*---------------------------------------------------------------------------*/
 
 typedef QList <int> QSpiIntList;
-Q_DECLARE_METATYPE (QSpiIntList);
+Q_DECLARE_METATYPE(QSpiIntList)
 
 typedef QList <uint> QSpiUIntList;
-Q_DECLARE_METATYPE (QSpiUIntList);
+Q_DECLARE_METATYPE(QSpiUIntList)
 
 /* QSpiObjectReference */
 /*---------------------------------------------------------------------------*/
@@ -49,7 +49,7 @@ struct QSpiObjectReference
         : name(name), path(path) {}
 };
 
-Q_DECLARE_METATYPE(QSpiObjectReference);
+Q_DECLARE_METATYPE(QSpiObjectReference)
 
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiObjectReference &address);
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiObjectReference &address);
@@ -59,7 +59,7 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiObjectReferen
 /*---------------------------------------------------------------------------*/
 typedef QList <QSpiObjectReference> QSpiObjectReferenceArray;
 
-Q_DECLARE_METATYPE (QSpiObjectReferenceArray);
+Q_DECLARE_METATYPE(QSpiObjectReferenceArray)
 
 /* QSpiAccessibleCacheArray */
 /*---------------------------------------------------------------------------*/
@@ -79,8 +79,8 @@ struct QSpiAccessibleCacheItem
 
 typedef QList <QSpiAccessibleCacheItem> QSpiAccessibleCacheArray;
 
-Q_DECLARE_METATYPE (QSpiAccessibleCacheItem);
-Q_DECLARE_METATYPE (QSpiAccessibleCacheArray);
+Q_DECLARE_METATYPE(QSpiAccessibleCacheItem)
+Q_DECLARE_METATYPE(QSpiAccessibleCacheArray)
 
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAccessibleCacheItem &item);
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAccessibleCacheItem &item);
@@ -97,8 +97,8 @@ struct QSpiAction
 
 typedef QList <QSpiAction> QSpiActionArray;
 
-Q_DECLARE_METATYPE (QSpiAction);
-Q_DECLARE_METATYPE (QSpiActionArray);
+Q_DECLARE_METATYPE(QSpiAction)
+Q_DECLARE_METATYPE(QSpiActionArray)
 
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAction &action);
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAction &action);
@@ -107,7 +107,7 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAction &actio
 /*---------------------------------------------------------------------------*/
 
 typedef QList < QMap < unsigned int, QSpiObjectReference > > QSpiRelationArray;
-Q_DECLARE_METATYPE(QSpiRelationArray);
+Q_DECLARE_METATYPE(QSpiRelationArray)
 
 /* QSpiRangeList */
 /*---------------------------------------------------------------------------*/
@@ -132,7 +132,7 @@ struct QSpiRect
     int height;
 };
 
-Q_DECLARE_METATYPE (QSpiRect);
+Q_DECLARE_METATYPE(QSpiRect)
 
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiRect &rect);
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiRect &rect);
@@ -142,7 +142,7 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiRect &rect);
 
 typedef QMap <QString, QString> QSpiAttributeSet;
 
-Q_DECLARE_METATYPE (QSpiAttributeSet);
+Q_DECLARE_METATYPE(QSpiAttributeSet)
 
 /* QSpiAppUpdate */
 /*---------------------------------------------------------------------------*/
@@ -160,7 +160,7 @@ struct QSpiAppUpdate {
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAppUpdate &update);
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAppUpdate &update);
 
-Q_DECLARE_METATYPE (QSpiAppUpdate)
+Q_DECLARE_METATYPE(QSpiAppUpdate)
 
 /* QSpiDeviceEvent */
 /*---------------------------------------------------------------------------*/
@@ -178,7 +178,7 @@ struct QSpiDeviceEvent {
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiDeviceEvent &event);
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiDeviceEvent &event);
 
-Q_DECLARE_METATYPE (QSpiDeviceEvent)
+Q_DECLARE_METATYPE(QSpiDeviceEvent)
 
 /*---------------------------------------------------------------------------*/
 
