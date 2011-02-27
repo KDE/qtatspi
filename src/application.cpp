@@ -128,7 +128,7 @@ bool QSpiApplication::eventFilter(QObject *obj, QEvent *event)
             }
 
             // FIXME
-            de.isText = !keyEvent->text().isEmpty();
+            de.isText = !keyEvent->text().trimmed().isEmpty();
 
             qDebug() << "Key event text: " << event->type() << de.isText << " " << de.text
                      << " hardware code: " << de.hardwareCode
