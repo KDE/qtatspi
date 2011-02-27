@@ -168,7 +168,7 @@ void QSpiApplication::notifyKeyboardListenerCallback(const QDBusMessage& message
     }
 }
 
-void QSpiApplication::notifyKeyboardListenerError(const QDBusError&, const QDBusMessage& message)
+void QSpiApplication::notifyKeyboardListenerError(const QDBusError& error, const QDBusMessage& /*message*/)
 {
-    qWarning() << "QSpiApplication::keyEventError " << message.errorName() << message.errorMessage();
+    qWarning() << "QSpiApplication::keyEventError " << error.name() << error.message();
 }
