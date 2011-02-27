@@ -55,8 +55,9 @@ private Q_SLOTS:
     void notifyKeyboardListenerError(const QDBusError& error, const QDBusMessage& message);
 
 private:
-    QSpiObjectReference *accessibilityRegistry;
+    void callAccessibilityRegistry();
     QDBusConnection dbusConnection;
+    QSpiObjectReference *accessibilityRegistry;
 };
 
 #endif

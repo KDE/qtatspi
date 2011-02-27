@@ -32,17 +32,13 @@
 
 #define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
 
-
 QSpiApplication::QSpiApplication(QSpiAccessibleCache  *cache,
                                  QAccessibleInterface *interface,
                                  QDBusConnection c)
-    :QSpiAdaptor(cache, interface), dbusConnection(c)
+    :QSpiAdaptor(cache, interface), dbusConnection(c), accessibilityRegistry(0)
 {
-    SocketProxy *registry;
-    QDBusPendingReply <QSpiObjectReference> reply;
-
-    reference = new QSpiObjectReference (dbusConnection.baseService(),
-                                               QDBusObjectPath (QSPI_OBJECT_PATH_ROOT));
+    reference = new QSpiObjectReference(dbusConnection.baseService(),
+           QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
 
     new AccessibleAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;
@@ -51,18 +47,24 @@ QSpiApplication::QSpiApplication(QSpiAccessibleCache  *cache,
     supportedInterfaces << QSPI_INTERFACE_APPLICATION;
 
     dbusConnection.registerObject(reference->path.path(),
-                                                 this,
-                                                 QDBusConnection::ExportAdaptors);
+                                  this, QDBusConnection::ExportAdaptors);
 
-    /* Plug in to the desktop socket */
-    registry = new SocketProxy (QSPI_REGISTRY_NAME,
-                             QSPI_OBJECT_PATH_ROOT,
-                             dbusConnection);
+    callAccessibilityRegistry();
+    qApp->installEventFilter(this);
+}
+
+void QSpiApplication::callAccessibilityRegistry()
+{
+    SocketProxy *registry;
+    registry = new SocketProxy(QSPI_REGISTRY_NAME,
+                               QSPI_OBJECT_PATH_ROOT, dbusConnection);
+
+    QDBusPendingReply<QSpiObjectReference> reply;
     reply = registry->Embed(getReference());
     reply.waitForFinished();
     if (reply.isValid ()) {
-        const QSpiObjectReference &_socket = reply.value();
-        accessibilityRegistry = new QSpiObjectReference(_socket);
+        const QSpiObjectReference &socket = reply.value();
+        accessibilityRegistry = new QSpiObjectReference(socket);
     } else {
         accessibilityRegistry = new QSpiObjectReference();
         qDebug() << "Error in contacting registry";
@@ -70,8 +72,6 @@ QSpiApplication::QSpiApplication(QSpiAccessibleCache  *cache,
         qDebug() << reply.error().message();
     }
     delete registry;
-
-    qApp->installEventFilter(this);
 }
 
 QSpiObjectReference &QSpiApplication::getParentReference() const
@@ -84,8 +84,7 @@ void QSpiApplication::accessibleEvent(QAccessible::Event event)
     qDebug() << "Event in QSpiApplication: " << QString::number(event, 16);
 }
 
-enum QSpiKeyEventType
-{
+enum QSpiKeyEventType {
       QSPI_KEY_EVENT_PRESS,
       QSPI_KEY_EVENT_RELEASE,
       QSPI_KEY_EVENT_LAST_DEFINED
