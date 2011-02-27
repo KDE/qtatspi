@@ -378,7 +378,15 @@ int QSpiAdaptor::GetSize(int &height)
 bool QSpiAdaptor::GrabFocus()
 {
     // TODO This does not seem to be supported by QAccessibleInterface.
-    // THIS COULD CAUSE PROBLEMS
+    // FIXME: raise the window to make it active also?
+    // FIXME: graphics/qml items
+
+    if (interface->object()->isWidgetType()) {
+        QWidget* w = static_cast<QWidget*>(interface->object());
+        w->setFocus(Qt::OtherFocusReason);
+        return true;
+    }
+
     return false;
 }
 
@@ -837,6 +845,7 @@ double QSpiAdaptor::maximumValue() const
 
 double QSpiAdaptor::minimumIncrement() const
 {
+    // FIXME: should be in value interface
     return 0.0;
 }
 
