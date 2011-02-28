@@ -762,6 +762,8 @@ int QSpiAdaptor::GetSelection(int selectionNum, int &endOffset)
 
 QString QSpiAdaptor::GetText(int startOffset, int endOffset)
 {
+    if (endOffset == -1)
+        endOffset = interface->textInterface()->characterCount();
     return getInterface().textInterface()->text(startOffset, endOffset);
 }
 
