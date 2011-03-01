@@ -39,9 +39,7 @@ class QSpiApplication : public QSpiAdaptor
     Q_OBJECT
 
 public:
-    QSpiApplication(QSpiAccessibleCache  *cache,
-                    QAccessibleInterface *interface,
-                    QDBusConnection c);
+    QSpiApplication(QAccessibleInterface *interface);
 
     virtual QSpiObjectReference& getParentReference() const;
 
@@ -56,7 +54,6 @@ private Q_SLOTS:
 
 private:
     void callAccessibilityRegistry();
-    QDBusConnection dbusConnection;
     QSpiObjectReference *accessibilityRegistry;
 };
 

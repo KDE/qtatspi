@@ -33,9 +33,8 @@ class QSpiAdaptor :public QSpiObject
 {
     Q_OBJECT
 public:
-    QSpiAdaptor(QSpiAccessibleCache  *cache,
-                QAccessibleInterface *interface)
-        : QSpiObject(cache, interface) {}
+    QSpiAdaptor(QAccessibleInterface *interface)
+        : QSpiObject(interface) {}
 
 /* AT-SPI Accessible interface */
 public:

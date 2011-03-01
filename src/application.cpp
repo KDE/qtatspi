@@ -24,6 +24,7 @@
 
 #include "accessible.h"
 #include "application.h"
+#include "bridge.h"
 #include "cache.h"
 
 #include "generated/accessible_adaptor.h"
@@ -32,12 +33,10 @@
 
 #define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
 
-QSpiApplication::QSpiApplication(QSpiAccessibleCache  *cache,
-                                 QAccessibleInterface *interface,
-                                 QDBusConnection c)
-    :QSpiAdaptor(cache, interface), dbusConnection(c), accessibilityRegistry(0)
+QSpiApplication::QSpiApplication(QAccessibleInterface *interface)
+    :QSpiAdaptor(interface), accessibilityRegistry(0)
 {
-    reference = new QSpiObjectReference(dbusConnection.baseService(),
+    reference = new QSpiObjectReference(spiBridge->dBusConnection().baseService(),
            QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
 
     new AccessibleAdaptor(this);
@@ -46,7 +45,7 @@ QSpiApplication::QSpiApplication(QSpiAccessibleCache  *cache,
     new ApplicationAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_APPLICATION;
 
-    dbusConnection.registerObject(reference->path.path(),
+    spiBridge->dBusConnection().registerObject(reference->path.path(),
                                   this, QDBusConnection::ExportAdaptors);
 
     callAccessibilityRegistry();
@@ -57,7 +56,7 @@ void QSpiApplication::callAccessibilityRegistry()
 {
     SocketProxy *registry;
     registry = new SocketProxy(QSPI_REGISTRY_NAME,
-                               QSPI_OBJECT_PATH_ROOT, dbusConnection);
+                               QSPI_OBJECT_PATH_ROOT, spiBridge->dBusConnection());
 
     QDBusPendingReply<QSpiObjectReference> reply;
     reply = registry->Embed(getReference());
@@ -98,7 +97,7 @@ bool QSpiApplication::eventFilter(QObject *obj, QEvent *event)
     switch (event->type()) {
         case QEvent::WindowActivate: {
         qDebug() << " Window activate: " << event->spontaneous() << obj;
-        QSpiObject* a = cache->objectToAccessible(obj);
+        QSpiObject* a = spiBridge->objectToAccessible(obj);
         QSpiAccessible* acc = static_cast<QSpiAccessible*>(a);
         acc->windowActivated();
         break;
@@ -142,7 +141,7 @@ bool QSpiApplication::eventFilter(QObject *obj, QEvent *event)
 
             // FIXME: this is critical, the timeout should probably be pretty low to allow normal processing
             int timeout = -1;
-            bool sent = dbusConnection.callWithCallback(m, this, SLOT(notifyKeyboardListenerCallback(QDBusMessage)),
+            bool sent = spiBridge->dBusConnection().callWithCallback(m, this, SLOT(notifyKeyboardListenerCallback(QDBusMessage)),
                                                         SLOT(notifyKeyboardListenerError(QDBusError, QDBusMessage)), timeout);
             if (!sent)
                 return false;

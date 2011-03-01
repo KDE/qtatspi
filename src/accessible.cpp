@@ -25,6 +25,7 @@
 
 #include "adaptor.h"
 #include "accessible.h"
+#include "bridge.h"
 #include "cache.h"
 
 #include "generated/accessible_adaptor.h"
@@ -51,12 +52,10 @@ QDBusObjectPath QSpiAccessible::getUnique()
     return QDBusObjectPath(prefix + num.setNum(id++));
 }
 
-QSpiAccessible::QSpiAccessible(QSpiAccessibleCache  *cache,
-                               QAccessibleInterface *interface,
-                               QDBusConnection c)
-    : QSpiAdaptor(cache, interface), dbusConnection(c)
+QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface)
+    : QSpiAdaptor(interface)
 {
-    reference = new QSpiObjectReference(dbusConnection.baseService(),
+    reference = new QSpiObjectReference(spiBridge->dBusConnection().baseService(),
                                                getUnique());
 
     new AccessibleAdaptor(this);
@@ -106,9 +105,9 @@ QSpiAccessible::QSpiAccessible(QSpiAccessibleCache  *cache,
         supportedInterfaces << QSPI_INTERFACE_TABLE;
     }
 
-    dbusConnection.registerObject(reference->path.path(),
-                                                 this,
-                                                 QDBusConnection::ExportAdaptors);
+    spiBridge->dBusConnection().registerObject(reference->path.path(),
+                                  this, QDBusConnection::ExportAdaptors);
+    state = interface->state(0);
 }
 
 QSpiObjectReference &QSpiAccessible::getParentReference() const
@@ -119,7 +118,7 @@ QSpiObjectReference &QSpiAccessible::getParentReference() const
     interface->navigate(QAccessible::Ancestor, 1, &parentInterface);
     if (parentInterface)
     {
-        parent = cache->objectToAccessible(parentInterface->object());
+        parent = spiBridge->objectToAccessible(parentInterface->object());
         delete parentInterface;
         if (parent)
         {
@@ -127,7 +126,7 @@ QSpiObjectReference &QSpiAccessible::getParentReference() const
         }
     }
 
-    static QSpiObjectReference null_reference(dbusConnection.baseService(),
+    static QSpiObjectReference null_reference(spiBridge->dBusConnection().baseService(),
                                               QDBusObjectPath(QSPI_OBJECT_PATH_NULL));
 
     return null_reference;
@@ -135,7 +134,7 @@ QSpiObjectReference &QSpiAccessible::getParentReference() const
 
 QSpiObjectReference QSpiAccessible::getRootReference() const
 {
-    return QSpiObjectReference(dbusConnection.baseService(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
+    return QSpiObjectReference(spiBridge->dBusConnection().baseService(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
 }
 
 void QSpiAccessible::signalChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data)
@@ -172,12 +171,19 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         // handled in bridge
         break;
     case QAccessible::ObjectHide:
+        // TODO
+        break;
+    case QAccessible::StateChanged: {
+        QAccessible::State newState = interface->state(0);
+        qDebug() << "StateChanged: " << (state^newState);
+        state = newState;
+        break;
+    }
     case QAccessible::ParentChanged:
-    case QAccessible::StateChanged:
     default:
         qWarning() << "QSpiAccessible::accessibleEvent not handled: " << QString::number(event, 16)
                    << " obj: " << interface->object()
-                   << interface->object()->objectName() ;
+                   << (interface->isValid() ? interface->object()->objectName() : " invalid interface!");
         break;
     }
 }

@@ -22,7 +22,9 @@
 
 #include "bridge.h"
 
+#include "adaptor.h"
 #include "accessible.h"
+#include "application.h"
 #include "cache.h"
 #include "constant_mappings.h"
 #include "object.h"
@@ -41,11 +43,55 @@
 #define QSPI_DEC_NAME        "/org/a11y/atspi/Registry"
 #define QSPI_DEC_OBJECT_PATH "/org/a11y/atspi/registry/deviceeventcontroller"
 
+QSpiAccessibleBridge* QSpiAccessibleBridge::self = 0;
 
 QSpiAccessibleBridge::QSpiAccessibleBridge()
-    : cache(0), rootInterface(0)
+    : cache(0), dbusConnection(connectDBus())
 {
-    accessibilityDBusAddress = getAccessibilityBusAddress();
+    Q_ASSERT(self == 0);
+    self = this;
+
+    if (!dbusConnection.isConnected()) {
+        qWarning() << "Could not connect to dbus.";
+    }
+
+    qSpiInitializeStructTypes();
+    qSpiInitializeConstantMappings();
+
+    /* Create the cache of accessible objects */
+    cache = new QSpiDBusCache(this);
+    dec = new DeviceEventControllerProxy(this);
+
+    bool reg = dbusConnection.registerObject(QSPI_DEC_OBJECT_PATH, this, QDBusConnection::ExportAdaptors);
+    qDebug() << "Registered DEC: " << reg;
+
+    QAccessibleInterface* i = QAccessible::queryAccessibleInterface(qApp);
+    cacheObjects_.insert(qApp, new QSpiApplication(i));
+    registerChildren(i);
+}
+
+QSpiAccessibleBridge::~QSpiAccessibleBridge ()
+{} // Qt currently doesn't delete plugins.
+
+QDBusConnection QSpiAccessibleBridge::connectDBus()
+{
+    QString address = getAccessibilityBusAddress();
+    if (!address.isEmpty()) {
+        QDBusConnection c = QDBusConnection::connectToBus(address, "a11y");
+        if (c.isConnected()) {
+            qDebug() << "Connected to accessibility bus at: " << address;
+            return c;
+        }
+        qWarning("Found Accessibility DBus address but cannot connect. Falling back to session bus.");
+    } else {
+        qWarning("Accessibility DBus not found. Falling back to session bus.");
+    }
+
+    QDBusConnection c = QDBusConnection::sessionBus();
+    if (!c.isConnected()) {
+        qWarning("Could not connect to DBus.");
+    }
+    return QDBusConnection::sessionBus();
 }
 
 QString QSpiAccessibleBridge::getAccessibilityBusAddress() const
@@ -71,93 +117,82 @@ QString QSpiAccessibleBridge::getAccessibilityBusAddress() const
     return busAddress;
 }
 
-QDBusConnection QSpiAccessibleBridge::dbusConnection() const
+QDBusConnection QSpiAccessibleBridge::dBusConnection() const
 {
-    if (!accessibilityDBusAddress.isEmpty()) {
-        QDBusConnection c = QDBusConnection::connectToBus(accessibilityDBusAddress, "a11y");
-        if (c.isConnected()) {
-            qDebug() << "Connected to accessibility bus at: " << accessibilityDBusAddress;
-            return c;
-        }
-        qWarning("Found Accessibility DBus address but cannot connect. Falling back to session bus.");
-    } else {
-        qWarning("Accessibility DBus not found. Falling back to session bus.");
-    }
-
-    QDBusConnection c = QDBusConnection::sessionBus();
-    if (!c.isConnected()) {
-        qWarning("Could not connect to DBus.");
-    }
-    return QDBusConnection::sessionBus();
+    return dbusConnection;
 }
 
-void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *inter)
+void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *interface)
 {
     // the interface we get will be for the QApplication object.
+    Q_ASSERT(interface->object() == qApp);
+    if (!cacheObjects_.contains(qApp))
+        cacheObjects_.insert(qApp, new QSpiApplication(interface));
+}
 
-    qDebug() << "QSpiAccessibleBridge : Initializing bridge";
-
-    QDBusConnection c = dbusConnection();
-    if (!c.isConnected())
-        return;
-
-    rootInterface = inter;
-    qDebug() << "  got a11y root object. children: " << inter->childCount();
-
-    qspi_initialize_struct_types();
-    qSpiInitializeConstantMappings();
-
-    /* Create the cache of accessible objects */
-    cache = new QSpiAccessibleCache(rootInterface->object(), c);
-
-    dec = new DeviceEventControllerProxy(this);
-
-    bool reg = c.registerObject(QSPI_DEC_OBJECT_PATH, this, QDBusConnection::ExportAdaptors);
-    qDebug() << "Registered DEC: " << reg;
+QSpiObjectReference QSpiAccessibleBridge::getRootReference() const
+{
+    Q_ASSERT(cacheObjects_.contains(qApp));
+    return cacheObjects_.value(qApp)->getReference();
 }
 
 void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface, int index)
 {
-    if (!cache) {
-        qWarning("QSpi::notifyAccessibilityUpdate: no cache, returning");
+    if (index == 0) {
+        notifyAccessibilityUpdate(reason, interface);
         return;
     }
 
-    qDebug() << "notifyAccessibilityUpdate" << interface->object() << " i: " << index;
-    QSpiObject *accessible = 0;
+    qDebug() << "notifyAccessibilityUpdate CHILD" << interface->object() << " i: " << index << " reason: " << QString::number(reason, 16);
 
-    if (index > 0) {
-        QAccessibleInterface *child;
-        interface->navigate(QAccessible::Child, index, &child);
-        if (!child) {
-            qWarning() << "WARNING: Implement: QSpiAccessibleBridge::notifyAccessibilityUpdate for child of " << interface->object() << index;
-            return;
+    QAccessibleInterface *child = 0;
+    interface->navigate(QAccessible::Child, index, &child);
+    Q_ASSERT(child);
+
+    if (!cacheObjects_.contains(child->object())) {
+        qDebug() << " Add new child: " << interface->object();
+
+        QSpiAdaptor *accessibleChild = interfaceToAccessible(child);
+        cacheObjects_.insert(child->object(), accessibleChild);
+        cache->emitAddAccessible(accessibleChild->getCacheItem());
+
+        QSpiAccessible* parentAccessible = qobject_cast<QSpiAccessible*>(cacheObjects_.value(interface->object()));
+        Q_ASSERT(parentAccessible);
+        if (parentAccessible) {
+            QSpiObjectReference r = accessibleChild->getReference();
+            QDBusVariant data;
+            data.setVariant(QVariant::fromValue(r));
+            qDebug() << "sending children changed index !0: " << interface->childCount() << r.path.path();
+            parentAccessible->signalChildrenChanged("add", 0, 0, data);
         }
-        accessible = cache->objectToAccessible(child->object());
-        delete child;
     } else {
+        delete child;
+    }
+}
 
-        accessible = cache->objectToAccessible(interface->object());
+void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface)
+{
+    QSpiObject *accessible = objectToAccessible(interface->object());
 
-        if (reason == QAccessible::ObjectShow) {
-            qDebug() << "Object Show event, notify parent..." << interface->object();
-            QAccessibleInterface *parent = 0;
-            interface->navigate(QAccessible::Ancestor, 1, &parent);
-            if (parent) {
-                QSpiObject *parentAccessibleObject = cache->objectToAccessible(parent->object());
-                QSpiAccessible* parentAccessible = qobject_cast<QSpiAccessible*>(parentAccessibleObject);
-                if (!parentAccessible) {
-                    qWarning() << "Invalid parent accessible";
-                    return;
-                }
-
-                QSpiObjectReference r = accessible->getReference();
-                QDBusVariant data;
-                data.setVariant(QVariant::fromValue(r));
-                parentAccessible->signalChildrenChanged("add", parent->childCount(), 0, data);
+    if (reason == QAccessible::ObjectShow) {
+        qDebug() << "Object Show event, notify parent..." << interface->object();
+        QAccessibleInterface *parent = 0;
+        interface->navigate(QAccessible::Ancestor, 1, &parent);
+        if (parent) {
+            QSpiObject *parentAccessibleObject = objectToAccessible(parent->object());
+            QSpiAccessible* parentAccessible = qobject_cast<QSpiAccessible*>(parentAccessibleObject);
+            if (!parentAccessible) {
+                qWarning() << "Invalid parent accessible";
+                return;
             }
+
+            QSpiObjectReference r = accessible->getReference();
+            QDBusVariant data;
+            data.setVariant(QVariant::fromValue(r));
+            parentAccessible->signalChildrenChanged("add", parent->childCount(), 0, data);
         }
     }
+
     if (accessible) {
         if (reason == QAccessible::Focus) {
             static QSpiAccessible *lastFocused = 0;
@@ -176,7 +211,61 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
     }
 }
 
-QSpiAccessibleBridge::~QSpiAccessibleBridge ()
+
+void QSpiAccessibleBridge::registerChildren(QAccessibleInterface *interface)
 {
-    qDebug() << "QSpiAccessibleBridge::~QSpiAccessibleBridge";
+    qDebug() << "QSpiAccessibleCache::registerChildren: " << interface->object();
+
+    QAccessibleInterface *current;
+    QSpiObject *accessible = 0;
+    QStack <QAccessibleInterface *> stack;
+
+    if (interface == NULL || interface->object() == NULL)
+        return;
+
+    /* Depth first iteration over all un-registered objects */
+    stack.push(interface);
+    while (!stack.empty()) {
+        current = stack.pop();
+        qDebug() << "  child: " << current->object();
+        accessible = interfaceToAccessible(current);
+
+        for (int i = 1; i <= current->childCount (); i++) {
+            QAccessibleInterface *child = NULL;
+            current->navigate(QAccessible::Child, i, &child);
+            if (child) {
+                stack.push(child);
+            }
+        }
+    }
 }
+
+QSpiAdaptor* QSpiAccessibleBridge::objectToAccessible(QObject *object)
+{
+    if (cacheObjects_.contains(object))
+        return cacheObjects_.value(object);
+
+    QAccessibleInterface* interface = QAccessible::queryAccessibleInterface(object);
+    if (!interface) {
+        qWarning() << "Create accessible for object which cannot create an accessible interface." << object;
+        return 0;
+    }
+
+    return interfaceToAccessible(interface);
+}
+
+QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface *interface)
+{
+    Q_ASSERT(interface);
+    QObject* object = interface->object();
+
+    if (cacheObjects_.contains(object)) {
+        return cacheObjects_.value(object);
+    }
+
+    QSpiAdaptor *accessible = new QSpiAccessible(interface);
+    cacheObjects_.insert(object, accessible);
+    cache->emitAddAccessible(accessible->getCacheItem());
+    return accessible;
+}
+

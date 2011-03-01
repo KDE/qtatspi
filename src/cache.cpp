@@ -27,6 +27,7 @@
 #include <QApplication>
 #include <QStackedWidget>
 
+#include "bridge.h"
 #include "cache.h"
 #include "object.h"
 #include "adaptor.h"
@@ -38,85 +39,25 @@
 #define QSPI_OBJECT_PATH_CACHE "/org/a11y/atspi/cache"
 
 
-QSpiAccessibleCache::QSpiAccessibleCache(QObject *root, QDBusConnection c)
-    : dbusConnection(c)
+QSpiDBusCache::QSpiDBusCache(QObject* parent)
+    : QObject(parent)
 {
     CacheAdaptor *adaptor;
-
-    rootObject = root;
-    cache.insert(root, new QSpiApplication(this, QAccessible::queryAccessibleInterface(root), dbusConnection));
-    registerChildren(QAccessible::queryAccessibleInterface(root));
-
     adaptor = new CacheAdaptor(this);
+    QDBusConnection c = QSpiAccessibleBridge::instance()->dBusConnection();
     c.registerObject(QSPI_OBJECT_PATH_CACHE, this, QDBusConnection::ExportAdaptors);
 }
 
-
-QObject *QSpiAccessibleCache::getRoot ()
+void QSpiDBusCache::emitAddAccessible(const QSpiAccessibleCacheItem& item)
 {
-    return rootObject;
+    emit AddAccessible(item);
 }
 
-
-/* 
- * Registers all descendants of the given accessible interface with the cache.
- *
- * No Idea about the threading implications here.
- * What is the equivalent of the GDK lock?
- */
-void QSpiAccessibleCache::registerChildren(QAccessibleInterface *interface)
-{
-    qDebug() << "QSpiAccessibleCache::registerChildren";
-
-    QAccessibleInterface *current;
-    QSpiObject *accessible = NULL;
-    QStack <QAccessibleInterface *> stack;
-
-    if (interface == NULL || interface->object() == NULL)
-        return;
-
-    /* Depth first iteration over all un-registered objects */
-    stack.push (interface);
-    while (!stack.empty())
-    {
-        current = stack.pop();
-        accessible = objectToAccessible(current->object());
-
-        for (int i = 1; i <= current->childCount (); i++)
-        {
-            QAccessibleInterface *child = NULL;
-            current->navigate(QAccessible::Child, i, &child);
-            if (child)
-            {
-                stack.push (child);
-            }
-        }
-    }
-}
-
-QSpiObject *QSpiAccessibleCache::objectToAccessible(QObject *obj)
-{
-    if (cache.contains(obj)) {
-        return cache.value(obj);
-    } else {
-        QAccessibleInterface *interface = QAccessible::queryAccessibleInterface(obj);
-        if (interface)
-        {
-            QSpiObject *accessible = new QSpiAccessible(this, interface, dbusConnection);
-            cache.insert(interface->object(), accessible);
-            emit AddAccessible(accessible->getCacheItem());
-            return accessible;
-        }
-    }
-    return 0;
-}
-
-
-QSpiAccessibleCacheArray QSpiAccessibleCache::GetItems()
+QSpiAccessibleCacheArray QSpiDBusCache::GetItems()
 {
     QList <QSpiAccessibleCacheItem> cacheArray;
 
-    foreach (QSpiObject *obj, cache.values())
+    foreach (QSpiObject *obj, spiBridge->cacheObjects().values())
     {
         cacheArray << obj->getCacheItem();
     }

@@ -42,9 +42,7 @@ class QSpiAccessible : public QSpiAdaptor
     Q_OBJECT
 
 public:
-    QSpiAccessible(QSpiAccessibleCache  *cache,
-                   QAccessibleInterface *interface,
-                   QDBusConnection c);
+    QSpiAccessible(QAccessibleInterface *interface);
 
     virtual QSpiObjectReference& getParentReference() const;
 
@@ -65,11 +63,11 @@ Q_SIGNALS:
     void Create(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
     void Restore(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
 
-
 private:
     static QDBusObjectPath getUnique();
     QSpiObjectReference getRootReference() const;
-    QDBusConnection dbusConnection;
+
+    QAccessible::State state;
 
     friend class QSpiAccessibleBridge;
 };

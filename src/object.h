@@ -55,7 +55,6 @@
 #define QSPI_OBJECT_PATH_ROOT    QSPI_OBJECT_PATH_PREFIX "root"
 
 
-class QSpiAccessibleCache;
 class ObjectAdaptor;
 
 /**
@@ -70,8 +69,7 @@ class QSpiObject : public QObject
     Q_OBJECT
 
 public:
-    QSpiObject(QSpiAccessibleCache *cache,
-               QAccessibleInterface *interface);
+    QSpiObject(QAccessibleInterface *interface);
 
     QAccessibleInterface &getInterface() const;
     QStringList getSupportedInterfaces() const;
@@ -84,7 +82,6 @@ public:
 
 protected:
     QAccessibleInterface *interface;
-    QSpiAccessibleCache *cache;
     QSpiObjectReference *reference;
     QStringList supportedInterfaces;
 };

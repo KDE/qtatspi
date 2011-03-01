@@ -40,6 +40,7 @@ QSpiAccessibleBridgePlugin::QSpiAccessibleBridgePlugin(QObject *parent)
 QAccessibleBridge* QSpiAccessibleBridgePlugin::create(const QString &key)
 {
     if (key == "QSPIACCESSIBLEBRIDGE")
+
         return new QSpiAccessibleBridge();
     return 0;
 }

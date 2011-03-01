@@ -29,8 +29,13 @@
 #include <QDBusConnection>
 
 class DeviceEventControllerProxy;
-class QSpiAccessibleCache;
+class QSpiDBusCache;
 class QAccessibleInterface;
+class QSpiAdaptor;
+class QSpiObject;
+class QSpiObjectReference;
+
+#define spiBridge QSpiAccessibleBridge::instance()
 
 class QSpiAccessibleBridge: public QObject, public QAccessibleBridge
 {
@@ -38,20 +43,39 @@ class QSpiAccessibleBridge: public QObject, public QAccessibleBridge
 public:
         QSpiAccessibleBridge();
 
+        static QSpiAccessibleBridge *instance() { return self; }
+
         virtual ~QSpiAccessibleBridge();
         virtual void setRootObject(QAccessibleInterface *obj);
         virtual void notifyAccessibilityUpdate(int reason, QAccessibleInterface *obj, int child);
 
-private:
-        QString getAccessibilityBusAddress() const;
-        QDBusConnection dbusConnection() const;
+        void notifyAccessibilityUpdate(int reason, QAccessibleInterface *obj);
 
-        QSpiAccessibleCache *cache;
+        QSpiObjectReference getRootReference() const;
+
+        QSpiAdaptor* objectToAccessible(QObject* object);
+        QSpiAdaptor* interfaceToAccessible(QAccessibleInterface *interface);
+
+        QDBusConnection dBusConnection() const;
+
+        QHash <QObject *, QSpiAdaptor *> cacheObjects() const
+        { return cacheObjects_; }
+
+private:
+        static QSpiAccessibleBridge* self;
+        QString getAccessibilityBusAddress() const;
+        QDBusConnection connectDBus();
+
+        void registerChildren(QAccessibleInterface *interface);
+
+        QSpiDBusCache *cache;
         DeviceEventControllerProxy *dec;
 
-        QAccessibleInterface* rootInterface;
+        QHash <QObject *, QSpiAdaptor *> cacheObjects_;
 
-        QString accessibilityDBusAddress;
+        QDBusConnection dbusConnection;
+
+        //friend class QSpiAccessibleCache;
 };
 
 #endif

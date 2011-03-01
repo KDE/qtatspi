@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->statusBar->showMessage("Status Bar Text");
 
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(createButton()));
 }

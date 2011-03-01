@@ -73,7 +73,7 @@ struct QSpiAccessibleCacheItem
     QString                     description;
     QSpiUIntList                states;
     QList <QSpiObjectReference> children;
-    QStringList                 supported;
+    QStringList                 supportedInterfaces;
     QString                     name;
 };
 
@@ -182,6 +182,6 @@ Q_DECLARE_METATYPE(QSpiDeviceEvent)
 
 /*---------------------------------------------------------------------------*/
 
-void qspi_initialize_struct_types ();
+void qSpiInitializeStructTypes ();
 
 #endif /* Q_SPI_STRUCT_MARSHALLERS_H */

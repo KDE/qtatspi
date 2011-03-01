@@ -37,14 +37,17 @@
 #include <QtGui/QApplication>
 #include <QtGui/QWidget>
 
-#include "object.h"
 #include "adaptor.h"
-#include "cache.h"
+#include "bridge.h"
 #include "constant_mappings.h"
 
 
 int QSpiAdaptor::childCount() const
 {
+    if (interface->object()->objectName() == "menuBar") {
+        qDebug() << "menu child count";
+    }
+
     return getInterface().childCount();
 }
 
@@ -65,7 +68,7 @@ QSpiObjectReference QSpiAdaptor::parent() const
 
 QSpiObjectReference QSpiAdaptor::GetApplication()
 {
-    return cache->objectToAccessible(cache->getRoot())->getReference();
+    return spiBridge->getRootReference();
 }
 
 QSpiAttributeSet QSpiAdaptor::GetAttributes()
@@ -86,12 +89,15 @@ QSpiObjectReference QSpiAdaptor::GetChildAtIndex(int index)
         interface->navigate(QAccessible::Child, i, &child);
         if (child) {
             QSpiObject *current;
-            current = cache->objectToAccessible (child->object ());
+            current = spiBridge->objectToAccessible(child->object());
             if (current)
                 children << current;
             delete child;
         }
     }
+
+    Q_ASSERT(index < children.length());
+
     return children.value(index)->getReference();
 }
 
@@ -104,7 +110,7 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren()
         interface->navigate(QAccessible::Child, i, &child);
         if (child) {
             QSpiObject *current;
-            current = cache->objectToAccessible(child->object ());
+            current = spiBridge->objectToAccessible(child->object());
             if (current)
                 children << current->getReference();
             delete child;
@@ -313,7 +319,7 @@ QSpiObjectReference QSpiAdaptor::GetAccessibleAtPoint(int x, int y, uint coord_t
 
     QWidget* w = qApp->widgetAt(x,y);
     if (w) {
-        return cache->objectToAccessible(w)->getReference();
+        return spiBridge->objectToAccessible(w)->getReference();
     } else {
         QSpiObjectReference ref;
         ref.name = QDBusConnection::sessionBus().baseService();
@@ -438,7 +444,7 @@ bool QSpiAdaptor::SetTextContents(const QString &newContents)
 
 QSpiObjectReference QSpiAdaptor::caption() const
 {
-    return cache->objectToAccessible (getInterface().tableInterface()->caption()->object())->getReference();
+    return spiBridge->objectToAccessible (getInterface().tableInterface()->caption()->object())->getReference();
 }
 
 int QSpiAdaptor::nColumns() const
@@ -463,7 +469,7 @@ int QSpiAdaptor::nSelectedRows() const
 
 QSpiObjectReference QSpiAdaptor::summary() const
 {
-    return cache->objectToAccessible (getInterface().tableInterface()->summary()->object())->getReference();
+    return spiBridge->objectToAccessible (getInterface().tableInterface()->summary()->object())->getReference();
 }
 
 bool QSpiAdaptor::AddColumnSelection(int column)
@@ -480,7 +486,7 @@ bool QSpiAdaptor::AddRowSelection(int row)
 
 QSpiObjectReference QSpiAdaptor::GetAccessibleAt(int row, int column)
 {
-    return cache->objectToAccessible (getInterface().tableInterface()->accessibleAt(row, column)->object())->getReference();
+    return spiBridge->objectToAccessible (getInterface().tableInterface()->accessibleAt(row, column)->object())->getReference();
 }
 
 int QSpiAdaptor::GetColumnAtIndex(int index)
@@ -502,7 +508,7 @@ QSpiObjectReference QSpiAdaptor::GetColumnHeader(int column)
 {
     Q_UNUSED (column);
     // TODO There should be a column param in this function right?
-    return cache->objectToAccessible (getInterface().tableInterface()->columnHeader()->object())->getReference();
+    return spiBridge->objectToAccessible (getInterface().tableInterface()->columnHeader()->object())->getReference();
 }
 
 int QSpiAdaptor::GetIndexAt(int row, int column)
@@ -555,7 +561,7 @@ QSpiObjectReference QSpiAdaptor::GetRowHeader(int row)
 {
     Q_UNUSED (row);
     // TODO There should be a row param here right?
-    return cache->objectToAccessible (getInterface().tableInterface()->rowHeader()->object())->getReference();
+    return spiBridge->objectToAccessible (getInterface().tableInterface()->rowHeader()->object())->getReference();
 }
 
 QSpiIntList QSpiAdaptor::GetSelectedColumns()

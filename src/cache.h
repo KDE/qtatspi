@@ -23,39 +23,22 @@
 #define Q_SPI_CACHE_H
 
 #include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QStringList>
-
-#include <QtDBus/QtDBus>
-#include <QAccessible>
-
-#include "object.h"
 #include "struct_marshallers.h"
 
-class QSpiAccessibleCache : public QObject
+class QSpiDBusCache : public QObject
 {
     Q_OBJECT
 
 public:
-    QSpiAccessibleCache(QObject *rootObject, QDBusConnection c);
-    QSpiObject *objectToAccessible(QObject *);
-
-    QObject *getRoot();
+    QSpiDBusCache(QObject* parent = 0);
+    void emitAddAccessible(const QSpiAccessibleCacheItem& item);
 
 signals:
     void AddAccessible(const QSpiAccessibleCacheItem &nodeAdded);
     void RemoveAccessible(const QSpiObjectReference &nodeRemoved);
 
-    /* AT-SPI Cache interface */
 public Q_SLOTS:
     QSpiAccessibleCacheArray GetItems();
-
-private:
-    QObject *rootObject;
-    QHash <QObject *, QSpiObject *> cache;
-    void registerChildren(QAccessibleInterface *interface);
-
-    QDBusConnection dbusConnection;
 };
 
 #endif /* Q_SPI_CACHE_H */

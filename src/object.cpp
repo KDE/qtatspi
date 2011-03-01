@@ -21,16 +21,15 @@
 
 #include <QDBusObjectPath>
 
-#include "cache.h"
-#include "object.h"
+#include "adaptor.h"
+#include "bridge.h"
 #include "constant_mappings.h"
+#include "struct_marshallers.h"
 
 #include "generated/event_adaptor.h"
 
-QSpiObject::QSpiObject(QSpiAccessibleCache  *_cache,
-                       QAccessibleInterface *_interface)
-    : interface(_interface),
-      cache(_cache)
+QSpiObject::QSpiObject(QAccessibleInterface *_interface)
+    : interface(_interface)
 {
 }
 
@@ -51,47 +50,39 @@ QStringList QSpiObject::getSupportedInterfaces() const
 
 QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
 {
+    qDebug() << "QSpiObject::getCacheItem" << reference->path.path();
+
     QSpiAccessibleCacheItem item;
-
-    QList<QSpiObject *> children;
-    QList<QSpiObjectReference> childPaths;
-
-    /* Path */
     item.path = getReference();
-    /* Parent */
     item.parent = getParentReference();
-
-    item.application = cache->objectToAccessible(cache->getRoot())->getReference();
+    item.application = spiBridge->getRootReference();
 
     /* Children */
+    QList<QSpiAdaptor *> children;
+    QList<QSpiObjectReference> childPaths;
     for (int i = 1; i <= getInterface().childCount(); i++)
     {
         QAccessibleInterface *child = 0;
         getInterface().navigate(QAccessible::Child, i, &child);
         if (child)
         {
-            QSpiObject *current;
-            current = cache->objectToAccessible(child->object());
+            QSpiAdaptor *current;
+            current = spiBridge->objectToAccessible(child->object());
             if (current)
                 children << current;
             delete child;
         }
     }
-    foreach (QSpiObject *obj, children)
+    foreach (QSpiAdaptor *obj, children)
     {
         childPaths << obj->getReference();
     }
     item.children = childPaths;
-    /* Supported interfaces */
-    item.supported = getSupportedInterfaces();
-    /* Name */
-    item.name = getInterface().text(QAccessible::Name, 0);
-    /* Role */
-    item.role = qSpiRoleMapping.value(getInterface().role(0)).spiRole();
 
-    /* Description */
+    item.supportedInterfaces = getSupportedInterfaces();
+    item.name = getInterface().text(QAccessible::Name, 0);
+    item.role = qSpiRoleMapping.value(getInterface().role(0)).spiRole();
     item.description = getInterface().text(QAccessible::Description, 0);
-    /* State set */
     item.states = qSpiStatesetFromQState(getInterface().state(0));
     return item;
 }

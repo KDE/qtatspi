@@ -34,7 +34,7 @@ QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAccessibleCacheItem
     argument << item.application;
     argument << item.parent;
     argument << item.children;
-    argument << item.supported;
+    argument << item.supportedInterfaces;
     argument << item.name;
     argument << item.role;
     argument << item.description;
@@ -50,7 +50,7 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAccessibleCac
     argument >> item.application;
     argument >> item.parent;
     argument >> item.children;
-    argument >> item.supported;
+    argument >> item.supportedInterfaces;
     argument >> item.name;
     argument >> item.role;
     argument >> item.description;
@@ -169,7 +169,7 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiDeviceEvent &
 
 /*---------------------------------------------------------------------------*/
 
-void qspi_initialize_struct_types ()
+void qSpiInitializeStructTypes ()
 {
     qDBusRegisterMetaType<QSpiIntList>();
     qDBusRegisterMetaType<QSpiAccessibleCacheItem>();
