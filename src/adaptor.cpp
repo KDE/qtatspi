@@ -560,21 +560,24 @@ int QSpiAdaptor::GetRowExtentAt(int row, int column)
 QSpiObjectReference QSpiAdaptor::GetRowHeader(int row)
 {
     Q_UNUSED (row);
+    qWarning() << "Implement: QSpiAdaptor::GetRowHeader";
+    return QSpiObjectReference();
+
     // TODO There should be a row param here right?
-    return spiBridge->objectToAccessible (getInterface().tableInterface()->rowHeader()->object())->getReference();
+//    return spiBridge->objectToAccessible(getInterface().tableInterface()->rowHeader()->object())->getReference();
 }
 
 QSpiIntList QSpiAdaptor::GetSelectedColumns()
 {
     QSpiIntList columns;
-    getInterface().tableInterface()->selectedColumns (MAX_SELECTED_COLUMNS, &columns);
+    getInterface().tableInterface()->selectedColumns(MAX_SELECTED_COLUMNS, &columns);
     return columns;
 }
 
 QSpiIntList QSpiAdaptor::GetSelectedRows()
 {
     QSpiIntList rows;
-    getInterface().tableInterface()->selectedRows (MAX_SELECTED_ROWS, &rows);
+    getInterface().tableInterface()->selectedRows(MAX_SELECTED_ROWS, &rows);
     return rows;
 }
 
