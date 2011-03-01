@@ -50,7 +50,11 @@ QStringList QSpiObject::getSupportedInterfaces() const
 
 QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
 {
-    qDebug() << "QSpiObject::getCacheItem" << reference->path.path();
+    Q_ASSERT(interface);
+    if (!interface->isValid()) {
+        qWarning() << "QSpiObject::getCacheItem: invalid interface" << reference->path.path();
+        return QSpiAccessibleCacheItem();
+    }
 
     QSpiAccessibleCacheItem item;
     item.path = getReference();
@@ -60,14 +64,12 @@ QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
     /* Children */
     QList<QSpiAdaptor *> children;
     QList<QSpiObjectReference> childPaths;
-    for (int i = 1; i <= getInterface().childCount(); i++)
-    {
+    for (int i = 1; i <= getInterface().childCount(); i++) {
         QAccessibleInterface *child = 0;
         getInterface().navigate(QAccessible::Child, i, &child);
-        if (child)
-        {
-            QSpiAdaptor *current;
-            current = spiBridge->objectToAccessible(child->object());
+        if (child && child->isValid() && child->object()) {
+            // FIXME: interfaces without QObject?
+            QSpiAdaptor* current = spiBridge->objectToAccessible(child->object());
             if (current)
                 children << current;
             delete child;

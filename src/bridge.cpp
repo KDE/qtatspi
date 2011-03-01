@@ -147,26 +147,32 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
 
     QAccessibleInterface *child = 0;
     interface->navigate(QAccessible::Child, index, &child);
-    Q_ASSERT(child);
 
-    if (!cacheObjects_.contains(child->object())) {
-        qDebug() << " Add new child: " << interface->object();
+    if (child && child->object()) {
+        // we get child objects sometimes - for example for menus
+        if (!cacheObjects_.contains(child->object())) {
+            QSpiAdaptor *accessibleChild = interfaceToAccessible(child);
+            cacheObjects_.insert(child->object(), accessibleChild);
+            cache->emitAddAccessible(accessibleChild->getCacheItem());
 
-        QSpiAdaptor *accessibleChild = interfaceToAccessible(child);
-        cacheObjects_.insert(child->object(), accessibleChild);
-        cache->emitAddAccessible(accessibleChild->getCacheItem());
-
-        QSpiAccessible* parentAccessible = qobject_cast<QSpiAccessible*>(cacheObjects_.value(interface->object()));
-        Q_ASSERT(parentAccessible);
-        if (parentAccessible) {
-            QSpiObjectReference r = accessibleChild->getReference();
-            QDBusVariant data;
-            data.setVariant(QVariant::fromValue(r));
-            qDebug() << "sending children changed index !0: " << interface->childCount() << r.path.path();
-            parentAccessible->signalChildrenChanged("add", 0, 0, data);
+            QSpiAccessible* parentAccessible = qobject_cast<QSpiAccessible*>(cacheObjects_.value(interface->object()));
+            Q_ASSERT(parentAccessible);
+            if (parentAccessible) {
+                QSpiObjectReference r = accessibleChild->getReference();
+                QDBusVariant data;
+                data.setVariant(QVariant::fromValue(r));
+                qDebug() << "sending children changed index !0: " << interface->childCount() << r.path.path();
+                parentAccessible->signalChildrenChanged("add", 0, 0, data);
+            }
+        } else {
+            delete child;
         }
     } else {
-        delete child;
+        // no child - for example tab bar
+        qWarning() << "Child index for complex widget not handled " << interface->object();
+        if (child) {
+            qDebug() << "Child without object: " << child;
+        }
     }
 }
 
@@ -242,6 +248,7 @@ void QSpiAccessibleBridge::registerChildren(QAccessibleInterface *interface)
 
 QSpiAdaptor* QSpiAccessibleBridge::objectToAccessible(QObject *object)
 {
+    Q_ASSERT(object);
     if (cacheObjects_.contains(object))
         return cacheObjects_.value(object);
 
@@ -258,6 +265,7 @@ QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface *i
 {
     Q_ASSERT(interface);
     QObject* object = interface->object();
+    Q_ASSERT(object);
 
     if (cacheObjects_.contains(object)) {
         return cacheObjects_.value(object);

@@ -112,23 +112,22 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface)
 
 QSpiObjectReference &QSpiAccessible::getParentReference() const
 {
-    QAccessibleInterface *parentInterface = NULL;
-    QSpiObject *parent;
+    Q_ASSERT(interface);
 
-    interface->navigate(QAccessible::Ancestor, 1, &parentInterface);
-    if (parentInterface)
-    {
-        parent = spiBridge->objectToAccessible(parentInterface->object());
-        delete parentInterface;
-        if (parent)
+    if (interface->isValid()) {
+        QAccessibleInterface *parentInterface = 0;
+        interface->navigate(QAccessible::Ancestor, 1, &parentInterface);
+        if (parentInterface)
         {
-           return parent->getReference();
+            QSpiObject *parent = spiBridge->objectToAccessible(parentInterface->object());
+            delete parentInterface;
+            if (parent)
+                return parent->getReference();
         }
     }
 
     static QSpiObjectReference null_reference(spiBridge->dBusConnection().baseService(),
                                               QDBusObjectPath(QSPI_OBJECT_PATH_NULL));
-
     return null_reference;
 }
 
@@ -172,6 +171,11 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         break;
     case QAccessible::ObjectHide:
         // TODO
+        qWarning() << "Object hide";
+        break;
+    case QAccessible::ObjectDestroyed:
+        qWarning() << "Object destroyed";
+        Q_ASSERT(0);
         break;
     case QAccessible::StateChanged: {
         QAccessible::State newState = interface->state(0);
