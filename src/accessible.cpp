@@ -143,6 +143,8 @@ void QSpiAccessible::signalChildrenChanged(const QString &type, int detail1, int
 
 void QSpiAccessible::accessibleEvent(QAccessible::Event event)
 {
+    Q_ASSERT(interface && interface->isValid());
+
     switch (event) {
     case QAccessible::NameChanged: {
         QSpiObjectReference r = getReference();

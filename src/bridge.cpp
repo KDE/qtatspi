@@ -143,6 +143,7 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
         return;
     }
 
+    Q_ASSERT(interface && interface->isValid());
     qDebug() << "notifyAccessibilityUpdate CHILD" << interface->object() << " i: " << index << " reason: " << QString::number(reason, 16);
 
     QAccessibleInterface *child = 0;
@@ -178,6 +179,7 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
 
 void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface)
 {
+    Q_ASSERT(interface && interface->isValid());
     QSpiObject *accessible = objectToAccessible(interface->object());
 
     if (reason == QAccessible::ObjectShow) {
