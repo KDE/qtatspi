@@ -103,7 +103,6 @@ QSpiObjectReference QSpiAdaptor::GetChildAtIndex(int index)
             current = spiBridge->objectToAccessible(child->object());
             if (current)
                 children << current;
-            delete child;
         }
     }
 
@@ -124,7 +123,6 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren()
             current = spiBridge->objectToAccessible(child->object());
             if (current)
                 children << current->getReference();
-            delete child;
         }
     }
 
@@ -144,7 +142,6 @@ int QSpiAdaptor::GetIndexInParent()
     if (parent) {
         qDebug() << "QSpiAdaptor::GetIndexInParent" << parent->text(QAccessible::Name, 0);
         int index = parent->indexOfChild(interface);
-        delete parent;
         qDebug() << "Index: " << index;
         return index;
     }
@@ -283,7 +280,6 @@ static QAccessibleInterface *getWindow(QAccessibleInterface* interface)
     {
         tmp = NULL;
         current->navigate (QAccessible::Ancestor, 1, &tmp);
-        delete current;
         current = tmp;
     }
 
@@ -308,7 +304,6 @@ static QRect getRelativeRect(QAccessibleInterface* interface, int child)
 
         cr.setX(cr.x() - wr.x());
         cr.setY(cr.x() - wr.y());
-        delete window;
     }
     return cr;
 }

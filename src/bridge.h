@@ -49,8 +49,6 @@ public:
         virtual void setRootObject(QAccessibleInterface *obj);
         virtual void notifyAccessibilityUpdate(int reason, QAccessibleInterface *obj, int child);
 
-        void notifyAccessibilityUpdate(int reason, QAccessibleInterface *obj);
-
         QSpiObjectReference getRootReference() const;
 
         QSpiAdaptor* createSpiObject(QAccessibleInterface* interface, int index = 0);

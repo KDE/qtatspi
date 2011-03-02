@@ -61,6 +61,7 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
     new AccessibleAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;
 
+
     if (interface->object()->isWidgetType()) {
         qDebug() << "ComponentAdaptor for: " << interface->object();
         new ComponentAdaptor(this);
@@ -120,7 +121,6 @@ QSpiObjectReference &QSpiAccessible::getParentReference() const
         if (parentInterface)
         {
             QSpiObject *parent = spiBridge->objectToAccessible(parentInterface->object());
-            delete parentInterface;
             if (parent)
                 return parent->getReference();
         }
@@ -159,7 +159,6 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         break;
     }
     case QAccessible::ObjectShow:
-        // handled in bridge
         break;
     case QAccessible::ObjectHide:
         // TODO

@@ -143,28 +143,6 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
 
     QSpiAdaptor* accessible = interfaceToAccessible(interface, index);
 
-    // special: focus
-
-
-
-
-
-
-
-
-
-    accessible->accessibleEvent((QAccessible::Event)reason);
-
-
-
-}
-
-void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface)
-{
-    Q_ASSERT(interface && interface->isValid());
-    QSpiObject *accessible = objectToAccessible(interface->object());
-
-
     if (reason == QAccessible::Focus) {
         static QSpiAccessible *lastFocused = 0;
         if (lastFocused) {
@@ -175,11 +153,12 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
         }
         lastFocused = qobject_cast<QSpiAccessible*>(accessible);
     }
-
-
-    accessible->accessibleEvent((QAccessible::Event) reason);
+qDebug() << "QSpiAccessibleBridge::notifyAccessibilityUpdate" << QString::number(reason, 16)
+         << " obj: " << interface->object()
+         << (interface->isValid() ? interface->object()->objectName() : " invalid interface!")
+            << accessible->interface;
+    accessible->accessibleEvent((QAccessible::Event)reason);
 }
-
 
 void QSpiAccessibleBridge::registerChildren(QAccessibleInterface *interface)
 {
@@ -224,6 +203,7 @@ QSpiAdaptor* QSpiAccessibleBridge::objectToAccessible(QObject *object)
     QAccessibleInterface* interface = QAccessible::queryAccessibleInterface(object);
     if (!interface) {
         qWarning() << "Create accessible for object which cannot create an accessible interface." << object;
+        Q_ASSERT(interface);
         return 0;
     }
 
@@ -232,7 +212,7 @@ QSpiAdaptor* QSpiAccessibleBridge::objectToAccessible(QObject *object)
 
 QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* interface, int index)
 {
-    Q_ASSERT(interface);
+    Q_ASSERT(interface && interface->isValid());
     if (index == 0 && interface->object() && objectToAccessibleMap.contains(interface->object())) {
         return objectToAccessibleMap.value(interface->object());
     }

@@ -64,10 +64,9 @@ QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
         interface->navigate(QAccessible::Child, i, &child);
         if (child && child->isValid() && child->object()) {
             // FIXME: interfaces without QObject?
-            QSpiAdaptor* current = spiBridge->objectToAccessible(child->object());
+            QSpiAdaptor* current = spiBridge->interfaceToAccessible(child);
             if (current)
                 children << current;
-            delete child;
         }
     }
     foreach (QSpiAdaptor *obj, children)
