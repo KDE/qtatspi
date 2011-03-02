@@ -61,18 +61,17 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
     new AccessibleAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;
 
-
-    if (interface->object()->isWidgetType()) {
-        qDebug() << "ComponentAdaptor for: " << interface->object();
+    if (!interface->rect(index).isEmpty() || (interface->object() && interface->object()->isWidgetType())) {
         new ComponentAdaptor(this);
         supportedInterfaces << QSPI_INTERFACE_COMPONENT;
 
-        QWidget *w = qobject_cast<QWidget*>(interface->object());
-        if (w->isWindow()) {
-            new WindowAdaptor(this);
-            qDebug() << "Created Window adaptor for: " << interface->object();
+        if (interface->object() && interface->object()->isWidgetType()) {
+            QWidget *w = qobject_cast<QWidget*>(interface->object());
+            if (w->isWindow()) {
+                new WindowAdaptor(this);
+                qDebug() << "Created Window adaptor for: " << interface->object();
+            }
         }
-
     } else {
         qDebug() << "NO ComponentAdaptor for: " << interface->object();
     }
