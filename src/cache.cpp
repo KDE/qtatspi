@@ -57,7 +57,7 @@ QSpiAccessibleCacheArray QSpiDBusCache::GetItems()
 {
     QList <QSpiAccessibleCacheItem> cacheArray;
 
-    foreach (QSpiObject *obj, spiBridge->cacheObjects().values())
+    foreach (QSpiObject *obj, spiBridge->cacheObjects())
     {
         cacheArray << obj->getCacheItem();
     }

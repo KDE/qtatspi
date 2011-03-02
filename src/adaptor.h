@@ -33,8 +33,18 @@ class QSpiAdaptor :public QSpiObject
 {
     Q_OBJECT
 public:
-    QSpiAdaptor(QAccessibleInterface *interface)
-        : QSpiObject(interface) {}
+    QSpiAdaptor(QAccessibleInterface *interface, int index)
+        : QSpiObject(interface, index) {}
+
+    QSpiObjectReference getRootReference() const;
+    // event stuff
+    void signalChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data);
+Q_SIGNALS:
+    void ChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void StateChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void PropertyChange(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void Focus(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+
 
 /* AT-SPI Accessible interface */
 public:

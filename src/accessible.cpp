@@ -52,8 +52,8 @@ QDBusObjectPath QSpiAccessible::getUnique()
     return QDBusObjectPath(prefix + num.setNum(id++));
 }
 
-QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface)
-    : QSpiAdaptor(interface)
+QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
+    : QSpiAdaptor(interface, index)
 {
     reference = new QSpiObjectReference(spiBridge->dBusConnection().baseService(),
                                                getUnique());
@@ -129,16 +129,6 @@ QSpiObjectReference &QSpiAccessible::getParentReference() const
     static QSpiObjectReference null_reference(spiBridge->dBusConnection().baseService(),
                                               QDBusObjectPath(QSPI_OBJECT_PATH_NULL));
     return null_reference;
-}
-
-QSpiObjectReference QSpiAccessible::getRootReference() const
-{
-    return QSpiObjectReference(spiBridge->dBusConnection().baseService(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
-}
-
-void QSpiAccessible::signalChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data)
-{
-    emit ChildrenChanged(type, detail1, detail2, data, getRootReference());
 }
 
 void QSpiAccessible::accessibleEvent(QAccessible::Event event)

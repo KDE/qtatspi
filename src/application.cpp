@@ -34,7 +34,7 @@
 #define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
 
 QSpiApplication::QSpiApplication(QAccessibleInterface *interface)
-    :QSpiAdaptor(interface), accessibilityRegistry(0)
+    :QSpiAdaptor(interface, 0), accessibilityRegistry(0)
 {
     reference = new QSpiObjectReference(spiBridge->dBusConnection().baseService(),
            QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));

@@ -54,9 +54,6 @@
 #define QSPI_OBJECT_PATH_NULL    QSPI_OBJECT_PATH_PREFIX "null"
 #define QSPI_OBJECT_PATH_ROOT    QSPI_OBJECT_PATH_PREFIX "root"
 
-
-class ObjectAdaptor;
-
 /**
  * This class is the virtual base class for all accessible objects.
  *
@@ -69,9 +66,8 @@ class QSpiObject : public QObject
     Q_OBJECT
 
 public:
-    QSpiObject(QAccessibleInterface *interface);
+    QSpiObject(QAccessibleInterface *interface, int child = 0);
 
-    QAccessibleInterface &getInterface() const;
     QStringList getSupportedInterfaces() const;
     QSpiAccessibleCacheItem getCacheItem() const;
 
@@ -80,8 +76,10 @@ public:
 
     virtual void accessibleEvent(QAccessible::Event event) = 0;
 
-protected:
+    // FIXME
     QAccessibleInterface *interface;
+    int child;
+protected:
     QSpiObjectReference *reference;
     QStringList supportedInterfaces;
 };

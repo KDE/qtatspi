@@ -53,13 +53,15 @@ public:
 
         QSpiObjectReference getRootReference() const;
 
+        QSpiAdaptor* createSpiObject(QAccessibleInterface* interface, int index = 0);
+
         QSpiAdaptor* objectToAccessible(QObject* object);
-        QSpiAdaptor* interfaceToAccessible(QAccessibleInterface *interface);
+        QSpiAdaptor* interfaceToAccessible(QAccessibleInterface *interface, int index = 0);
 
         QDBusConnection dBusConnection() const;
 
-        QHash <QObject *, QSpiAdaptor *> cacheObjects() const
-        { return cacheObjects_; }
+        QList<QSpiAdaptor*> cacheObjects() const
+        { return accessibleList; }
 
 private:
         static QSpiAccessibleBridge* self;
@@ -71,11 +73,10 @@ private:
         QSpiDBusCache *cache;
         DeviceEventControllerProxy *dec;
 
-        QHash <QObject *, QSpiAdaptor *> cacheObjects_;
+        QHash<QObject*, QSpiAdaptor*> objectToAccessibleMap;
+        QList<QSpiAdaptor*> accessibleList;
 
         QDBusConnection dbusConnection;
-
-        //friend class QSpiAccessibleCache;
 };
 
 #endif

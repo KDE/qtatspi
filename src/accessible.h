@@ -42,21 +42,16 @@ class QSpiAccessible : public QSpiAdaptor
     Q_OBJECT
 
 public:
-    QSpiAccessible(QAccessibleInterface *interface);
+    QSpiAccessible(QAccessibleInterface *interface, int index = 0);
 
     virtual QSpiObjectReference& getParentReference() const;
 
     virtual void accessibleEvent(QAccessible::Event event);
 
-    void signalChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data);
 
     void windowActivated();
 
 Q_SIGNALS:
-    void ChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
-    void StateChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
-    void PropertyChange(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
-    void Focus(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
 
     // window
     void Activate(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
@@ -65,7 +60,6 @@ Q_SIGNALS:
 
 private:
     static QDBusObjectPath getUnique();
-    QSpiObjectReference getRootReference() const;
 
     QAccessible::State state;
 
