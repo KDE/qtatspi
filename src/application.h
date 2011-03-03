@@ -41,7 +41,7 @@ class QSpiApplication : public QSpiAdaptor
 public:
     QSpiApplication(QAccessibleInterface *interface);
 
-    virtual QSpiObjectReference& getParentReference() const;
+    virtual QSpiObjectReference getParentReference() const;
 
     virtual void accessibleEvent(QAccessible::Event event);
 
@@ -54,7 +54,7 @@ private Q_SLOTS:
 
 private:
     void callAccessibilityRegistry();
-    QSpiObjectReference *accessibilityRegistry;
+    QSpiObjectReference accessibilityRegistry;
 };
 
 #endif

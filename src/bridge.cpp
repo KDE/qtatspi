@@ -67,8 +67,8 @@ QSpiAccessibleBridge::QSpiAccessibleBridge()
 
     QAccessibleInterface* i = QAccessible::queryAccessibleInterface(qApp);
     QSpiApplication* accessible = new QSpiApplication(i);
-    objectToAccessibleMap.insert(qApp, accessible);
-    accessibleList.append(accessible);
+    adaptorWithObjectMap.insert(qApp, accessible);
+    allAdaptors.append(accessible);
     registerChildren(i);
 }
 
@@ -133,8 +133,9 @@ void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *interface)
 
 QSpiObjectReference QSpiAccessibleBridge::getRootReference() const
 {
-    Q_ASSERT(objectToAccessibleMap.contains(qApp));
-    return objectToAccessibleMap.value(qApp)->getReference();
+//    Q_ASSERT(adaptorWithObjectMap.contains(qApp));
+//    return adaptorWithObjectMap.value(qApp)->getReference();
+    return QSpiObjectReference(spiBridge->dBusConnection().baseService(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
 }
 
 void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface, int index)
@@ -149,14 +150,14 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
             QDBusVariant data;
             data.setVariant(QVariant::fromValue(lastFocused->getReference()));
             qDebug() << "last focus: " << lastFocused;
-            emit lastFocused->StateChanged("focused", 0, 0, data, lastFocused->getRootReference());
+            emit lastFocused->StateChanged("focused", 0, 0, data, getRootReference());
         }
         lastFocused = qobject_cast<QSpiAccessible*>(accessible);
     }
-    qDebug() << "QSpiAccessibleBridge::notifyAccessibilityUpdate" << QString::number(reason, 16)
-             << " obj: " << interface->object()
-             << (interface->isValid() ? interface->object()->objectName() : " invalid interface!")
-             << accessible->interface;
+//    qDebug() << "QSpiAccessibleBridge::notifyAccessibilityUpdate" << QString::number(reason, 16)
+//             << " obj: " << interface->object()
+//             << (interface->isValid() ? interface->object()->objectName() : " invalid interface!")
+//             << accessible->interface;
     accessible->accessibleEvent((QAccessible::Event)reason);
 }
 
@@ -179,15 +180,19 @@ void QSpiAccessibleBridge::registerChildren(QAccessibleInterface *interface)
         accessible = interfaceToAccessible(current);
 
         for (int i = 1; i <= current->childCount(); i++) {
-            QAccessibleInterface *child = NULL;
+            QAccessibleInterface *child = 0;
             int ret = current->navigate(QAccessible::Child, i, &child);
             if (ret == 0) {
+                Q_ASSERT(child != 0);
                 stack.push(child);
             } else if (ret > 0) {
-                qDebug() << "    Child " << i << " in " << current->object() << " ret: " << ret << child;
+                Q_ASSERT(child == 0);
+                qDebug() << "    Child " << i << " in " << current->object() << " child index: " << ret;
+                Q_ASSERT(i == ret);
                 interfaceToAccessible(current, i);
             } else {
                 qDebug() << "INVALID CHILD!";
+                Q_ASSERT(child == 0);
                 //Q_ASSERT(0);
             }
         }
@@ -197,8 +202,8 @@ void QSpiAccessibleBridge::registerChildren(QAccessibleInterface *interface)
 QSpiAdaptor* QSpiAccessibleBridge::objectToAccessible(QObject *object)
 {
     Q_ASSERT(object);
-    if (objectToAccessibleMap.contains(object))
-        return objectToAccessibleMap.value(object);
+    if (adaptorWithObjectMap.contains(object))
+        return adaptorWithObjectMap.value(object);
 
     QAccessibleInterface* interface = QAccessible::queryAccessibleInterface(object);
     if (!interface) {
@@ -213,22 +218,36 @@ QSpiAdaptor* QSpiAccessibleBridge::objectToAccessible(QObject *object)
 QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* interface, int index)
 {
     Q_ASSERT(interface && interface->isValid());
-    if (index == 0 && interface->object() && objectToAccessibleMap.contains(interface->object())) {
-        return objectToAccessibleMap.value(interface->object());
+    if (interface->object()) {
+        QHash<QObject*, QSpiAdaptor*>::const_iterator i = adaptorWithObjectMap.constFind(interface->object());
+        while (i != adaptorWithObjectMap.constEnd()) {
+            if (i.value()->child == index)
+                return i.value();
+            ++i;
+        }
     }
 
-    foreach (QSpiAdaptor* a, accessibleList) {
-        if (a->interface == interface && a->child == index)
-            return a;
+    // FIXME maybe cache (QHash<QAccessibleInterface*, QSpiAdaptor*> for things that don't have an object associated?
+    if (interface->object() == 0) {
+        foreach (QSpiAdaptor* a, adaptorWithoutObjectList) {
+            if (a->interface == interface && a->child == index)
+                return a;
+        }
+        qDebug() << "      QSpiAccessibleBridge::interfaceToAccessible new with no object";
+    } else {
+        qDebug() << "      QSpiAccessibleBridge::interfaceToAccessible new: " << interface->object()
+                 << interface->text(QAccessible::Name, index) << interface->role(index);
     }
 
     // FIXME look for interfaces with no object or index > 0
     QSpiAdaptor *accessible = new QSpiAccessible(interface, index);
 
     if (interface->object()) {
-        objectToAccessibleMap.insert(interface->object(), accessible);
+        adaptorWithObjectMap.insertMulti(interface->object(), accessible);
+    } else {
+        adaptorWithoutObjectList.append(accessible);
     }
-    accessibleList.append(accessible);
+    allAdaptors.append(accessible);
     cache->emitAddAccessible(accessible->getCacheItem());
 
     int childCount = 0;
@@ -239,7 +258,6 @@ QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* i
         if (parent)
             parentAdaptor = interfaceToAccessible(parent);
         childCount = parent->childCount();
-
     } else {
         parentAdaptor = interfaceToAccessible(interface, 0);
         childCount = interface->childCount();

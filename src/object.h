@@ -71,8 +71,8 @@ public:
     QStringList getSupportedInterfaces() const;
     QSpiAccessibleCacheItem getCacheItem() const;
 
-    virtual QSpiObjectReference &getReference() const;
-    virtual QSpiObjectReference &getParentReference() const = 0;
+    virtual QSpiObjectReference getReference() const;
+    virtual QSpiObjectReference getParentReference() const = 0;
 
     virtual void accessibleEvent(QAccessible::Event event) = 0;
 
@@ -80,7 +80,7 @@ public:
     QAccessibleInterface *interface;
     int child;
 protected:
-    QSpiObjectReference *reference;
+    QSpiObjectReference reference;
     QStringList supportedInterfaces;
 };
 

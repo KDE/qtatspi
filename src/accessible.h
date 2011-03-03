@@ -44,7 +44,7 @@ class QSpiAccessible : public QSpiAdaptor
 public:
     QSpiAccessible(QAccessibleInterface *interface, int index = 0);
 
-    virtual QSpiObjectReference& getParentReference() const;
+    virtual QSpiObjectReference getParentReference() const;
 
     virtual void accessibleEvent(QAccessible::Event event);
 

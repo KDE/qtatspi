@@ -45,32 +45,25 @@
 
 void QSpiAdaptor::signalChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data)
 {
-    emit ChildrenChanged(type, detail1, detail2, data, getRootReference());
-}
-
-QSpiObjectReference QSpiAdaptor::getRootReference() const
-{
-    return QSpiObjectReference(spiBridge->dBusConnection().baseService(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
+    emit ChildrenChanged(type, detail1, detail2, data, spiBridge->getRootReference());
 }
 
 int QSpiAdaptor::childCount() const
 {
-    if (interface->object()->objectName() == "menuBar") {
-        qDebug() << "menu child count";
-    }
-
+    if (child)
+        return 0;
     return interface->childCount();
 }
 
 QString QSpiAdaptor::description() const
 {
-    return interface->text(QAccessible::Description, 0);
+    return interface->text(QAccessible::Description, child);
 }
 
 QString QSpiAdaptor::name() const
 {
     Q_ASSERT(interface->isValid());
-    return interface->text(QAccessible::Name, 0);
+    return interface->text(QAccessible::Name, child);
 }
 
 QSpiObjectReference QSpiAdaptor::parent() const
@@ -92,51 +85,60 @@ QSpiAttributeSet QSpiAdaptor::GetAttributes()
 
 QSpiObjectReference QSpiAdaptor::GetChildAtIndex(int index)
 {
-    QList<QSpiObject *> children;
+    // if we are the child of a complex widget, we cannot have any children
+    Q_ASSERT(child == 0);
+    Q_ASSERT(index < interface->childCount());
 
-    qDebug() << "QSpiAdaptor::GetChildAtIndex get child " << index << " of " << interface->childCount();
-    qDebug() << interface->text(QAccessible::Name, 0);
-    for (int i = 1; i <= interface->childCount (); i++) {
-        QAccessibleInterface *child = NULL;
-        interface->navigate(QAccessible::Child, i, &child);
-        if (child) {
-            QSpiObject *current;
-            current = spiBridge->objectToAccessible(child->object());
-            if (current)
-                children << current;
-        }
+    qDebug() << "QSpiAdaptor::GetChildAtIndex get child " << index << " of " << interface->childCount()
+             << interface->text(QAccessible::Name, 0) << interface->object();
+
+    if (interface->text(QAccessible::Name, 0) == "Fruits") {
+        qDebug() << "fruit salad" << interface->object();
     }
 
-    Q_ASSERT(index < children.length());
+    QSpiAdaptor* child = getChild(interface, index+1);
+//    Q_ASSERT(child);
+    if (!child) {
+        qWarning() << "QSpiAdaptor::GetChildAtIndex could not find child!";
+        return QSpiObjectReference();
+    }
 
-    return children.value(index)->getReference();
+    return child->getReference();
 }
 
 QSpiObjectReferenceArray QSpiAdaptor::GetChildren()
 {
+    // if we are the child of a complex widget, we cannot have any children
+    Q_ASSERT(child == 0);
+
     QList<QSpiObjectReference> children;
 
     for (int i = 1; i <= interface->childCount(); ++i) {
-        QAccessibleInterface *child = NULL;
-        interface->navigate(QAccessible::Child, i, &child);
-        if (child) {
-            QSpiObject *current;
-            current = spiBridge->objectToAccessible(child->object());
-            if (current)
-                children << current->getReference();
-        }
+        QSpiAdaptor* child = getChild(interface, i);
+        if (child)
+            children << child->getReference();
     }
-
     return children;
+}
+
+QSpiAdaptor* QSpiAdaptor::getChild(QAccessibleInterface* interface, int index)
+{
+    Q_ASSERT(index > 0 && index <= interface->childCount());
+    QAccessibleInterface *child = 0;
+    int ret = interface->navigate(QAccessible::Child, index, &child);
+    if (ret == 0) {
+        return spiBridge->interfaceToAccessible(child, 0);
+    } else if (ret > 0){
+        Q_ASSERT(ret <= interface->childCount());
+        return spiBridge->interfaceToAccessible(interface, ret);
+    }
+    return 0;
 }
 
 int QSpiAdaptor::GetIndexInParent()
 {
-    // TODO
-    // Not handling for now. indexInParent can now be calculated just as
-    // easily on the client side.
-    qDebug() << "QSpiAdaptor::GetIndexInParent" << interface->text(QAccessible::Name, 0);
-    qDebug() << "  obj: " << interface->object();
+//    qDebug() << "QSpiAdaptor::GetIndexInParent" << interface->text(QAccessible::Name, 0);
+//    qDebug() << "  obj: " << interface->object();
 
     QAccessibleInterface* parent;
     interface->navigate(QAccessible::Ancestor, 1, &parent);
@@ -202,10 +204,10 @@ QSpiActionArray QSpiAdaptor::GetActions()
         QSpiAction action;
         QStringList keyBindings;
 
-        action.name = interface->actionInterface()->name (i);
-        action.description = interface->actionInterface()->description (i);
+        action.name = interface->actionInterface()->name(i);
+        action.description = interface->actionInterface()->description(i);
 
-        keyBindings = interface->actionInterface()->keyBindings (i);
+        keyBindings = interface->actionInterface()->keyBindings(i);
 
         if (keyBindings.length() > 0)
                 action.keyBinding = keyBindings[0];
@@ -219,14 +221,14 @@ QSpiActionArray QSpiAdaptor::GetActions()
 
 QString QSpiAdaptor::GetDescription(int index)
 {
-    return interface->actionInterface()->description (index);
+    return interface->actionInterface()->description(index);
 }
 
 QString QSpiAdaptor::GetKeyBinding(int index)
 {
     QStringList keyBindings;
 
-    keyBindings = interface->actionInterface()->keyBindings (index);
+    keyBindings = interface->actionInterface()->keyBindings(index);
     /* Might as well return the first key binding, what are the other options? */
     if (keyBindings.length() > 0)
         return keyBindings[0];
@@ -261,9 +263,9 @@ QString QSpiAdaptor::version() const
 
 QString QSpiAdaptor::GetLocale(uint lctype)
 {
-    Q_UNUSED (lctype);
+    Q_UNUSED(lctype)
     QLocale currentLocale;
-    return currentLocale.languageToString (currentLocale.language());
+    return currentLocale.languageToString(currentLocale.language());
 }
 
 /* AT-SPI Component interface -----------------------------------------------*/
@@ -405,18 +407,18 @@ bool QSpiAdaptor::GrabFocus()
 
 void QSpiAdaptor::CopyText(int startPos, int endPos)
 {
-    return interface->editableTextInterface()->copyText (startPos, endPos);
+    return interface->editableTextInterface()->copyText(startPos, endPos);
 }
 
 bool QSpiAdaptor::CutText(int startPos, int endPos)
 {
-    interface->editableTextInterface()->cutText (startPos, endPos);
+    interface->editableTextInterface()->cutText(startPos, endPos);
     return TRUE;
 }
 
 bool QSpiAdaptor::DeleteText(int startPos, int endPos)
 {
-    interface->editableTextInterface()->deleteText (startPos, endPos);
+    interface->editableTextInterface()->deleteText(startPos, endPos);
     return TRUE;
 }
 
@@ -424,19 +426,19 @@ bool QSpiAdaptor::InsertText(int position, const QString &text, int length)
 {
     QString resized (text);
     resized.resize(length);
-    interface->editableTextInterface()->insertText (position, text);
+    interface->editableTextInterface()->insertText(position, text);
     return TRUE;
 }
 
 bool QSpiAdaptor::PasteText(int position)
 {
-    interface->editableTextInterface()->pasteText (position);
+    interface->editableTextInterface()->pasteText(position);
     return TRUE;
 }
 
 bool QSpiAdaptor::SetTextContents(const QString &newContents)
 {
-    interface->editableTextInterface()->replaceText (0, interface->textInterface()->characterCount(), newContents);
+    interface->editableTextInterface()->replaceText(0, interface->textInterface()->characterCount(), newContents);
     return TRUE;
 }
 
@@ -478,13 +480,13 @@ QSpiObjectReference QSpiAdaptor::summary() const
 
 bool QSpiAdaptor::AddColumnSelection(int column)
 {
-    interface->tableInterface()->selectColumn (column);
+    interface->tableInterface()->selectColumn(column);
     return TRUE;
 }
 
 bool QSpiAdaptor::AddRowSelection(int row)
 {
-    interface->tableInterface()->selectRow (row);
+    interface->tableInterface()->selectRow(row);
     return TRUE;
 }
 
@@ -496,29 +498,29 @@ QSpiObjectReference QSpiAdaptor::GetAccessibleAt(int row, int column)
 
 int QSpiAdaptor::GetColumnAtIndex(int index)
 {
-    return interface->tableInterface()->columnIndex (index);
+    return interface->tableInterface()->columnIndex(index);
 }
 
 QString QSpiAdaptor::GetColumnDescription(int column)
 {
-    return interface->tableInterface()->columnDescription (column);
+    return interface->tableInterface()->columnDescription(column);
 }
 
 int QSpiAdaptor::GetColumnExtentAt(int row, int column)
 {
-    return interface->tableInterface()->columnSpan (row, column);
+    return interface->tableInterface()->columnSpan(row, column);
 }
 
 QSpiObjectReference QSpiAdaptor::GetColumnHeader(int column)
 {
     Q_UNUSED (column);
     // TODO There should be a column param in this function right?
-    return spiBridge->objectToAccessible (interface->tableInterface()->columnHeader()->object())->getReference();
+    return spiBridge->objectToAccessible(interface->tableInterface()->columnHeader()->object())->getReference();
 }
 
 int QSpiAdaptor::GetIndexAt(int row, int column)
 {
-    return interface->tableInterface()->childIndex (row, column);
+    return interface->tableInterface()->childIndex(row, column);
 }
 
 int QSpiAdaptor::GetRowAtIndex(int index)

@@ -59,7 +59,7 @@ public:
         QDBusConnection dBusConnection() const;
 
         QList<QSpiAdaptor*> cacheObjects() const
-        { return accessibleList; }
+        { return allAdaptors; }
 
 private:
         static QSpiAccessibleBridge* self;
@@ -71,8 +71,9 @@ private:
         QSpiDBusCache *cache;
         DeviceEventControllerProxy *dec;
 
-        QHash<QObject*, QSpiAdaptor*> objectToAccessibleMap;
-        QList<QSpiAdaptor*> accessibleList;
+        QHash<QObject*, QSpiAdaptor*> adaptorWithObjectMap;
+        QList<QSpiAdaptor*> adaptorWithoutObjectList;
+        QList<QSpiAdaptor*> allAdaptors;
 
         QDBusConnection dbusConnection;
 };

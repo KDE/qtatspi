@@ -33,9 +33,9 @@ QSpiObject::QSpiObject(QAccessibleInterface *_interface, int child)
 {
 }
 
-QSpiObjectReference &QSpiObject::getReference() const
+QSpiObjectReference QSpiObject::getReference() const
 {
-    return *reference;
+    return reference;
 }
 
 QStringList QSpiObject::getSupportedInterfaces() const
@@ -47,7 +47,7 @@ QSpiAccessibleCacheItem QSpiObject::getCacheItem() const
 {
     Q_ASSERT(interface);
     if (!interface->isValid()) {
-        qWarning() << "QSpiObject::getCacheItem: invalid interface" << reference->path.path();
+        qWarning() << "QSpiObject::getCacheItem: invalid interface" << reference.path.path();
         return QSpiAccessibleCacheItem();
     }
 

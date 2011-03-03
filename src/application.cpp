@@ -34,10 +34,10 @@
 #define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
 
 QSpiApplication::QSpiApplication(QAccessibleInterface *interface)
-    :QSpiAdaptor(interface, 0), accessibilityRegistry(0)
+    :QSpiAdaptor(interface, 0)
 {
-    reference = new QSpiObjectReference(spiBridge->dBusConnection().baseService(),
-           QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
+    reference = QSpiObjectReference(spiBridge->dBusConnection().baseService(),
+                   QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
 
     new AccessibleAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;
@@ -45,7 +45,7 @@ QSpiApplication::QSpiApplication(QAccessibleInterface *interface)
     new ApplicationAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_APPLICATION;
 
-    spiBridge->dBusConnection().registerObject(reference->path.path(),
+    spiBridge->dBusConnection().registerObject(reference.path.path(),
                                   this, QDBusConnection::ExportAdaptors);
 
     callAccessibilityRegistry();
@@ -63,9 +63,8 @@ void QSpiApplication::callAccessibilityRegistry()
     reply.waitForFinished();
     if (reply.isValid ()) {
         const QSpiObjectReference &socket = reply.value();
-        accessibilityRegistry = new QSpiObjectReference(socket);
+        accessibilityRegistry = QSpiObjectReference(socket);
     } else {
-        accessibilityRegistry = new QSpiObjectReference();
         qDebug() << "Error in contacting registry";
         qDebug() << reply.error().name();
         qDebug() << reply.error().message();
@@ -73,9 +72,9 @@ void QSpiApplication::callAccessibilityRegistry()
     delete registry;
 }
 
-QSpiObjectReference &QSpiApplication::getParentReference() const
+QSpiObjectReference QSpiApplication::getParentReference() const
 {
-    return *accessibilityRegistry;
+    return accessibilityRegistry;
 }
 
 void QSpiApplication::accessibleEvent(QAccessible::Event event)

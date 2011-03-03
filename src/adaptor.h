@@ -32,11 +32,11 @@
 class QSpiAdaptor :public QSpiObject
 {
     Q_OBJECT
+
 public:
     QSpiAdaptor(QAccessibleInterface *interface, int index)
         : QSpiObject(interface, index) {}
 
-    QSpiObjectReference getRootReference() const;
     // event stuff
     void signalChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data);
 Q_SIGNALS:
@@ -191,6 +191,9 @@ public:
     double minimumIncrement() const;
     Q_PROPERTY(double MinimumValue READ minimumValue)
     double minimumValue() const;
+
+private:
+    QSpiAdaptor* getChild(QAccessibleInterface* interface, int child);
 };
 
 #endif /* Q_SPI_ADAPTOR_H */

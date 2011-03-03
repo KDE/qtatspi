@@ -55,13 +55,15 @@ QDBusObjectPath QSpiAccessible::getUnique()
 QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
     : QSpiAdaptor(interface, index)
 {
-    reference = new QSpiObjectReference(spiBridge->dBusConnection().baseService(),
+    reference = QSpiObjectReference(spiBridge->dBusConnection().baseService(),
                                                getUnique());
+
+    qDebug() << "ACCESSIBLE: " << interface->object() << reference.path.path();
 
     new AccessibleAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;
 
-    if (!interface->rect(index).isEmpty() || (interface->object() && interface->object()->isWidgetType())) {
+    if ((!interface->rect(index).isEmpty()) || (interface->object() && interface->object()->isWidgetType())) {
         new ComponentAdaptor(this);
         supportedInterfaces << QSPI_INTERFACE_COMPONENT;
 
@@ -69,11 +71,11 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
             QWidget *w = qobject_cast<QWidget*>(interface->object());
             if (w->isWindow()) {
                 new WindowAdaptor(this);
-                qDebug() << "Created Window adaptor for: " << interface->object();
+                qDebug() << " + window";
             }
         }
     } else {
-        qDebug() << "NO ComponentAdaptor for: " << interface->object();
+        qDebug() << " - component";
     }
 
     new ObjectAdaptor(this);
@@ -105,12 +107,12 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
         supportedInterfaces << QSPI_INTERFACE_TABLE;
     }
 
-    spiBridge->dBusConnection().registerObject(reference->path.path(),
+    spiBridge->dBusConnection().registerObject(reference.path.path(),
                                   this, QDBusConnection::ExportAdaptors);
     state = interface->state(0);
 }
 
-QSpiObjectReference &QSpiAccessible::getParentReference() const
+QSpiObjectReference QSpiAccessible::getParentReference() const
 {
     Q_ASSERT(interface);
 
@@ -125,9 +127,7 @@ QSpiObjectReference &QSpiAccessible::getParentReference() const
         }
     }
 
-    static QSpiObjectReference null_reference(spiBridge->dBusConnection().baseService(),
-                                              QDBusObjectPath(QSPI_OBJECT_PATH_NULL));
-    return null_reference;
+    return QSpiObjectReference();
 }
 
 void QSpiAccessible::accessibleEvent(QAccessible::Event event)
@@ -139,22 +139,21 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         QSpiObjectReference r = getReference();
         QDBusVariant data;
         data.setVariant(QVariant::fromValue(r));
-        emit PropertyChange("accessible-name", 0, 0, data, getRootReference());
+        emit PropertyChange("accessible-name", 0, 0, data, spiBridge->getRootReference());
         break;
     }
     case QAccessible::DescriptionChanged: {
         QSpiObjectReference r = getReference();
         QDBusVariant data;
         data.setVariant(QVariant::fromValue(r));
-        emit PropertyChange("accessible-description", 0, 0, data, getRootReference());
+        emit PropertyChange("accessible-description", 0, 0, data, spiBridge->getRootReference());
         break;
     }
     case QAccessible::Focus: {
-        qDebug() << "Focus event";
         QDBusVariant data;
         data.setVariant(QVariant::fromValue(getReference()));
-        emit StateChanged("focused", 1, 0, data, getRootReference());
-        emit Focus("", 0, 0, data, getRootReference());
+        emit StateChanged("focused", 1, 0, data, spiBridge->getRootReference());
+        emit Focus("", 0, 0, data, spiBridge->getRootReference());
         break;
     }
     case QAccessible::ObjectShow:
@@ -175,9 +174,9 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
     }
     case QAccessible::ParentChanged:
     default:
-        qWarning() << "QSpiAccessible::accessibleEvent not handled: " << QString::number(event, 16)
-                   << " obj: " << interface->object()
-                   << (interface->isValid() ? interface->object()->objectName() : " invalid interface!");
+//        qWarning() << "QSpiAccessible::accessibleEvent not handled: " << QString::number(event, 16)
+//                   << " obj: " << interface->object()
+//                   << (interface->isValid() ? interface->object()->objectName() : " invalid interface!");
         break;
     }
 }
@@ -186,7 +185,7 @@ void QSpiAccessible::windowActivated()
 {
     QDBusVariant data;
     data.setVariant(QString());
-    emit Create("", 0, 0, data, getRootReference());
-    emit Restore("", 0, 0, data, getRootReference());
-    emit Activate("", 0, 0, data, getRootReference());
+    emit Create("", 0, 0, data, spiBridge->getRootReference());
+    emit Restore("", 0, 0, data, spiBridge->getRootReference());
+    emit Activate("", 0, 0, data, spiBridge->getRootReference());
 }

@@ -38,13 +38,13 @@ Q_DECLARE_METATYPE(QSpiUIntList)
 /* QSpiObjectReference */
 /*---------------------------------------------------------------------------*/
 
+// FIXME: make this copy on write
 struct QSpiObjectReference
 {
     QString name;
     QDBusObjectPath path;
 
-    QSpiObjectReference()
-        : path(QDBusObjectPath("/")) {}
+    QSpiObjectReference(); // null reference
     QSpiObjectReference(QString name, QDBusObjectPath path)
         : name(name), path(path) {}
 };

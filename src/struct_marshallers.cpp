@@ -22,7 +22,14 @@
 #include <QtDBus>
 
 #include "struct_marshallers.h"
+#include "bridge.h"
 
+#define QSPI_OBJECT_PATH_PREFIX  "/org/a11y/atspi/accessible/"
+#define QSPI_OBJECT_PATH_NULL    QSPI_OBJECT_PATH_PREFIX "null"
+
+QSpiObjectReference::QSpiObjectReference()
+    : name(spiBridge->dBusConnection().baseService()), path(QDBusObjectPath(QSPI_OBJECT_PATH_NULL))
+{}
 
 /* QSpiAccessibleCacheArray */
 /*---------------------------------------------------------------------------*/
