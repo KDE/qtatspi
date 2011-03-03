@@ -153,10 +153,10 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
         }
         lastFocused = qobject_cast<QSpiAccessible*>(accessible);
     }
-qDebug() << "QSpiAccessibleBridge::notifyAccessibilityUpdate" << QString::number(reason, 16)
-         << " obj: " << interface->object()
-         << (interface->isValid() ? interface->object()->objectName() : " invalid interface!")
-            << accessible->interface;
+    qDebug() << "QSpiAccessibleBridge::notifyAccessibilityUpdate" << QString::number(reason, 16)
+             << " obj: " << interface->object()
+             << (interface->isValid() ? interface->object()->objectName() : " invalid interface!")
+             << accessible->interface;
     accessible->accessibleEvent((QAccessible::Event)reason);
 }
 
@@ -175,7 +175,7 @@ void QSpiAccessibleBridge::registerChildren(QAccessibleInterface *interface)
     stack.push(interface);
     while (!stack.empty()) {
         current = stack.pop();
-        qDebug() << "  child: " << current->object();
+        qDebug() << "QSpiAccessibleCache::registerChildren:" << current->object() << " childCount:" << current->childCount();
         accessible = interfaceToAccessible(current);
 
         for (int i = 1; i <= current->childCount(); i++) {
@@ -184,7 +184,7 @@ void QSpiAccessibleBridge::registerChildren(QAccessibleInterface *interface)
             if (ret == 0) {
                 stack.push(child);
             } else if (ret > 0) {
-                qDebug() << "Child " << i << " in " << current->object() << " ret: " << ret << child;
+                qDebug() << "    Child " << i << " in " << current->object() << " ret: " << ret << child;
                 interfaceToAccessible(current, i);
             } else {
                 qDebug() << "INVALID CHILD!";

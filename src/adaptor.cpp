@@ -69,6 +69,7 @@ QString QSpiAdaptor::description() const
 
 QString QSpiAdaptor::name() const
 {
+    Q_ASSERT(interface->isValid());
     return interface->text(QAccessible::Name, 0);
 }
 
@@ -489,7 +490,8 @@ bool QSpiAdaptor::AddRowSelection(int row)
 
 QSpiObjectReference QSpiAdaptor::GetAccessibleAt(int row, int column)
 {
-    return spiBridge->objectToAccessible (interface->tableInterface()->accessibleAt(row, column)->object())->getReference();
+    Q_ASSERT(interface->tableInterface());
+    return spiBridge->objectToAccessible(interface->tableInterface()->accessibleAt(row, column)->object())->getReference();
 }
 
 int QSpiAdaptor::GetColumnAtIndex(int index)
