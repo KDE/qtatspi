@@ -68,7 +68,7 @@ private:
         QString getAccessibilityBusAddress() const;
         QDBusConnection connectDBus();
 
-        void registerChildren(QAccessibleInterface *interface);
+        void registerChildren(QSpiAdaptor* interface);
 
         QSpiDBusCache *cache;
         DeviceEventControllerProxy *dec;

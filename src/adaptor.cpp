@@ -73,7 +73,7 @@ QSpiAccessibleCacheItem QSpiAdaptor::getCacheItem() const
     /* Children */
     QList<QSpiObjectReference> childPaths;
     for (int i = 1; i <= interface->childCount(); i++) {
-        QSpiAdaptor* child = getChild(interface, i);
+        QSpiAdaptor* child = getChild(i);
         if (child)
             childPaths << child->getReference();
     }
@@ -140,7 +140,7 @@ QSpiObjectReference QSpiAdaptor::GetChildAtIndex(int index)
         qDebug() << "fruit salad" << interface->object();
     }
 
-    QSpiAdaptor* child = getChild(interface, index+1);
+    QSpiAdaptor* child = getChild(index+1);
 //    Q_ASSERT(child);
     if (!child) {
         qWarning() << "QSpiAdaptor::GetChildAtIndex could not find child!";
@@ -158,14 +158,14 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren()
     QList<QSpiObjectReference> children;
 
     for (int i = 1; i <= interface->childCount(); ++i) {
-        QSpiAdaptor* child = getChild(interface, i);
+        QSpiAdaptor* child = getChild(i);
         if (child)
             children << child->getReference();
     }
     return children;
 }
 
-QSpiAdaptor* QSpiAdaptor::getChild(QAccessibleInterface* interface, int index) const
+QSpiAdaptor* QSpiAdaptor::getChild(int index) const
 {
     Q_ASSERT(index > 0 && index <= interface->childCount());
     QAccessibleInterface *child = 0;
@@ -176,6 +176,7 @@ QSpiAdaptor* QSpiAdaptor::getChild(QAccessibleInterface* interface, int index) c
         Q_ASSERT(ret <= interface->childCount());
         return spiBridge->interfaceToAccessible(interface, ret, true);
     }
+    qWarning() << "QSpiAdaptor::getChild INVALID CHILD: " << interface->object() << index;
     return 0;
 }
 
@@ -183,6 +184,8 @@ int QSpiAdaptor::GetIndexInParent()
 {
 //    qDebug() << "QSpiAdaptor::GetIndexInParent" << interface->text(QAccessible::Name, 0);
 //    qDebug() << "  obj: " << interface->object();
+    if (child)
+        return child;
 
     QAccessibleInterface* parent;
     interface->navigate(QAccessible::Ancestor, 1, &parent);

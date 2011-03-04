@@ -68,7 +68,7 @@ QSpiAccessibleBridge::QSpiAccessibleBridge()
     QSpiApplication* accessible = new QSpiApplication(i);
     adaptorWithObjectMap.insert(qApp, accessible);
     allAdaptors.append(accessible);
-    registerChildren(i);
+    registerChildren(accessible);
 }
 
 QSpiAccessibleBridge::~QSpiAccessibleBridge ()
@@ -132,8 +132,6 @@ void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *interface)
 
 QSpiObjectReference QSpiAccessibleBridge::getRootReference() const
 {
-//    Q_ASSERT(adaptorWithObjectMap.contains(qApp));
-//    return adaptorWithObjectMap.value(qApp)->getReference();
     return QSpiObjectReference(spiBridge->dBusConnection().baseService(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
 }
 
@@ -161,36 +159,26 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
     accessible->accessibleEvent((QAccessible::Event)reason);
 }
 
-void QSpiAccessibleBridge::registerChildren(QAccessibleInterface *interface)
+void QSpiAccessibleBridge::registerChildren(QSpiAdaptor* rootAdaptor)
 {
-    Q_ASSERT(interface);
-    Q_ASSERT(interface->object());
-
-    qDebug() << "QSpiAccessibleCache::registerChildren: " << interface->object();
+    Q_ASSERT(rootAdaptor);
+    qDebug() << "QSpiAccessibleCache::registerChildren: " << rootAdaptor->associatedInterface()->object();
 
     /* Depth first iteration over all un-registered objects */
-    QStack <QAccessibleInterface *> stack;
-    stack.push(interface);
+    QStack <QSpiAdaptor*> stack;
+    stack.push(rootAdaptor);
     while (!stack.empty()) {
-        QAccessibleInterface *current = stack.pop();
-        qDebug() << "QSpiAccessibleCache::registerChildren:" << current->object() << " childCount:" << current->childCount();
+        QSpiAdaptor* current = stack.pop();
+        qDebug() << "QSpiAccessibleCache::registerChildren:" << current->associatedInterface()->object()
+                 << " childCount:" << current->childCount();
 
-        for (int i = 1; i <= current->childCount(); i++) {
-            QAccessibleInterface *child = 0;
-            int ret = current->navigate(QAccessible::Child, i, &child);
-            if (ret == 0) {
-                Q_ASSERT(child != 0);
-                stack.push(child);
-            } else if (ret > 0) {
-                Q_ASSERT(child == 0);
-                qDebug() << "    Child " << i << " in " << current->object() << " child index: " << ret;
-                Q_ASSERT(i == ret);
-                interfaceToAccessible(current, i, true);
-            } else {
-                qDebug() << "INVALID CHILD!";
-                Q_ASSERT(child == 0);
-                //Q_ASSERT(0);
+        for(int index = 0; index < current->childCount(); ++index) {
+            QSpiAdaptor* child = current->getChild(index+1);
+            if (!child) {
+                qWarning() << "  INVALID CHILD: " << index;
+                continue;
             }
+            stack.push(child);
         }
     }
 }
@@ -232,7 +220,7 @@ QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* i
         qDebug() << "      QSpiAccessibleBridge::interfaceToAccessible new with no object";
     } else {
         qDebug() << "      QSpiAccessibleBridge::interfaceToAccessible new: " << interface->object()
-                 << interface->text(QAccessible::Name, index) << interface->role(index);
+                 << interface->text(QAccessible::Name, index) << qSpiRoleMapping.value(interface->role(index)).name();
     }
 
     // FIXME look for interfaces with no object or index > 0

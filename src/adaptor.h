@@ -230,13 +230,16 @@ public:
     Q_PROPERTY(double MinimumValue READ minimumValue)
     double minimumValue() const;
 
+
+
+public:
+    QSpiAdaptor* getChild(int child) const;
 protected:
     QAccessibleInterface *interface;
     QSpiObjectReference reference;
     QStringList supportedInterfaces;
 
 private:
-    QSpiAdaptor* getChild(QAccessibleInterface* interface, int child) const;
 
     int child;
 };
