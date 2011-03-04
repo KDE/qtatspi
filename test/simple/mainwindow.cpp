@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QDebug>
+#include <QtGui/QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -12,6 +13,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(createButton()));
     connect(ui->action_Quit, SIGNAL(triggered()), qApp, SLOT(quit()));
+
+    if (qgetenv("QT_ACCESSIBILITY") != "1")
+        QMessageBox::warning(this, tr("Qt Accessibility not enabled"),
+            tr("In order to test accessibility, please export \"QT_ACCESSIBILITY=1\" before starting this applicaton."));
 }
 
 MainWindow::~MainWindow()
