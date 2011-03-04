@@ -1,0 +1,14 @@
+Qt AT-SPI2 bridge
+=================
+
+This is a Qt plugin that bridges Qt's accessibility API to AT-SPI2.
+With recent versions of AT-SPI2 this should make Qt applications accessible
+with the help of tools such as Gnome's Orca screen-reader.
+
+Qt will only load this plugin when the environment variable
+QT_ACCESSIBILITY is set to 1.
+
+$ export QT_ACCESSIBILITY=1
+
+~                                                                                                                                                            
+~                       
