@@ -20,21 +20,12 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include <QApplication>
-#include <QObject>
-#include <QWidget>
-#include <QWidgetList>
-#include <QApplication>
-#include <QStackedWidget>
+#include "cache.h"
+#include "generated/cache_adaptor.h"
 
 #include "bridge.h"
-#include "cache.h"
-#include "object.h"
 #include "adaptor.h"
-#include "accessible.h"
-#include "application.h"
 
-#include "generated/cache_adaptor.h"
 
 #define QSPI_OBJECT_PATH_CACHE "/org/a11y/atspi/cache"
 
@@ -57,8 +48,7 @@ QSpiAccessibleCacheArray QSpiDBusCache::GetItems()
 {
     QList <QSpiAccessibleCacheItem> cacheArray;
 
-    foreach (QSpiObject *obj, spiBridge->cacheObjects())
-    {
+    foreach (QSpiAdaptor* obj, spiBridge->cacheObjects()) {
         cacheArray << obj->getCacheItem();
     }
     return cacheArray;

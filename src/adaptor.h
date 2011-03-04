@@ -22,21 +22,59 @@
 #ifndef Q_SPI_ADAPTOR_H
 #define Q_SPI_ADAPTOR_H
 
-#include "object.h"
+#include <QtCore/QObject>
+#include <QtGui/QAccessibleInterface>
+
+#include "struct_marshallers.h"
+
+#define QSPI_INTERFACE_PREFIX "org.a11y.atspi"
+
+#define QSPI_INTERFACE_ACCESSIBLE            QSPI_INTERFACE_PREFIX ".Accessible"
+#define QSPI_INTERFACE_ACTION                QSPI_INTERFACE_PREFIX ".Action"
+#define QSPI_INTERFACE_APPLICATION           QSPI_INTERFACE_PREFIX ".Application"
+#define QSPI_INTERFACE_COLLECTION            QSPI_INTERFACE_PREFIX ".Collection"
+#define QSPI_INTERFACE_COMPONENT             QSPI_INTERFACE_PREFIX ".Component"
+#define QSPI_INTERFACE_DOCUMENT              QSPI_INTERFACE_PREFIX ".Document"
+#define QSPI_INTERFACE_EDITABLE_TEXT         QSPI_INTERFACE_PREFIX ".EditableText"
+#define QSPI_INTERFACE_HYPERLINK             QSPI_INTERFACE_PREFIX ".Hyperlink"
+#define QSPI_INTERFACE_HYPERTEXT             QSPI_INTERFACE_PREFIX ".Hypertext"
+#define QSPI_INTERFACE_IMAGE                 QSPI_INTERFACE_PREFIX ".Image"
+#define QSPI_INTERFACE_REGISTRY              QSPI_INTERFACE_PREFIX ".Registry"
+#define QSPI_INTERFACE_SELECTION             QSPI_INTERFACE_PREFIX ".Selection"
+#define QSPI_INTERFACE_TABLE                 QSPI_INTERFACE_PREFIX ".Table"
+#define QSPI_INTERFACE_TEXT                  QSPI_INTERFACE_PREFIX ".Text"
+#define QSPI_INTERFACE_TREE                  QSPI_INTERFACE_PREFIX ".Tree"
+#define QSPI_INTERFACE_VALUE                 QSPI_INTERFACE_PREFIX ".Value"
+
+#define QSPI_OBJECT_PATH_PREFIX  "/org/a11y/atspi/accessible/"
+#define QSPI_OBJECT_PATH_NULL    QSPI_OBJECT_PATH_PREFIX "null"
+#define QSPI_OBJECT_PATH_ROOT    QSPI_OBJECT_PATH_PREFIX "root"
+
+
 
 /*
  * Implements all methods neccessary to adapt calls from AT-SPI to the
  * QAccessibleInterface.
  *
  */
-class QSpiAdaptor :public QSpiObject
+class QSpiAdaptor :public QObject
 {
     Q_OBJECT
 
 public:
-    QSpiAdaptor(QAccessibleInterface *interface, int index)
-        : QSpiObject(interface, index) {}
+    QSpiAdaptor(QAccessibleInterface *interface, int index);
 
+    QStringList getSupportedInterfaces() const;
+    QSpiAccessibleCacheItem getCacheItem() const;
+
+    virtual QSpiObjectReference getReference() const;
+    virtual QSpiObjectReference getParentReference() const = 0;
+
+    virtual void accessibleEvent(QAccessible::Event event) = 0;
+    inline QAccessibleInterface* associatedInterface() const { return interface; }
+    inline int childIndex() const { return child; }
+
+public:
     // event stuff
     void signalChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data);
 Q_SIGNALS:
@@ -192,8 +230,15 @@ public:
     Q_PROPERTY(double MinimumValue READ minimumValue)
     double minimumValue() const;
 
+protected:
+    QAccessibleInterface *interface;
+    QSpiObjectReference reference;
+    QStringList supportedInterfaces;
+
 private:
-    QSpiAdaptor* getChild(QAccessibleInterface* interface, int child);
+    QSpiAdaptor* getChild(QAccessibleInterface* interface, int child) const;
+
+    int child;
 };
 
 #endif /* Q_SPI_ADAPTOR_H */

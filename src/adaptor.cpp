@@ -42,6 +42,50 @@
 #include "constant_mappings.h"
 
 
+QSpiAdaptor::QSpiAdaptor(QAccessibleInterface *interface_, int child)
+    : interface(interface_), child(child)
+{
+}
+
+QSpiObjectReference QSpiAdaptor::getReference() const
+{
+    return reference;
+}
+
+QStringList QSpiAdaptor::getSupportedInterfaces() const
+{
+    return supportedInterfaces;
+}
+
+QSpiAccessibleCacheItem QSpiAdaptor::getCacheItem() const
+{
+    Q_ASSERT(interface);
+    if (!interface->isValid()) {
+        qWarning() << "QSpiObject::getCacheItem: invalid interface" << reference.path.path();
+        return QSpiAccessibleCacheItem();
+    }
+
+    QSpiAccessibleCacheItem item;
+    item.path = getReference();
+    item.parent = getParentReference();
+    item.application = spiBridge->getRootReference();
+
+    /* Children */
+    QList<QSpiObjectReference> childPaths;
+    for (int i = 1; i <= interface->childCount(); i++) {
+        QSpiAdaptor* child = getChild(interface, i);
+        if (child)
+            childPaths << child->getReference();
+    }
+    item.children = childPaths;
+
+    item.supportedInterfaces = getSupportedInterfaces();
+    item.name = interface->text(QAccessible::Name, child);
+    item.role = qSpiRoleMapping.value(interface->role(child)).spiRole();
+    item.description = interface->text(QAccessible::Description, child);
+    item.states = qSpiStatesetFromQState(interface->state(child));
+    return item;
+}
 
 void QSpiAdaptor::signalChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data)
 {
@@ -121,16 +165,16 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren()
     return children;
 }
 
-QSpiAdaptor* QSpiAdaptor::getChild(QAccessibleInterface* interface, int index)
+QSpiAdaptor* QSpiAdaptor::getChild(QAccessibleInterface* interface, int index) const
 {
     Q_ASSERT(index > 0 && index <= interface->childCount());
     QAccessibleInterface *child = 0;
     int ret = interface->navigate(QAccessible::Child, index, &child);
     if (ret == 0) {
-        return spiBridge->interfaceToAccessible(child, 0);
+        return spiBridge->interfaceToAccessible(child, 0, true);
     } else if (ret > 0){
         Q_ASSERT(ret <= interface->childCount());
-        return spiBridge->interfaceToAccessible(interface, ret);
+        return spiBridge->interfaceToAccessible(interface, ret, true);
     }
     return 0;
 }

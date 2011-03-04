@@ -47,6 +47,8 @@ public:
 
         virtual ~QSpiAccessibleBridge();
         virtual void setRootObject(QAccessibleInterface *obj);
+
+
         virtual void notifyAccessibilityUpdate(int reason, QAccessibleInterface *obj, int child);
 
         QSpiObjectReference getRootReference() const;
@@ -54,7 +56,7 @@ public:
         QSpiAdaptor* createSpiObject(QAccessibleInterface* interface, int index = 0);
 
         QSpiAdaptor* objectToAccessible(QObject* object);
-        QSpiAdaptor* interfaceToAccessible(QAccessibleInterface *interface, int index = 0);
+        QSpiAdaptor* interfaceToAccessible(QAccessibleInterface *interface, int index, bool takeOwnershipOfInterface);
 
         QDBusConnection dBusConnection() const;
 

@@ -17,7 +17,6 @@ HEADERS += \
            application.h \
            bridge.h \
            cache.h  \
-           object.h \
            adaptor.h \
            struct_marshallers.h \
            constant_mappings.h \
@@ -39,7 +38,6 @@ SOURCES += \
            application.cpp \
            bridge.cpp \
            cache.cpp  \
-           object.cpp \
            adaptor.cpp \
            struct_marshallers.cpp \
            constant_mappings.cpp \

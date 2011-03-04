@@ -96,7 +96,7 @@ bool QSpiApplication::eventFilter(QObject *obj, QEvent *event)
     switch (event->type()) {
         case QEvent::WindowActivate: {
         qDebug() << " Window activate: " << event->spontaneous() << obj;
-        QSpiObject* a = spiBridge->objectToAccessible(obj);
+        QSpiAdaptor* a = spiBridge->objectToAccessible(obj);
         QSpiAccessible* acc = static_cast<QSpiAccessible*>(a);
         acc->windowActivated();
         break;
