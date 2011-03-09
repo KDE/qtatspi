@@ -771,13 +771,35 @@ int QSpiAdaptor::GetCharacterAtOffset(int offset)
 
 int QSpiAdaptor::GetCharacterExtents(int offset, uint coordType, int &y, int &width, int &height)
 {
-    // TODO use 'characterRect'
-    Q_UNUSED (y);
-    Q_UNUSED (width);
-    Q_UNUSED (height);
-    Q_UNUSED (offset);
-    Q_UNUSED (coordType);
-    return 0;
+    int x;
+
+    // QAccessible2 has RelativeToParent as a coordinate type instead of relative
+    // to top-level window, which is an AT-SPI coordinate type.
+    if (static_cast<QAccessible2::CoordinateType>(coordType) != QAccessible2::RelativeToScreen) {
+        const QWidget *widget = qobject_cast<const QWidget*>(interface->object());
+        if (!widget) {
+            y = 0;
+            width = 0;
+            height = 0;
+            return 0;
+        }
+        const QWidget *parent = widget->parentWidget();
+        while (parent) {
+            widget = parent;
+            parent = widget->parentWidget();
+        }
+        x = -widget->x();
+        y = -widget->y();
+    } else {
+        x = 0;
+        y = 0;
+    }
+    
+    QRect rect = interface->textInterface()->characterRect(offset, QAccessible2::RelativeToScreen);
+    width = rect.width();
+    height = rect.height();
+    y += rect.y();
+    return x+rect.x();
 }
 
 QSpiAttributeSet QSpiAdaptor::GetDefaultAttributeSet()
