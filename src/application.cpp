@@ -34,7 +34,7 @@
 #define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
 
 QSpiApplication::QSpiApplication(QAccessibleInterface *interface)
-    :QSpiAdaptor(interface, 0)
+    :QSpiAdaptor(interface, 0), applicationId(-1)
 {
     reference = QSpiObjectReference(spiBridge->dBusConnection().baseService(),
                    QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
@@ -169,4 +169,14 @@ void QSpiApplication::notifyKeyboardListenerCallback(const QDBusMessage& message
 void QSpiApplication::notifyKeyboardListenerError(const QDBusError& error, const QDBusMessage& /*message*/)
 {
     qWarning() << "QSpiApplication::keyEventError " << error.name() << error.message();
+}
+
+int QSpiApplication::id() const
+{
+    return applicationId;
+}
+
+void QSpiApplication::setId(int value)
+{
+    applicationId = value;
 }

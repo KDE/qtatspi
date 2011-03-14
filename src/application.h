@@ -45,6 +45,12 @@ public:
 
     virtual void accessibleEvent(QAccessible::Event event);
 
+    // the Id property gets written and read by the accessibility framework
+    // we do nothing with it internally, it is only for the at-spi2 to identify us
+    Q_PROPERTY(int Id READ id WRITE setId)
+    int id() const;
+    void setId(int value);
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
 
@@ -55,6 +61,7 @@ private Q_SLOTS:
 private:
     void callAccessibilityRegistry();
     QSpiObjectReference accessibilityRegistry;
+    int applicationId;
 };
 
 #endif
