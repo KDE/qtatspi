@@ -88,15 +88,15 @@ enum QSpiKeyEventType {
       QSPI_KEY_EVENT_LAST_DEFINED
 };
 
-bool QSpiApplication::eventFilter(QObject *obj, QEvent *event)
+bool QSpiApplication::eventFilter(QObject *target, QEvent *event)
 {
     if (!event->spontaneous())
         return false;
 
     switch (event->type()) {
         case QEvent::WindowActivate: {
-        qDebug() << " Window activate: " << event->spontaneous() << obj;
-        QSpiAdaptor* a = spiBridge->objectToAccessible(obj);
+        qDebug() << " Window activate: " << event->spontaneous() << target;
+        QSpiAdaptor* a = spiBridge->objectToAccessible(target);
         QSpiAccessible* acc = static_cast<QSpiAccessible*>(a);
         acc->windowActivated();
         break;
@@ -139,15 +139,15 @@ bool QSpiApplication::eventFilter(QObject *obj, QEvent *event)
             m.setArguments(QVariantList() <<QVariant::fromValue(de));
 
             // FIXME: this is critical, the timeout should probably be pretty low to allow normal processing
-            int timeout = -1;
+            int timeout = 100;
             bool sent = spiBridge->dBusConnection().callWithCallback(m, this, SLOT(notifyKeyboardListenerCallback(QDBusMessage)),
                                                         SLOT(notifyKeyboardListenerError(QDBusError, QDBusMessage)), timeout);
             if (!sent)
                 return false;
 
             //queue the event and send it after callback
-            //return true;
-            break;
+            keyEvents.enqueue(QPair<QObject*, QKeyEvent*> (target, copyKeyEvent(keyEvent)));
+            return true;
     }
         default:
             break;
@@ -155,20 +155,33 @@ bool QSpiApplication::eventFilter(QObject *obj, QEvent *event)
     return false;
 }
 
+QKeyEvent* QSpiApplication::copyKeyEvent(QKeyEvent* old)
+{
+    return new QKeyEvent(old->type(), old->key(), old->modifiers(), old->text(), old->isAutoRepeat(), old->count());
+}
+
 void QSpiApplication::notifyKeyboardListenerCallback(const QDBusMessage& message)
 {
-    qDebug() << "QSpiApplication::keyEventCallback" << message.arguments().at(0).toBool();
     Q_ASSERT(message.arguments().length() == 1);
     if (message.arguments().at(0).toBool() == true) {
-        qDebug() << " Special key, INTERRUPT processing!";
+        qDebug() << "QSpiApplication::notifyKeyboardListenerCallback eat key";
+        // discard event
+        Q_ASSERT(keyEvents.length());
+        keyEvents.dequeue();
     } else {
-        // send pending key events
+        Q_ASSERT(keyEvents.length());
+        QPair<QObject*, QKeyEvent*> event = keyEvents.dequeue();
+        QApplication::postEvent(event.first, event.second);
     }
 }
 
 void QSpiApplication::notifyKeyboardListenerError(const QDBusError& error, const QDBusMessage& /*message*/)
 {
     qWarning() << "QSpiApplication::keyEventError " << error.name() << error.message();
+    while (!keyEvents.isEmpty()) {
+        QPair<QObject*, QKeyEvent*> event = keyEvents.dequeue();
+        QApplication::postEvent(event.first, event.second);
+    }
 }
 
 int QSpiApplication::id() const

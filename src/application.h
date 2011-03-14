@@ -26,6 +26,7 @@
 
 #include <QAccessible>
 #include <QAccessibleInterface>
+#include <QQueue>
 
 #include "adaptor.h"
 
@@ -59,9 +60,12 @@ private Q_SLOTS:
     void notifyKeyboardListenerError(const QDBusError& error, const QDBusMessage& message);
 
 private:
+    static QKeyEvent* copyKeyEvent(QKeyEvent*);
+
     void callAccessibilityRegistry();
     QSpiObjectReference accessibilityRegistry;
     int applicationId;
+    QQueue<QPair<QObject*, QKeyEvent*> > keyEvents;
 };
 
 #endif
