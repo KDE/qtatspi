@@ -249,9 +249,10 @@ QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* i
     if (index == 0) {
         QAccessibleInterface *parent = 0;
         interface->navigate(QAccessible::Ancestor, 1, &parent);
-        if (parent)
+        if (parent) {
             parentAdaptor = interfaceToAccessible(parent, 0, true);
-        childCount = parent->childCount();
+            childCount = parent->childCount();
+        }
     } else {
         parentAdaptor = interfaceToAccessible(interface, 0, true);
         childCount = interface->childCount();
