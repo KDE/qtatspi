@@ -2,8 +2,8 @@
 # ----------------------------------------------------------------------------
 
 # binary app
-test/calculator/calculator
-test/simple/simple
+examples/calculator/calculator
+examples/simple/simple
 
 callgrind.out.*
 pcviewer.cfg
