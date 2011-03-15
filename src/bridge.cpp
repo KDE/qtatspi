@@ -54,6 +54,10 @@ QSpiAccessibleBridge::QSpiAccessibleBridge()
         qWarning() << "Could not connect to dbus.";
     }
 
+    printf("DBUS address: %s", dbusConnection.baseService().toLatin1().data());
+    fflush(stdout);
+
+
     qSpiInitializeStructTypes();
     qSpiInitializeConstantMappings();
 
@@ -77,6 +81,7 @@ QSpiAccessibleBridge::~QSpiAccessibleBridge ()
 QDBusConnection QSpiAccessibleBridge::connectDBus()
 {
     QString address = getAccessibilityBusAddress();
+
     if (!address.isEmpty()) {
         QDBusConnection c = QDBusConnection::connectToBus(address, "a11y");
         if (c.isConnected()) {
@@ -114,6 +119,10 @@ QString QSpiAccessibleBridge::getAccessibilityBusAddress() const
                         (unsigned char **) (void *) &propData);
 
     QString busAddress = QString::fromLocal8Bit(propData);
+
+    if (propData)
+        printf("DBUS bus: %s", propData);
+
     XFree(propData);
     return busAddress;
 }
