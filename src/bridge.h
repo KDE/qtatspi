@@ -28,6 +28,7 @@
 #include <QAccessibleBridge>
 #include <QDBusConnection>
 
+class DBusConnection;
 class DeviceEventControllerProxy;
 class QSpiDBusCache;
 class QAccessibleInterface;
@@ -65,8 +66,6 @@ public:
 
 private:
         static QSpiAccessibleBridge* self;
-        QString getAccessibilityBusAddress() const;
-        QDBusConnection connectDBus();
 
         void registerChildren(QSpiAdaptor* interface);
 
@@ -77,7 +76,7 @@ private:
         QList<QSpiAdaptor*> adaptorWithoutObjectList;
         QList<QSpiAdaptor*> allAdaptors;
 
-        QDBusConnection dbusConnection;
+        DBusConnection* dbusConnection;
 };
 
 #endif

@@ -374,10 +374,7 @@ QSpiObjectReference QSpiAdaptor::GetAccessibleAtPoint(int x, int y, uint coord_t
     if (w) {
         return spiBridge->objectToAccessible(w)->getReference();
     } else {
-        QSpiObjectReference ref;
-        ref.name = QDBusConnection::sessionBus().baseService();
-        ref.path = QDBusObjectPath(QSPI_OBJECT_PATH_NULL);
-        return ref;
+        return QSpiObjectReference(spiBridge->dBusConnection(), QDBusObjectPath(QSPI_OBJECT_PATH_NULL));
     }
 }
 

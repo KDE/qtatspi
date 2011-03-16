@@ -36,7 +36,7 @@
 QSpiApplication::QSpiApplication(QAccessibleInterface *interface)
     :QSpiAdaptor(interface, 0), applicationId(-1)
 {
-    reference = QSpiObjectReference(spiBridge->dBusConnection().baseService(),
+    reference = QSpiObjectReference(spiBridge->dBusConnection(),
                    QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
 
     new AccessibleAdaptor(this);

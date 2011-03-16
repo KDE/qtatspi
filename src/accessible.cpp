@@ -126,7 +126,6 @@ QSpiObjectReference QSpiAccessible::getParentReference() const
                 return parent->getReference();
         }
     }
-
     return QSpiObjectReference();
 }
 

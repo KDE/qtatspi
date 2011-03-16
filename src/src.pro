@@ -20,7 +20,8 @@ HEADERS += \
            adaptor.h \
            struct_marshallers.h \
            constant_mappings.h \
-           accessible.h
+           accessible.h \
+    dbusconnection.h
 
 SOURCES += \
            generated/dec_proxy.cpp \
@@ -42,7 +43,8 @@ SOURCES += \
            struct_marshallers.cpp \
            constant_mappings.cpp \
            accessible.cpp \
-           main.cpp
+           main.cpp \
+    dbusconnection.cpp
 
 DEFINES += QT_ACCESSIBILITY
 

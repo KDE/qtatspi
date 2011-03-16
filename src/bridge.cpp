@@ -27,6 +27,7 @@
 #include "application.h"
 #include "cache.h"
 #include "constant_mappings.h"
+#include "dbusconnection.h"
 #include "struct_marshallers.h"
 
 #include "generated/dec_proxy.h"
@@ -35,9 +36,6 @@
 #include <QEvent>
 #include <QKeyEvent>
 
-#include <QX11Info>
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
 
 #define QSPI_DEC_NAME        "/org/a11y/atspi/Registry"
 #define QSPI_DEC_OBJECT_PATH "/org/a11y/atspi/registry/deviceeventcontroller"
@@ -45,18 +43,15 @@
 QSpiAccessibleBridge* QSpiAccessibleBridge::self = 0;
 
 QSpiAccessibleBridge::QSpiAccessibleBridge()
-    : cache(0), dbusConnection(connectDBus())
+    : cache(0)
 {
     Q_ASSERT(self == 0);
     self = this;
 
-    if (!dbusConnection.isConnected()) {
+    dbusConnection = new DBusConnection();
+    if (!dBusConnection().isConnected()) {
         qWarning() << "Could not connect to dbus.";
     }
-
-    printf("DBUS address: %s", dbusConnection.baseService().toLatin1().data());
-    fflush(stdout);
-
 
     qSpiInitializeStructTypes();
     qSpiInitializeConstantMappings();
@@ -65,7 +60,7 @@ QSpiAccessibleBridge::QSpiAccessibleBridge()
     cache = new QSpiDBusCache(this);
     dec = new DeviceEventControllerProxy(this);
 
-    bool reg = dbusConnection.registerObject(QSPI_DEC_OBJECT_PATH, this, QDBusConnection::ExportAdaptors);
+    bool reg = dBusConnection().registerObject(QSPI_DEC_OBJECT_PATH, this, QDBusConnection::ExportAdaptors);
     qDebug() << "Registered DEC: " << reg;
 
     QAccessibleInterface* i = QAccessible::queryAccessibleInterface(qApp);
@@ -76,60 +71,13 @@ QSpiAccessibleBridge::QSpiAccessibleBridge()
 }
 
 QSpiAccessibleBridge::~QSpiAccessibleBridge ()
-{} // Qt currently doesn't delete plugins.
-
-QDBusConnection QSpiAccessibleBridge::connectDBus()
 {
-    QString address = getAccessibilityBusAddress();
-
-    if (!address.isEmpty()) {
-        QDBusConnection c = QDBusConnection::connectToBus(address, "a11y");
-        if (c.isConnected()) {
-            qDebug() << "Connected to accessibility bus at: " << address;
-            return c;
-        }
-        qWarning("Found Accessibility DBus address but cannot connect. Falling back to session bus.");
-    } else {
-        qWarning("Accessibility DBus not found. Falling back to session bus.");
-    }
-
-    QDBusConnection c = QDBusConnection::sessionBus();
-    if (!c.isConnected()) {
-        qWarning("Could not connect to DBus.");
-    }
-    return QDBusConnection::sessionBus();
-}
-
-QString QSpiAccessibleBridge::getAccessibilityBusAddress() const
-{
-    Display* bridge_display = QX11Info::display();
-
-    Atom actualType;
-    int actualFormat;
-    char *propData = 0;
-    unsigned long nItems;
-    unsigned long leftOver;
-    Atom AT_SPI_BUS = XInternAtom (bridge_display, "AT_SPI_BUS", False);
-    XGetWindowProperty (bridge_display,
-                        XDefaultRootWindow (bridge_display),
-                        AT_SPI_BUS, 0L,
-                        (long) BUFSIZ, False,
-                        (Atom) 31, &actualType, &actualFormat,
-                        &nItems, &leftOver,
-                        (unsigned char **) (void *) &propData);
-
-    QString busAddress = QString::fromLocal8Bit(propData);
-
-    if (propData)
-        printf("DBUS bus: %s", propData);
-
-    XFree(propData);
-    return busAddress;
-}
+    delete dbusConnection;
+} // Qt currently doesn't delete plugins.
 
 QDBusConnection QSpiAccessibleBridge::dBusConnection() const
 {
-    return dbusConnection;
+    return dbusConnection->connection();
 }
 
 void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *interface)
@@ -141,7 +89,7 @@ void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *interface)
 
 QSpiObjectReference QSpiAccessibleBridge::getRootReference() const
 {
-    return QSpiObjectReference(spiBridge->dBusConnection().baseService(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
+    return QSpiObjectReference(dBusConnection(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
 }
 
 void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface, int index)
