@@ -55,7 +55,7 @@ QDBusObjectPath QSpiAccessible::getUnique()
 QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
     : QSpiAdaptor(interface, index)
 {
-    reference = QSpiObjectReference(spiBridge->dBusConnection().baseService(),
+    reference = QSpiObjectReference(spiBridge->dBusConnection(),
                                                getUnique());
 
     qDebug() << "ACCESSIBLE: " << interface->object() << reference.path.path();
