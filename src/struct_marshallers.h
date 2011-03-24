@@ -70,12 +70,12 @@ struct QSpiAccessibleCacheItem
     QSpiObjectReference         path;
     QSpiObjectReference         application;
     QSpiObjectReference         parent;
-    uint                        role;
-    QString                     description;
-    QSpiUIntList                states;
     QList <QSpiObjectReference> children;
     QStringList                 supportedInterfaces;
     QString                     name;
+    uint                        role;
+    QString                     description;
+    QSpiUIntList                states;
 };
 
 typedef QList <QSpiAccessibleCacheItem> QSpiAccessibleCacheArray;
