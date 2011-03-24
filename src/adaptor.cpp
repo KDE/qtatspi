@@ -827,14 +827,60 @@ int QSpiAdaptor::GetOffsetAtPoint(int x, int y, uint coordType)
 
 int QSpiAdaptor::GetRangeExtents(int startOffset, int endOffset, uint coordType, int &y, int &width, int &height)
 {
-    // TODO
-    Q_UNUSED (y);
-    Q_UNUSED (width);
-    Q_UNUSED (height);
-    Q_UNUSED (coordType);
-    Q_UNUSED (startOffset);
-    Q_UNUSED (endOffset);
-    return 0;
+    if (endOffset == -1)
+        endOffset = interface->textInterface()->characterCount();
+
+    if (endOffset <= startOffset) {
+        y=0;
+        width = 0;
+        height = 0;
+        return 0;
+    }
+
+    int xOffset = 0, yOffset = 0;
+    QAccessibleTextInterface *textInterface = interface->textInterface();
+
+    // QAccessible2 has RelativeToParent as a coordinate type instead of relative
+    // to top-level window, which is an AT-SPI coordinate type.
+    if (static_cast<QAccessible2::CoordinateType>(coordType) != QAccessible2::RelativeToScreen) {
+        const QWidget *widget = qobject_cast<const QWidget*>(interface->object());
+        if (!widget) {
+            y = 0;
+            width = 0;
+            height = 0;
+            return 0;
+        }
+        const QWidget *parent = widget->parentWidget();
+        while (parent) {
+            widget = parent;
+            parent = widget->parentWidget();
+        }
+        xOffset = -widget->x();
+        yOffset = -widget->y();
+    }
+
+    int minX=INT_MAX, minY=INT_MAX, maxX=0, maxY=0;
+
+    for (int i=startOffset; i<endOffset; i++) {
+        QRect rect = textInterface->characterRect(i, QAccessible2::RelativeToScreen);
+        if (rect.x() < minX) {
+            minX = rect.x();
+        }
+        if (rect.y() < minY) {
+            minY = rect.y();
+        }
+        if ((rect.x() + rect.width()) > maxX) {
+            maxX = (rect.x() + rect.width());
+        }
+        if ((rect.y() + rect.height()) > maxY) {
+            maxY = (rect.y() + rect.height());
+        }
+    }
+
+    width = maxX - minX;
+    height = maxY - minY;
+    y = minY + yOffset;
+    return minX + xOffset;
 }
 
 int QSpiAdaptor::GetSelection(int selectionNum, int &endOffset)
