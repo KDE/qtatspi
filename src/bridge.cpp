@@ -67,7 +67,6 @@ QSpiAccessibleBridge::QSpiAccessibleBridge()
     QSpiApplication* accessible = new QSpiApplication(i);
     adaptorWithObjectMap.insert(qApp, accessible);
     allAdaptors.append(accessible);
-    registerChildren(accessible);
 }
 
 QSpiAccessibleBridge::~QSpiAccessibleBridge ()
@@ -114,30 +113,6 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
 //             << (interface->isValid() ? interface->object()->objectName() : " invalid interface!")
 //             << accessible->interface;
     accessible->accessibleEvent((QAccessible::Event)reason);
-}
-
-void QSpiAccessibleBridge::registerChildren(QSpiAdaptor* rootAdaptor)
-{
-    Q_ASSERT(rootAdaptor);
-    qDebug() << "QSpiAccessibleCache::registerChildren: " << rootAdaptor->associatedInterface()->object();
-
-    /* Depth first iteration over all un-registered objects */
-    QStack <QSpiAdaptor*> stack;
-    stack.push(rootAdaptor);
-    while (!stack.empty()) {
-        QSpiAdaptor* current = stack.pop();
-        qDebug() << "QSpiAccessibleCache::registerChildren:" << current->associatedInterface()->object()
-                 << " childCount:" << current->childCount();
-
-        for(int index = 0; index < current->childCount(); ++index) {
-            QSpiAdaptor* child = current->getChild(index+1);
-            if (!child) {
-                qWarning() << "  INVALID CHILD: " << index;
-                continue;
-            }
-            stack.push(child);
-        }
-    }
 }
 
 QSpiAdaptor* QSpiAccessibleBridge::objectToAccessible(QObject *object)

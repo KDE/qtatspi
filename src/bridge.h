@@ -67,8 +67,6 @@ public:
 private:
         static QSpiAccessibleBridge* self;
 
-        void registerChildren(QSpiAdaptor* interface);
-
         QSpiDBusCache *cache;
         DeviceEventControllerProxy *dec;
 
