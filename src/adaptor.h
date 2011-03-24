@@ -99,7 +99,7 @@ public Q_SLOTS:
     QSpiObjectReference GetApplication();
     QSpiAttributeSet GetAttributes();
     QSpiObjectReference GetChildAtIndex(int index);
-    QSpiObjectReferenceArray GetChildren();
+    QSpiObjectReferenceArray GetChildren() const;
     int GetIndexInParent();
     QString GetLocalizedRoleName();
     QSpiRelationArray GetRelationSet();

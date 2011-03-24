@@ -69,16 +69,7 @@ QSpiAccessibleCacheItem QSpiAdaptor::getCacheItem() const
     item.path = getReference();
     item.parent = getParentReference();
     item.application = spiBridge->getRootReference();
-
-    /* Children */
-    QList<QSpiObjectReference> childPaths;
-    for (int i = 1; i <= interface->childCount(); i++) {
-        QSpiAdaptor* child = getChild(i);
-        if (child)
-            childPaths << child->getReference();
-    }
-    item.children = childPaths;
-
+    item.children = GetChildren();
     item.supportedInterfaces = getSupportedInterfaces();
     item.name = interface->text(QAccessible::Name, child);
     item.role = qSpiRoleMapping.value(interface->role(child)).spiRole();
@@ -150,12 +141,11 @@ QSpiObjectReference QSpiAdaptor::GetChildAtIndex(int index)
     return child->getReference();
 }
 
-QSpiObjectReferenceArray QSpiAdaptor::GetChildren()
+QSpiObjectReferenceArray QSpiAdaptor::GetChildren() const
 {
-    // if we are the child of a complex widget, we cannot have any children
-    Q_ASSERT(child == 0);
-
     QList<QSpiObjectReference> children;
+    if (child)
+        return children;
 
     for (int i = 1; i <= interface->childCount(); ++i) {
         QSpiAdaptor* child = getChild(i);
