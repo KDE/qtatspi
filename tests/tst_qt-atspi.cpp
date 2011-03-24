@@ -293,7 +293,14 @@ void tst_QtAtSpi::menu()
 void tst_QtAtSpi::cache()
 {
     QDBusInterface* cache = getInterface("/org/a11y/atspi/cache", "org.a11y.atspi.Cache");
-    //qDebug() << cache->call(QDBus::Block, "GetItems");
+
+    QList <QSpiAccessibleCacheItem> items;
+    cache->call(QDBus::Block, "GetItems").arguments().first().value<QDBusArgument>() >> items;
+
+    QSpiAccessibleCacheItem root = items.first();
+    QCOMPARE(root.supportedInterfaces, QStringList() << "org.a11y.atspi.Accessible" << "org.a11y.atspi.Application");
+    //QCOMPARE(root.children, );
+
     delete cache;
 }
 

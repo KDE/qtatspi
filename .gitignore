@@ -4,6 +4,7 @@
 # binary app
 examples/calculator/calculator
 examples/simple/simple
+examples/declarative/declarative
 
 callgrind.out.*
 pcviewer.cfg
