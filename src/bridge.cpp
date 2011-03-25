@@ -204,10 +204,19 @@ QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* i
 void QSpiAccessibleBridge::objectDestroyed(QObject* o)
 {
     QHash<QObject*, QSpiAdaptor*>::iterator i = adaptorWithObjectMap.find(o);
-    while (i != adaptorWithObjectMap.end() && i.key() == o) {
-        // FIXME: also delete children
+    if (i != adaptorWithObjectMap.end()) {
         adaptorWithObjectMap.erase(i);
-        ++i;
+        allAdaptors.removeAll(i.value());
     }
 }
 
+void QSpiAccessibleBridge::removeAdaptor(QSpiAdaptor *adaptor)
+{
+    if (adaptorWithoutObjectList.contains(adaptor)) {
+        adaptorWithoutObjectList.removeAll(adaptor);
+    } else {
+        adaptorWithObjectMap.remove(adaptor->getObject());
+    }
+
+    allAdaptors.removeAll(adaptor);
+}

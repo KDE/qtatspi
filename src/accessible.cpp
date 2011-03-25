@@ -131,7 +131,11 @@ QSpiObjectReference QSpiAccessible::getParentReference() const
 
 void QSpiAccessible::accessibleEvent(QAccessible::Event event)
 {
-    Q_ASSERT(interface && interface->isValid());
+    Q_ASSERT(interface);
+    if (!interface->isValid()) {
+        spiBridge->removeAdaptor(this);
+        return;
+    }
 
     switch (event) {
     case QAccessible::NameChanged: {
@@ -170,7 +174,6 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         qDebug() << "StateChanged: old: " << state << " new: " << newState << " xor: " << (state^newState);
         if ((state^newState) & QAccessible::Checked) {
             int checked = (newState & QAccessible::Checked) ? 1 : 0;
-
             QDBusVariant data;
             data.setVariant(QVariant::fromValue(getReference()));
             emit StateChanged("checked", checked, 0, data, spiBridge->getRootReference());

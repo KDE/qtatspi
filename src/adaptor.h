@@ -74,6 +74,8 @@ public:
     inline QAccessibleInterface* associatedInterface() const { return interface; }
     inline int childIndex() const { return child; }
 
+    QObject* getObject() const;
+
 public:
     // event stuff
     void signalChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data);
@@ -240,7 +242,7 @@ protected:
     QStringList supportedInterfaces;
 
 private:
-
+    bool checkInterface() const;
     int child;
 };
 
