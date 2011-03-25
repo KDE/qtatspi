@@ -109,7 +109,7 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
 
     spiBridge->dBusConnection().registerObject(reference.path.path(),
                                   this, QDBusConnection::ExportAdaptors);
-    state = interface->state(0);
+    state = interface->state(childIndex());
 }
 
 QSpiObjectReference QSpiAccessible::getParentReference() const
@@ -166,8 +166,15 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         Q_ASSERT(0);
         break;
     case QAccessible::StateChanged: {
-        QAccessible::State newState = interface->state(0);
-        qDebug() << "StateChanged: " << (state^newState);
+        QAccessible::State newState = interface->state(childIndex());
+        qDebug() << "StateChanged: old: " << state << " new: " << newState << " xor: " << (state^newState);
+        if ((state^newState) & QAccessible::Checked) {
+            int checked = (newState & QAccessible::Checked) ? 1 : 0;
+
+            QDBusVariant data;
+            data.setVariant(QVariant::fromValue(getReference()));
+            emit StateChanged("checked", checked, 0, data, spiBridge->getRootReference());
+        }
         state = newState;
         break;
     }
