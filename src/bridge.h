@@ -64,6 +64,8 @@ public:
         QList<QSpiAdaptor*> cacheObjects() const
         { return allAdaptors; }
 
+private Q_SLOTS:
+        void objectDestroyed(QObject*);
 private:
         static QSpiAccessibleBridge* self;
 

@@ -167,6 +167,7 @@ QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* i
     // put ourself in the list of accessibles
     if (interface->object()) {
         adaptorWithObjectMap.insertMulti(interface->object(), accessible);
+        connect(interface->object(), SIGNAL(destroyed(QObject*)), this, SLOT(objectDestroyed(QObject*)));
     } else {
         adaptorWithoutObjectList.append(accessible);
     }
@@ -199,3 +200,14 @@ QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* i
 
     return accessible;
 }
+
+void QSpiAccessibleBridge::objectDestroyed(QObject* o)
+{
+    QHash<QObject*, QSpiAdaptor*>::iterator i = adaptorWithObjectMap.find(o);
+    while (i != adaptorWithObjectMap.end() && i.key() == o) {
+        // FIXME: also delete children
+        adaptorWithObjectMap.erase(i);
+        ++i;
+    }
+}
+
