@@ -127,12 +127,7 @@ QSpiObjectReference QSpiAdaptor::GetChildAtIndex(int index)
     qDebug() << "QSpiAdaptor::GetChildAtIndex get child " << index << " of " << interface->childCount()
              << interface->text(QAccessible::Name, 0) << interface->object();
 
-    if (interface->text(QAccessible::Name, 0) == "Fruits") {
-        qDebug() << "fruit salad" << interface->object();
-    }
-
     QSpiAdaptor* child = getChild(index+1);
-//    Q_ASSERT(child);
     if (!child) {
         qWarning() << "QSpiAdaptor::GetChildAtIndex could not find child!";
         return QSpiObjectReference();
@@ -360,9 +355,18 @@ QSpiObjectReference QSpiAdaptor::GetAccessibleAtPoint(int x, int y, uint coord_t
 {
     Q_UNUSED (coord_type)
 
+    // Grab the top level widget. For complex widgets we want to return a child
+    // at the right position instead.
     QWidget* w = qApp->widgetAt(x,y);
     if (w) {
-        return spiBridge->objectToAccessible(w)->getReference();
+        QSpiAdaptor* adaptor = spiBridge->objectToAccessible(w);
+        for (int i = 1; i <= adaptor->childCount(); ++i) {
+            QSpiAdaptor* child = adaptor->getChild(i);
+            if (child->Contains(x, y, coord_type)) {
+                return child->getReference();
+            }
+        }
+        return adaptor->getReference();
     } else {
         return QSpiObjectReference(spiBridge->dBusConnection(), QDBusObjectPath(QSPI_OBJECT_PATH_NULL));
     }
