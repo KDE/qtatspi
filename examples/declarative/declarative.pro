@@ -20,4 +20,5 @@ HEADERS  += mainwindow.h
 FORMS    += mainwindow.ui
 
 OTHER_FILES += \
-    accessible.qml
+    accessible.qml \
+    Button.qml
