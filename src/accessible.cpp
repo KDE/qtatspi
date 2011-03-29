@@ -122,6 +122,7 @@ QSpiObjectReference QSpiAccessible::getParentReference() const
         if (parentInterface)
         {
             QSpiAdaptor *parent = spiBridge->objectToAccessible(parentInterface->object());
+            delete parentInterface;
             if (parent)
                 return parent->getReference();
         }
