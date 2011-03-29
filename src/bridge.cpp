@@ -205,8 +205,8 @@ void QSpiAccessibleBridge::objectDestroyed(QObject* o)
 {
     QHash<QObject*, QSpiAdaptor*>::iterator i = adaptorWithObjectMap.find(o);
     if (i != adaptorWithObjectMap.end()) {
-        adaptorWithObjectMap.erase(i);
         allAdaptors.removeAll(i.value());
+        adaptorWithObjectMap.erase(i);
     }
 }
 
