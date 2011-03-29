@@ -167,6 +167,8 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren() const
 {
     QList<QSpiObjectReference> children;
     if (!checkInterface()) return children;
+
+    // when we are a child that means that we cannot have children of our own
     if (child)
         return children;
 
@@ -588,7 +590,7 @@ int QSpiAdaptor::nSelectedRows() const
 QSpiObjectReference QSpiAdaptor::summary() const
 {
     if (!checkInterface()) return QSpiObjectReference();
-    return spiBridge->objectToAccessible (interface->tableInterface()->summary()->object())->getReference();
+    return spiBridge->objectToAccessible(interface->tableInterface()->summary()->object())->getReference();
 }
 
 bool QSpiAdaptor::AddColumnSelection(int column)
