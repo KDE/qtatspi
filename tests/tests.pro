@@ -9,6 +9,8 @@ SOURCES += tst_qt-atspi.cpp \
 
 CONFIG += gui qtestlib qdbus
 LIBS += -lX11
+OBJECTS_DIR = .obj
+MOC_DIR = .moc
 
 TEMPLATE = app
 TARGET =  tst_qt-atspi

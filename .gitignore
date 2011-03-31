@@ -37,11 +37,12 @@ Makefile*
 !qmake/Makefile.unix
 *.prl
 *.app
-*.pro.user
+*.pro.user*
 *.qmlproject.user
 *.gcov
 ui_*.h
 .com.apple.timemachine.supported
+.directory
 
 # Test generated files
 QObject.log
