@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>327</height>
+    <width>587</width>
+    <height>526</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,65 +15,109 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QLabel" name="label">
-      <property name="accessibleDescription">
-       <string>Accessible description for &quot;Some Text&quot; label</string>
-      </property>
-      <property name="text">
-       <string>Some Text</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="pushButton">
-      <property name="text">
-       <string>Create More Buttons</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Enter your name:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="lineEdit">
-        <property name="accessibleName">
-         <string>Name line edit</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <widget class="QTextEdit" name="textEdit">
-      <property name="html">
-       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'DejaVu Sans'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif';&quot;&gt;Hello,&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif';&quot;&gt;this is an example text.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif';&quot;&gt;Text can be &lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-weight:600;&quot;&gt;bold&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; text-decoration: underline;&quot;&gt;underlined&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif';&quot;&gt;.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:12pt;&quot;&gt;Big fonts&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif';&quot;&gt; are possible too.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-    </item>
+    <property name="margin">
+     <number>0</number>
+    </property>
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="tab_7">
        <attribute name="title">
-        <string>&amp;Fruits</string>
+        <string>Line Edit</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <layout class="QVBoxLayout" name="verticalLayout_7">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="accessibleDescription">
+           <string>Accessible description for &quot;Some Text&quot; label</string>
+          </property>
+          <property name="text">
+           <string>Some Text</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Enter your name:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit">
+            <property name="accessibleName">
+             <string>Name line edit</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_6">
+       <attribute name="title">
+        <string>Text Edit</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <widget class="QTextEdit" name="textEdit">
+          <property name="html">
+           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Hello,&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;this is an example text.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Text can be &lt;span style=&quot; font-weight:600;&quot;&gt;bold&lt;/span&gt; or &lt;span style=&quot; text-decoration: underline;&quot;&gt;underlined&lt;/span&gt;.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Big fonts&lt;/span&gt; are possible too.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>F&amp;ood</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QCheckBox" name="checkBox">
+          <property name="text">
+           <string>Bread</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBox_2">
+          <property name="text">
+           <string>Butter</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBox_3">
+          <property name="text">
+           <string>Milk</string>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QRadioButton" name="radioButton_3">
           <property name="text">
@@ -95,66 +139,198 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QPushButton" name="pushButton">
+          <property name="text">
+           <string>Create More Buttons</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="tab_3">
        <attribute name="title">
-        <string>&amp;Other</string>
+        <string>&amp;List</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QCheckBox" name="checkBox">
-          <property name="text">
-           <string>CheckBox</string>
-          </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="1" column="0">
+         <widget class="QListWidget" name="listWidget">
+          <item>
+           <property name="text">
+            <string>Core</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Gui</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Declarative</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>DBus</string>
+           </property>
+          </item>
          </widget>
         </item>
-        <item>
-         <widget class="QToolButton" name="toolButton">
-          <property name="text">
-           <string>...</string>
+        <item row="3" column="0" colspan="2">
+         <widget class="QTableWidget" name="tableWidget"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QTreeWidget" name="treeWidget">
+          <property name="alternatingRowColors">
+           <bool>true</bool>
           </property>
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+          <attribute name="headerShowSortIndicator" stdset="0">
+           <bool>true</bool>
+          </attribute>
+          <attribute name="headerStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Item</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Price</string>
+           </property>
+          </column>
+          <item>
+           <property name="text">
+            <string>Food</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>Vegetable</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>Eggplant</string>
+             </property>
+             <property name="text">
+              <string>7</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Carrots</string>
+             </property>
+             <property name="text">
+              <string>5</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Cabbage</string>
+             </property>
+             <property name="text">
+              <string>6</string>
+             </property>
+            </item>
+           </item>
+           <item>
+            <property name="text">
+             <string>Fruit</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <item>
+             <property name="text">
+              <string>Oranges</string>
+             </property>
+             <property name="text">
+              <string>3</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Bananas</string>
+             </property>
+             <property name="text">
+              <string>2</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Apples</string>
+             </property>
+             <property name="text">
+              <string>1</string>
+             </property>
+            </item>
+           </item>
+          </item>
          </widget>
         </item>
        </layout>
       </widget>
-     </widget>
-    </item>
-    <item>
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>164</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item>
-     <widget class="QComboBox" name="comboBox">
-      <item>
-       <property name="text">
-        <string>Comboboxes are fun!</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Or so I hear at least</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Crash for me!</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Last but not least</string>
-       </property>
-      </item>
+      <widget class="QWidget" name="tab_5">
+       <attribute name="title">
+        <string>&amp;Combobox</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="QComboBox" name="comboBox">
+          <item>
+           <property name="text">
+            <string>Comboboxes are fun!</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Or so I hear at least</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Crash for me!</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Last but not least</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>408</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -164,8 +340,8 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>400</width>
-     <height>24</height>
+     <width>587</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
