@@ -348,6 +348,12 @@ QString QSpiAdaptor::version() const
     return QLatin1String(QT_VERSION_STR);
 }
 
+QString QSpiAdaptor::GetApplicationBusAddress() const
+{
+    qDebug() << "QSpiAdaptor::GetApplicationBusAddress implement me!";
+    return QString();
+}
+
 QString QSpiAdaptor::GetLocale(uint lctype)
 {
     if (!checkInterface()) return QString();

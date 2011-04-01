@@ -50,7 +50,7 @@
 #define QSPI_OBJECT_PATH_NULL    QSPI_OBJECT_PATH_PREFIX "null"
 #define QSPI_OBJECT_PATH_ROOT    QSPI_OBJECT_PATH_PREFIX "root"
 
-
+// FIXME lots of const missing for all the getters...
 
 /*
  * Implements all methods neccessary to adapt calls from AT-SPI to the
@@ -129,6 +129,7 @@ public:
     QString toolkitName() const;
     Q_PROPERTY(QString Version READ version)
     QString version() const;
+    QString GetApplicationBusAddress() const;
 
 public Q_SLOTS: // METHODS
     QString GetLocale(uint lctype);
