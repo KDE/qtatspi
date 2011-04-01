@@ -124,7 +124,6 @@ QSpiAdaptor* QSpiAccessibleBridge::objectToAccessible(QObject *object)
     QAccessibleInterface* interface = QAccessible::queryAccessibleInterface(object);
     if (!interface) {
         qWarning() << "Create accessible for object which cannot create an accessible interface." << object;
-        Q_ASSERT(interface);
         return 0;
     }
 
