@@ -46,8 +46,6 @@ SOURCES += \
            main.cpp \
     dbusconnection.cpp
 
-DEFINES += QT_ACCESSIBILITY
-
 QMAKE_CFLAGS+=-Werror
 QMAKE_CXXFLAGS+=-Werror
 
