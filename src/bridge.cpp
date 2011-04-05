@@ -154,12 +154,20 @@ QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* i
                  << interface->text(QAccessible::Name, index) << qSpiRoleMapping.value(interface->role(index)).name();
     }
 
-    // FIXME look for interfaces with no object or index > 0
-
     // if we cannot keep the interface around (notifyAccessibility will delete interfaces)
     // we need to ask for one that we can keep
     if (!takeOwnershipOfInterface) {
-        interface = QAccessible::queryAccessibleInterface(interface->object());
+        QAccessibleInterface* ownedInterface = QAccessible::queryAccessibleInterface(interface->object());
+        if (!ownedInterface) {
+            QAccessibleInterface* parentInterface;
+            interface->navigate(QAccessible::Ancestor, 1, &parentInterface);
+            Q_ASSERT(parentInterface);
+            int index = parentInterface->indexOfChild(interface);
+            parentInterface->navigate(QAccessible::Child, index, &ownedInterface);
+            delete parentInterface;
+        }
+        Q_ASSERT(ownedInterface);
+        interface = ownedInterface;
     }
     QSpiAdaptor *accessible = new QSpiAccessible(interface, index);
 
