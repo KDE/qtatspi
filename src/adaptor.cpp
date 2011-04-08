@@ -129,13 +129,13 @@ QSpiObjectReference QSpiAdaptor::parent() const
     return getParentReference();
 }
 
-QSpiObjectReference QSpiAdaptor::GetApplication()
+QSpiObjectReference QSpiAdaptor::GetApplication() const
 {
     if (!checkInterface()) return QSpiObjectReference();
     return spiBridge->getRootReference();
 }
 
-QSpiAttributeSet QSpiAdaptor::GetAttributes()
+QSpiAttributeSet QSpiAdaptor::GetAttributes() const
 {
     if (!checkInterface()) return QSpiAttributeSet();
     // No attributes interface in QAccessible so a blank list seems the sensible option.
@@ -143,7 +143,7 @@ QSpiAttributeSet QSpiAdaptor::GetAttributes()
     return out0;
 }
 
-QSpiObjectReference QSpiAdaptor::GetChildAtIndex(int index)
+QSpiObjectReference QSpiAdaptor::GetChildAtIndex(int index) const
 {
     if (!checkInterface()) return QSpiObjectReference();
 
@@ -195,7 +195,7 @@ QSpiAdaptor* QSpiAdaptor::getChild(int index) const
     return 0;
 }
 
-int QSpiAdaptor::GetIndexInParent()
+int QSpiAdaptor::GetIndexInParent() const
 {
     if (!checkInterface()) return -1;
 
@@ -215,7 +215,7 @@ int QSpiAdaptor::GetIndexInParent()
     return -1;
 }
 
-QString QSpiAdaptor::GetLocalizedRoleName()
+QString QSpiAdaptor::GetLocalizedRoleName() const
 {
     if (!checkInterface()) return QString();
 
@@ -224,7 +224,7 @@ QString QSpiAdaptor::GetLocalizedRoleName()
     return out0;
 }
 
-QSpiRelationArray QSpiAdaptor::GetRelationSet()
+QSpiRelationArray QSpiAdaptor::GetRelationSet() const
 {
     if (!checkInterface()) return QSpiRelationArray();
 
@@ -234,7 +234,7 @@ QSpiRelationArray QSpiAdaptor::GetRelationSet()
     return out0;
 }
 
-uint QSpiAdaptor::GetRole()
+uint QSpiAdaptor::GetRole() const
 {
     if (!checkInterface()) return QAccessible::NoRole;
 
@@ -242,14 +242,14 @@ uint QSpiAdaptor::GetRole()
     return qSpiRoleMapping[role].spiRole();
 }
 
-QString QSpiAdaptor::GetRoleName()
+QString QSpiAdaptor::GetRoleName() const
 {
     if (!checkInterface()) return QString();
 
     return qSpiRoleMapping[interface->role(child)].name();
 }
 
-QSpiUIntList QSpiAdaptor::GetState()
+QSpiUIntList QSpiAdaptor::GetState() const
 {
     if (!checkInterface()) return QSpiUIntList();
 

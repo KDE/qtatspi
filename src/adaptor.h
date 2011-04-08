@@ -98,16 +98,16 @@ public:
     QSpiObjectReference parent() const;
 
 public Q_SLOTS:
-    QSpiObjectReference GetApplication();
-    QSpiAttributeSet GetAttributes();
-    QSpiObjectReference GetChildAtIndex(int index);
+    QSpiObjectReference GetApplication() const;
+    QSpiAttributeSet GetAttributes() const;
+    QSpiObjectReference GetChildAtIndex(int index) const;
     QSpiObjectReferenceArray GetChildren() const;
-    int GetIndexInParent();
-    QString GetLocalizedRoleName();
-    QSpiRelationArray GetRelationSet();
-    uint GetRole();
-    QString GetRoleName();
-    QSpiUIntList GetState();
+    int GetIndexInParent() const;
+    QString GetLocalizedRoleName() const;
+    QSpiRelationArray GetRelationSet() const;
+    uint GetRole() const;
+    QString GetRoleName() const;
+    QSpiUIntList GetState() const;
 
 /* AT-SPI Action interface */
 public:
