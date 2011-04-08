@@ -617,10 +617,13 @@ QSpiObjectReference QSpiAdaptor::GetAccessibleAt(int row, int column)
 {
     if (!checkInterface()) return QSpiObjectReference();
     Q_ASSERT(interface->tableInterface());
-    QObject* object = interface->tableInterface()->accessibleAt(row, column)->object();
-    if (!object)
-        return QSpiObjectReference();
-    return spiBridge->objectToAccessible(object)->getReference();
+
+    QAccessibleInterface* cell = interface->tableInterface()->accessibleAt(row, column);
+    if (cell && cell->object()) {
+        return spiBridge->objectToAccessible(cell->object())->getReference();
+    }
+    qWarning() << "Invalid table cell: " << row << ", " << column;
+    return QSpiObjectReference();
 }
 
 int QSpiAdaptor::GetColumnAtIndex(int index)
