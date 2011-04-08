@@ -195,7 +195,18 @@ enum QSpiState {
 
 extern QHash <int, QSpiState> qSpiStateMapping;
 
-QSpiUIntList qSpiStatesetFromQState(QAccessible::State state);
+inline void setSpiStateBit(quint64* state, QSpiState spiState)
+{
+    *state |= quint64(1) << spiState;
+}
+
+inline void unsetSpiStateBit(quint64* state, QSpiState spiState)
+{
+    *state &= ~(quint64(1) << spiState);
+}
+
+quint64 spiStatesFromQState(QAccessible::State state);
+QSpiUIntList spiStateSetFromSpiStates(quint64 states);
 
 /*---------------------------------------------------------------------------*/
 

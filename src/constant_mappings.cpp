@@ -100,17 +100,7 @@ static void initializeRoleMapping ()
     qSpiRoleMapping.insert(QAccessible::UserRole, RoleNames(ROLE_UNKNOWN, "unknown", QSpiAdaptor::tr("user role")));
 }
 
-inline void setSpiStateBit(quint64* state, QSpiState spiState)
-{
-    *state |= quint64(1) << spiState;
-}
-
-inline void unsetSpiStateBit(quint64* state, QSpiState spiState)
-{
-    *state &= ~(quint64(1) << spiState);
-}
-
-QSpiUIntList qSpiStatesetFromQState(QAccessible::State state)
+quint64 spiStatesFromQState(QAccessible::State state)
 {
     quint64 spiState = 0;
 
@@ -257,11 +247,13 @@ QSpiUIntList qSpiStatesetFromQState(QAccessible::State state)
         }
         }
     }
+    return spiState;
+}
 
-    setSpiStateBit(&spiState, STATE_MANAGES_DESCENDANTS);
-
-    uint low = spiState & 0xFFFFFFFF;
-    uint high = (spiState >> 32) & 0xFFFFFFFF;
+QSpiUIntList spiStateSetFromSpiStates(quint64 states)
+{
+    uint low = states & 0xFFFFFFFF;
+    uint high = (states >> 32) & 0xFFFFFFFF;
 
     QSpiUIntList stateList;
     stateList.append(low);

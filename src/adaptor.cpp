@@ -253,7 +253,11 @@ QSpiUIntList QSpiAdaptor::GetState() const
 {
     if (!checkInterface()) return QSpiUIntList();
 
-    return qSpiStatesetFromQState(interface->state(child));
+    quint64 spiState = spiStatesFromQState(interface->state(child));
+    if (interface->tableInterface()) {
+        setSpiStateBit(&spiState, STATE_MANAGES_DESCENDANTS);
+    }
+    return spiStateSetFromSpiStates(spiState);
 }
 
 int QSpiAdaptor::nActions() const
