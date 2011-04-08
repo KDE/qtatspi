@@ -100,23 +100,25 @@ static void initializeRoleMapping ()
     qSpiRoleMapping.insert(QAccessible::UserRole, RoleNames(ROLE_UNKNOWN, "unknown", QSpiAdaptor::tr("user role")));
 }
 
-// split the enum into 2 32 bit integers
-// if n > 31 bits, put it in array[1]
-// use the last 31 bits as value
-#define BITARRAY_SET(p, n)   ( (p)[n>>5] |=  (1<<(n&31)) )
-#define BITARRAY_UNSET(p, n) ( (p)[n>>5] &= ~(1<<(n&31)) )
+inline void setSpiStateBit(quint64* state, QSpiState spiState)
+{
+    *state |= quint64(1) << spiState;
+}
+
+inline void unsetSpiStateBit(quint64* state, QSpiState spiState)
+{
+    *state &= ~(quint64(1) << spiState);
+}
 
 QSpiUIntList qSpiStatesetFromQState(QAccessible::State state)
 {
-    int array[2] = {0, 0};
+    quint64 spiState = 0;
 
-    // We may need to take the role of the object into account when
-    // mapping between the state sets
-    BITARRAY_SET (array, STATE_EDITABLE);
-    BITARRAY_SET (array, STATE_ENABLED);
-    BITARRAY_SET (array, STATE_SHOWING);
-    BITARRAY_SET (array, STATE_VISIBLE);
-    BITARRAY_SET (array, STATE_SENSITIVE);
+    setSpiStateBit(&spiState, STATE_EDITABLE);
+    setSpiStateBit(&spiState, STATE_ENABLED);
+    setSpiStateBit(&spiState, STATE_SHOWING);
+    setSpiStateBit(&spiState, STATE_VISIBLE);
+    setSpiStateBit(&spiState, STATE_SENSITIVE);
 
     for (int mask = 1; mask <= int(QAccessible::HasInvokeExtension); mask <<= 1)
     {
@@ -124,40 +126,40 @@ QSpiUIntList qSpiStatesetFromQState(QAccessible::State state)
         {
         case QAccessible::Unavailable:
         {
-            BITARRAY_UNSET (array, STATE_ENABLED);
-            BITARRAY_UNSET (array, STATE_SHOWING);
-            BITARRAY_UNSET (array, STATE_VISIBLE);
-            BITARRAY_UNSET (array, STATE_SENSITIVE);
+            unsetSpiStateBit(&spiState, STATE_ENABLED);
+            unsetSpiStateBit(&spiState, STATE_SHOWING);
+            unsetSpiStateBit(&spiState, STATE_VISIBLE);
+            unsetSpiStateBit(&spiState, STATE_SENSITIVE);
             break;
         }
         case QAccessible::Selected:
         {
-            BITARRAY_SET (array, STATE_SELECTED);
+            setSpiStateBit(&spiState, STATE_SELECTED);
             break;
         }
         case QAccessible::Focused:
         {
-            BITARRAY_SET (array, STATE_FOCUSED);
+            setSpiStateBit(&spiState, STATE_FOCUSED);
             break;
         }
         case QAccessible::Pressed:
         {
-            BITARRAY_SET (array, STATE_PRESSED);
+            setSpiStateBit(&spiState, STATE_PRESSED);
             break;
         }
         case QAccessible::Checked:
         {
-            BITARRAY_SET (array, STATE_CHECKED);
+            setSpiStateBit(&spiState, STATE_CHECKED);
             break;
         }
         case QAccessible::Mixed:
         {
-            BITARRAY_SET (array, STATE_INDETERMINATE);
+            setSpiStateBit(&spiState, STATE_INDETERMINATE);
             break;
         }
         case QAccessible::ReadOnly:
         {
-            BITARRAY_UNSET (array, STATE_EDITABLE);
+            unsetSpiStateBit(&spiState, STATE_EDITABLE);
             break;
         }
         case QAccessible::HotTracked:
@@ -166,39 +168,39 @@ QSpiUIntList qSpiStatesetFromQState(QAccessible::State state)
         }
         case QAccessible::DefaultButton:
         {
-            BITARRAY_SET (array, STATE_IS_DEFAULT);
+            setSpiStateBit(&spiState, STATE_IS_DEFAULT);
             break;
         }
         case QAccessible::Expanded:
         {
-            BITARRAY_SET (array, STATE_EXPANDED);
+            setSpiStateBit(&spiState, STATE_EXPANDED);
             break;
         }
         case QAccessible::Collapsed:
         {
-            BITARRAY_SET (array, STATE_COLLAPSED);
+            setSpiStateBit(&spiState, STATE_COLLAPSED);
             break;
         }
         case QAccessible::Busy:
         {
-            BITARRAY_SET (array, STATE_BUSY);
+            setSpiStateBit(&spiState, STATE_BUSY);
             break;
         }
         case QAccessible::Marqueed:
         case QAccessible::Animated:
         {
-            BITARRAY_SET (array, STATE_ANIMATED);
+            setSpiStateBit(&spiState, STATE_ANIMATED);
             break;
         }
         case QAccessible::Invisible:
         case QAccessible::Offscreen:
         {
-            BITARRAY_UNSET (array, STATE_SHOWING);
+            unsetSpiStateBit(&spiState, STATE_SHOWING);
             break;
         }
         case QAccessible::Sizeable:
         {
-            BITARRAY_SET (array, STATE_RESIZABLE);
+            setSpiStateBit(&spiState, STATE_RESIZABLE);
             break;
         }
         case QAccessible::Movable:
@@ -208,12 +210,12 @@ QSpiUIntList qSpiStatesetFromQState(QAccessible::State state)
         }
         case QAccessible::Focusable:
         {
-            BITARRAY_SET (array, STATE_FOCUSABLE);
+            setSpiStateBit(&spiState, STATE_FOCUSABLE);
             break;
         }
         case QAccessible::Selectable:
         {
-            BITARRAY_SET (array, STATE_SELECTABLE);
+            setSpiStateBit(&spiState, STATE_SELECTABLE);
             break;
         }
         case QAccessible::Linked:
@@ -222,17 +224,17 @@ QSpiUIntList qSpiStatesetFromQState(QAccessible::State state)
         }
         case QAccessible::Traversed:
         {
-            BITARRAY_SET (array, STATE_VISITED);
+            setSpiStateBit(&spiState, STATE_VISITED);
             break;
         }
         case QAccessible::MultiSelectable:
         {
-            BITARRAY_SET (array, STATE_MULTISELECTABLE);
+            setSpiStateBit(&spiState, STATE_MULTISELECTABLE);
             break;
         }
         case QAccessible::ExtSelectable:
         {
-            BITARRAY_SET (array, STATE_SELECTABLE);
+            setSpiStateBit(&spiState, STATE_SELECTABLE);
             break;
         }
         case QAccessible::Protected:
@@ -242,7 +244,7 @@ QSpiUIntList qSpiStatesetFromQState(QAccessible::State state)
         }
         case QAccessible::Modal:
         {
-            BITARRAY_SET (array, STATE_MODAL);
+            setSpiStateBit(&spiState, STATE_MODAL);
             break;
         }
         case QAccessible::HasInvokeExtension:
@@ -256,10 +258,15 @@ QSpiUIntList qSpiStatesetFromQState(QAccessible::State state)
         }
     }
 
-    QSpiUIntList stateSet;
-    stateSet << array[0];
-    stateSet << array[1];
-    return stateSet;
+    setSpiStateBit(&spiState, STATE_MANAGES_DESCENDANTS);
+
+    uint low = spiState & 0xFFFFFFFF;
+    uint high = (spiState >> 32) & 0xFFFFFFFF;
+
+    QSpiUIntList stateList;
+    stateList.append(low);
+    stateList.append(high);
+    return stateList;
 }
 
 void qSpiInitializeConstantMappings()

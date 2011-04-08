@@ -75,7 +75,7 @@ struct QSpiAccessibleCacheItem
     QString                     name;
     uint                        role;
     QString                     description;
-    QSpiUIntList                states;
+    QSpiUIntList                state;
 };
 
 typedef QList <QSpiAccessibleCacheItem> QSpiAccessibleCacheArray;

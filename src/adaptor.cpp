@@ -89,7 +89,7 @@ QSpiAccessibleCacheItem QSpiAdaptor::getCacheItem() const
     item.name = interface->text(QAccessible::Name, child);
     item.role = qSpiRoleMapping.value(interface->role(child)).spiRole();
     item.description = interface->text(QAccessible::Description, child);
-    item.states = qSpiStatesetFromQState(interface->state(child));
+    item.state = GetState();
     return item;
 }
 

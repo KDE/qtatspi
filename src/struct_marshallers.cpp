@@ -45,7 +45,7 @@ QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAccessibleCacheItem
     argument << item.name;
     argument << item.role;
     argument << item.description;
-    argument << item.states;
+    argument << item.state;
     argument.endStructure();
     return argument;
 }
@@ -61,7 +61,7 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAccessibleCac
     argument >> item.name;
     argument >> item.role;
     argument >> item.description;
-    argument >> item.states;
+    argument >> item.state;
     argument.endStructure();
     return argument;
 }
