@@ -63,7 +63,10 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
     new AccessibleAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;
 
-    if ((!interface->rect(index).isEmpty()) || (interface->object() && interface->object()->isWidgetType())) {
+    if (  (!interface->rect(index).isEmpty())
+       || (interface->object() && interface->object()->isWidgetType())
+       || (interface->object()->inherits("QSGItem"))
+          ) {
         new ComponentAdaptor(this);
         supportedInterfaces << QSPI_INTERFACE_COMPONENT;
 
@@ -74,8 +77,6 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
                 qDebug() << " + window";
             }
         }
-    } else {
-        qDebug() << " - component";
     }
 
     new ObjectAdaptor(this);
@@ -119,14 +120,14 @@ QSpiObjectReference QSpiAccessible::getParentReference() const
     if (interface->isValid()) {
         QAccessibleInterface *parentInterface = 0;
         interface->navigate(QAccessible::Ancestor, 1, &parentInterface);
-        if (parentInterface)
-        {
+        if (parentInterface) {
             QSpiAdaptor *parent = spiBridge->objectToAccessible(parentInterface->object());
             delete parentInterface;
             if (parent)
                 return parent->getReference();
         }
     }
+    qWarning() << "Invalid parent: " << interface << interface->object();
     return QSpiObjectReference();
 }
 
@@ -167,8 +168,7 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         qWarning() << "Object hide";
         break;
     case QAccessible::ObjectDestroyed:
-        qWarning() << "Object destroyed";
-        Q_ASSERT(0);
+        qDebug() << "Object destroyed";
         break;
     case QAccessible::StateChanged: {
         QAccessible::State newState = interface->state(childIndex());
