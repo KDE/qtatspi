@@ -6,4 +6,5 @@ SUBDIRS += src \
            tests \
            examples/calculator \
            examples/declarative \
+           examples/scenegraph \
            examples/simple
