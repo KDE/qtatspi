@@ -78,6 +78,8 @@ private:
         QList<QSpiAdaptor*> allAdaptors;
 
         DBusConnection* dbusConnection;
+
+        bool initialized;
 };
 
 #endif

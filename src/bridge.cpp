@@ -43,7 +43,7 @@
 QSpiAccessibleBridge* QSpiAccessibleBridge::self = 0;
 
 QSpiAccessibleBridge::QSpiAccessibleBridge()
-    : cache(0)
+    : cache(0), initialized(false)
 {
     Q_ASSERT(self == 0);
     self = this;
@@ -81,6 +81,8 @@ QDBusConnection QSpiAccessibleBridge::dBusConnection() const
 
 void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *interface)
 {
+    initialized = true;
+
     // the interface we get will be for the QApplication object.
     // we already cache it in the constructor.
     Q_ASSERT(interface->object() == qApp);
@@ -94,6 +96,9 @@ QSpiObjectReference QSpiAccessibleBridge::getRootReference() const
 void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface, int index)
 {
     Q_ASSERT(interface && interface->isValid());
+
+    if (!initialized)
+        return;
 
     // this gets deleted, so create one if we don't have it yet
     QSpiAdaptor* accessible = interfaceToAccessible(interface, index, false);
