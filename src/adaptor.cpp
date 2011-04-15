@@ -430,11 +430,11 @@ QSpiObjectReference QSpiAdaptor::GetAccessibleAtPoint(int x, int y, uint coord_t
     QWidget* w = qApp->widgetAt(x,y);
     if (w) {
         QSpiAdaptor* adaptor = spiBridge->objectToAccessible(w);
-        for (int i = 1; i <= adaptor->childCount(); ++i) {
+
+        int i = adaptor->associatedInterface()->childAt(x, y);
+        if (i > 0) {
             QSpiAdaptor* child = adaptor->getChild(i);
-            if (child->Contains(x, y, coord_type)) {
-                return child->getReference();
-            }
+            return child->getReference();
         }
         return adaptor->getReference();
     } else {
