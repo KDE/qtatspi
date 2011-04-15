@@ -64,9 +64,9 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
     supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;
 
     if (  (!interface->rect(index).isEmpty())
-       || (interface->object() && interface->object()->isWidgetType())
-       || (interface->object()->inherits("QSGItem"))
-          ) {
+       || (interface->object()
+           && (interface->object()->isWidgetType() || (interface->object()->inherits("QSGItem")))
+       )) {
         new ComponentAdaptor(this);
         supportedInterfaces << QSPI_INTERFACE_COMPONENT;
 
