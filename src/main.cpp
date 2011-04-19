@@ -27,6 +27,7 @@ class QSpiAccessibleBridgePlugin: public QAccessibleBridgePlugin
 {
 public:
         QSpiAccessibleBridgePlugin(QObject *parent = 0);
+        virtual ~QSpiAccessibleBridgePlugin() {};
 
         virtual QAccessibleBridge* create(const QString &key);
         virtual QStringList keys() const;

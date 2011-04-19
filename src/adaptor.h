@@ -63,6 +63,7 @@ class QSpiAdaptor :public QObject
 
 public:
     QSpiAdaptor(QAccessibleInterface *interface, int index);
+    virtual ~QSpiAdaptor() {};
 
     QStringList getSupportedInterfaces() const;
     QSpiAccessibleCacheItem getCacheItem() const;
