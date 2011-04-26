@@ -939,7 +939,13 @@ int QSpiAdaptor::GetSelection(int selectionNum, int &endOffset)
 {
     if (!checkInterface()) return -1;
     int start, end;
-    interface->textInterface()->selection (selectionNum, &start, &end);
+    interface->textInterface()->selection(selectionNum, &start, &end);
+
+    if (start<0) {
+        endOffset = interface->textInterface()->cursorPosition();
+        return endOffset;
+    }
+
     endOffset = end;
     return start;
 }
