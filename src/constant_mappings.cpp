@@ -241,6 +241,11 @@ quint64 spiStatesFromQState(QAccessible::State state)
         {
             break;
         }
+        case QAccessible::SingleLine:
+        {
+            setSpiStateBit(&spiState, STATE_SINGLE_LINE);
+            break;
+        }
         default:
         {
             break;
