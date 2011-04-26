@@ -780,7 +780,7 @@ int QSpiAdaptor::caretOffset() const
 int QSpiAdaptor::characterCount() const
 {
     if (!checkInterface()) return 0;
-    return interface->textInterface()->cursorPosition();
+    return interface->textInterface()->characterCount();
 }
 
 bool QSpiAdaptor::AddSelection(int startOffset, int endOffset)
