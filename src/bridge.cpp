@@ -185,6 +185,17 @@ QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* i
     }
     allAdaptors.append(accessible);
 
+    // FIXME relations
+//    QAccessibleInterface* labelInterface;
+//    interface->navigate(QAccessible::Labelled, 1, &labelInterface);
+//    if (labelInterface) {
+//        qDebug() << "Found a label. No I didn't believe that possible either.";
+//        QSpiAdaptor *labelAdaptor = interfaceToAccessible(labelInterface, 0, true);
+//        labelAdaptor->addRelation(this);
+
+//        addRelation(labelAdaptor);
+//    }
+
     // say hello to d-bus
     cache->emitAddAccessible(accessible->getCacheItem());
 

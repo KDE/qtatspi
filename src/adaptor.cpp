@@ -228,10 +228,10 @@ QSpiRelationArray QSpiAdaptor::GetRelationSet() const
 {
     if (!checkInterface()) return QSpiRelationArray();
 
-    qWarning("Not implemented: QSpiAdaptor::GetRelationSet");
-    QSpiRelationArray out0;
-
-    return out0;
+//    qWarning("Not implemented: QSpiAdaptor::GetRelationSet");
+    QSpiRelationArray relations;
+    relations.append(QMap < unsigned int, QSpiObjectReference >());
+    return relations;
 }
 
 uint QSpiAdaptor::GetRole() const
