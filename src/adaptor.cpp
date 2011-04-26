@@ -854,7 +854,7 @@ QSpiAttributeSet QSpiAdaptor::GetAttributes(int offset, int &startOffset, int &e
         set[items[0]] = items[1];
     }
     endOffset = endOffsetCopy;
-    startOffsetCopy = startOffset;
+    startOffset = startOffsetCopy;
     return set;
 }
 
