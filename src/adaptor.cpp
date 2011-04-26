@@ -341,7 +341,7 @@ int QSpiAdaptor::id() const
 QString QSpiAdaptor::toolkitName() const
 {
     if (!checkInterface()) return QString();
-    qWarning() << "QSpiAdaptor::toolkitName FIXME: We pretend to be GAIL as toolkit. This is evil and needs fixing.";
+//    qWarning() << "QSpiAdaptor::toolkitName FIXME: We pretend to be GAIL as toolkit. This is evil and needs fixing.";
     return QLatin1String("Qt");
 //    return QLatin1String("GAIL");
 }
@@ -352,6 +352,8 @@ QString QSpiAdaptor::version() const
     return QLatin1String(QT_VERSION_STR);
 }
 
+/// The bus address for direct (p2p) connections.
+/// Not supported atm.
 QString QSpiAdaptor::GetApplicationBusAddress() const
 {
     qDebug() << "QSpiAdaptor::GetApplicationBusAddress implement me!";
