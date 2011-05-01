@@ -165,7 +165,8 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         emit Focus("", 0, 0, data, spiBridge->getRootReference());
         break;
     }
-    case QAccessible::TextChanged: {
+#if (QT_VERSION >= QT_VERSION_CHECK(4, 8, 0))
+    case QAccessible::TextUpdated: {
         Q_ASSERT(interface->textInterface());
 
         // at-spi doesn't have a proper text updated/changed, so remove all and re-add the new text
@@ -194,6 +195,7 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         emit TextCaretMoved(QString(), pos ,0, data, spiBridge->getRootReference());
         break;
     }
+#endif
     case QAccessible::ValueChanged: {
         Q_ASSERT(interface->valueInterface());
         qDebug() << "Value changed: " << interface->object() << interface->valueInterface()->currentValue();
