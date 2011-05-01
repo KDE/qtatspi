@@ -22,14 +22,14 @@
 #ifndef Q_SPI_ACCESSIBLE_H
 #define Q_SPI_ACCESSIBLE_H
 
+#include "adaptor.h"
+
 #include <QtCore/QObject>
-#include <QtDBus/QtDBus>
 #include <QDBusObjectPath>
+#include <QtDBus/QtDBus>
 
 #include <QAccessible>
-#include <QAccessibleInterface>
 
-#include "adaptor.h"
 
 /*
  * Used for all accessible objects other than the root object.
@@ -49,7 +49,6 @@ public:
 
     virtual void accessibleEvent(QAccessible::Event event);
 
-
     void windowActivated();
 
 Q_SIGNALS:
@@ -62,7 +61,10 @@ Q_SIGNALS:
 private:
     static QDBusObjectPath getUnique();
 
+    // AT-SPI wants updates of what changed, not only the new state.
     QAccessible::State state;
+    // When changing text, we remove the complete old text, but for that we need its length.
+    QString oldText;
 
     friend class QSpiAccessibleBridge;
 };
