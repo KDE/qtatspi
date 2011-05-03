@@ -228,10 +228,10 @@ QSpiRelationArray QSpiAdaptor::GetRelationSet() const
 {
     if (!checkInterface()) return QSpiRelationArray();
 
-    qWarning("Not implemented: QSpiAdaptor::GetRelationSet");
-    QSpiRelationArray out0;
-
-    return out0;
+//    qWarning("Not implemented: QSpiAdaptor::GetRelationSet");
+    QSpiRelationArray relations;
+    relations.append(QMap < unsigned int, QSpiObjectReference >());
+    return relations;
 }
 
 uint QSpiAdaptor::GetRole() const
@@ -341,7 +341,7 @@ int QSpiAdaptor::id() const
 QString QSpiAdaptor::toolkitName() const
 {
     if (!checkInterface()) return QString();
-    qWarning() << "QSpiAdaptor::toolkitName FIXME: We pretend to be GAIL as toolkit. This is evil and needs fixing.";
+//    qWarning() << "QSpiAdaptor::toolkitName FIXME: We pretend to be GAIL as toolkit. This is evil and needs fixing.";
     return QLatin1String("Qt");
 //    return QLatin1String("GAIL");
 }
@@ -352,6 +352,8 @@ QString QSpiAdaptor::version() const
     return QLatin1String(QT_VERSION_STR);
 }
 
+/// The bus address for direct (p2p) connections.
+/// Not supported atm.
 QString QSpiAdaptor::GetApplicationBusAddress() const
 {
     qDebug() << "QSpiAdaptor::GetApplicationBusAddress implement me!";
@@ -428,11 +430,11 @@ QSpiObjectReference QSpiAdaptor::GetAccessibleAtPoint(int x, int y, uint coord_t
     QWidget* w = qApp->widgetAt(x,y);
     if (w) {
         QSpiAdaptor* adaptor = spiBridge->objectToAccessible(w);
-        for (int i = 1; i <= adaptor->childCount(); ++i) {
+
+        int i = adaptor->associatedInterface()->childAt(x, y);
+        if (i > 0) {
             QSpiAdaptor* child = adaptor->getChild(i);
-            if (child->Contains(x, y, coord_type)) {
-                return child->getReference();
-            }
+            return child->getReference();
         }
         return adaptor->getReference();
     } else {
@@ -778,7 +780,7 @@ int QSpiAdaptor::caretOffset() const
 int QSpiAdaptor::characterCount() const
 {
     if (!checkInterface()) return 0;
-    return interface->textInterface()->cursorPosition();
+    return interface->textInterface()->characterCount();
 }
 
 bool QSpiAdaptor::AddSelection(int startOffset, int endOffset)
@@ -852,7 +854,7 @@ QSpiAttributeSet QSpiAdaptor::GetAttributes(int offset, int &startOffset, int &e
         set[items[0]] = items[1];
     }
     endOffset = endOffsetCopy;
-    startOffsetCopy = startOffset;
+    startOffset = startOffsetCopy;
     return set;
 }
 
@@ -937,7 +939,13 @@ int QSpiAdaptor::GetSelection(int selectionNum, int &endOffset)
 {
     if (!checkInterface()) return -1;
     int start, end;
-    interface->textInterface()->selection (selectionNum, &start, &end);
+    interface->textInterface()->selection(selectionNum, &start, &end);
+
+    if (start<0) {
+        endOffset = interface->textInterface()->cursorPosition();
+        return endOffset;
+    }
+
     endOffset = end;
     return start;
 }

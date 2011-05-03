@@ -33,8 +33,7 @@
 QSpiDBusCache::QSpiDBusCache(QObject* parent)
     : QObject(parent)
 {
-    CacheAdaptor *adaptor;
-    adaptor = new CacheAdaptor(this);
+    new CacheAdaptor(this);
     QDBusConnection c = QSpiAccessibleBridge::instance()->dBusConnection();
     c.registerObject(QSPI_OBJECT_PATH_CACHE, this, QDBusConnection::ExportAdaptors);
 }
