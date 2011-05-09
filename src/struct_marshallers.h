@@ -22,8 +22,9 @@
 #ifndef Q_SPI_STRUCT_MARSHALLERS_H
 #define Q_SPI_STRUCT_MARSHALLERS_H
 
-#include <QDBusObjectPath>
 #include <QDBusArgument>
+#include <QDBusConnection>
+#include <QDBusObjectPath>
 #include <QList>
 
 /* QSpiIntList */
@@ -41,12 +42,12 @@ Q_DECLARE_METATYPE(QSpiUIntList)
 // FIXME: make this copy on write
 struct QSpiObjectReference
 {
-    QString name;
+    QString service;
     QDBusObjectPath path;
 
-    QSpiObjectReference(); // null reference
-    QSpiObjectReference(QString name, QDBusObjectPath path)
-        : name(name), path(path) {}
+    QSpiObjectReference();
+    QSpiObjectReference(const QDBusConnection& connection, const QDBusObjectPath& path)
+        : service(connection.baseService()), path(path) {}
 };
 
 Q_DECLARE_METATYPE(QSpiObjectReference)
@@ -69,12 +70,12 @@ struct QSpiAccessibleCacheItem
     QSpiObjectReference         path;
     QSpiObjectReference         application;
     QSpiObjectReference         parent;
-    uint                        role;
-    QString                     description;
-    QSpiUIntList                states;
     QList <QSpiObjectReference> children;
     QStringList                 supportedInterfaces;
     QString                     name;
+    uint                        role;
+    QString                     description;
+    QSpiUIntList                state;
 };
 
 typedef QList <QSpiAccessibleCacheItem> QSpiAccessibleCacheArray;

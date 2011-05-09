@@ -34,9 +34,9 @@
 #define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
 
 QSpiApplication::QSpiApplication(QAccessibleInterface *interface)
-    :QSpiAdaptor(interface, 0)
+    :QSpiAdaptor(interface, 0), applicationId(-1)
 {
-    reference = QSpiObjectReference(spiBridge->dBusConnection().baseService(),
+    reference = QSpiObjectReference(spiBridge->dBusConnection(),
                    QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
 
     new AccessibleAdaptor(this);
@@ -88,15 +88,15 @@ enum QSpiKeyEventType {
       QSPI_KEY_EVENT_LAST_DEFINED
 };
 
-bool QSpiApplication::eventFilter(QObject *obj, QEvent *event)
+bool QSpiApplication::eventFilter(QObject *target, QEvent *event)
 {
     if (!event->spontaneous())
         return false;
 
     switch (event->type()) {
         case QEvent::WindowActivate: {
-        qDebug() << " Window activate: " << event->spontaneous() << obj;
-        QSpiAdaptor* a = spiBridge->objectToAccessible(obj);
+        qDebug() << " Window activate: " << event->spontaneous() << target;
+        QSpiAdaptor* a = spiBridge->objectToAccessible(target);
         QSpiAccessible* acc = static_cast<QSpiAccessible*>(a);
         acc->windowActivated();
         break;
@@ -118,11 +118,46 @@ bool QSpiApplication::eventFilter(QObject *obj, QEvent *event)
             de.timestamp = QDateTime::currentMSecsSinceEpoch();
 
             // FIXME: how to generate key strings?
+            // FIXME: localize?
             if (keyEvent->key() == Qt::Key_Tab) {
                 de.text = "Tab";
+            } else if (keyEvent->key() == Qt::Key_Backtab) {
+                de.text = "Backtab";
+            } else if (keyEvent->key() == Qt::Key_Left) {
+                de.text = "Left";
+            } else if (keyEvent->key() == Qt::Key_Right) {
+                de.text = "Right";
+            } else if (keyEvent->key() == Qt::Key_Up) {
+                de.text = "Up";
+            } else if (keyEvent->key() == Qt::Key_Down) {
+                de.text = "Down";
+            } else if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
+                de.text = "Return";
+            } else if (keyEvent->key() == Qt::Key_Backspace) {
+                de.text = "BackSpace";
+            } else if (keyEvent->key() == Qt::Key_Delete) {
+                de.text = "Delete";
+            } else if (keyEvent->key() == Qt::Key_PageUp) {
+                de.text = "Page_Up";
+            } else if (keyEvent->key() == Qt::Key_PageDown) {
+                de.text = "Page_Down";
+            } else if (keyEvent->key() == Qt::Key_Home) {
+                de.text = "Home";
+            } else if (keyEvent->key() == Qt::Key_End) {
+                de.text = "End";
+            } else if (keyEvent->key() == Qt::Key_Escape) {
+                de.text = "Escape";
+            } else if (keyEvent->key() == Qt::Key_Space) {
+                de.text = "space";
+            } else if (keyEvent->key() == Qt::Key_CapsLock) {
+                de.text = "Caps_Lock";
+            } else if (keyEvent->key() == Qt::Key_NumLock) {
+                de.text = "Num_Lock";
             } else {
                 de.text = keyEvent->text();
             }
+//            "F1", "F2", "F3", "F4", "F5", "F6",
+//            "F7", "F8", "F9", "F10", "F11", "F12"
 
             // FIXME
             de.isText = !keyEvent->text().trimmed().isEmpty();
@@ -139,15 +174,15 @@ bool QSpiApplication::eventFilter(QObject *obj, QEvent *event)
             m.setArguments(QVariantList() <<QVariant::fromValue(de));
 
             // FIXME: this is critical, the timeout should probably be pretty low to allow normal processing
-            int timeout = -1;
+            int timeout = 100;
             bool sent = spiBridge->dBusConnection().callWithCallback(m, this, SLOT(notifyKeyboardListenerCallback(QDBusMessage)),
                                                         SLOT(notifyKeyboardListenerError(QDBusError, QDBusMessage)), timeout);
             if (!sent)
                 return false;
 
             //queue the event and send it after callback
-            //return true;
-            break;
+            keyEvents.enqueue(QPair<QObject*, QKeyEvent*> (target, copyKeyEvent(keyEvent)));
+            return true;
     }
         default:
             break;
@@ -155,18 +190,45 @@ bool QSpiApplication::eventFilter(QObject *obj, QEvent *event)
     return false;
 }
 
+QKeyEvent* QSpiApplication::copyKeyEvent(QKeyEvent* old)
+{
+    return new QKeyEvent(old->type(), old->key(), old->modifiers(), old->text(), old->isAutoRepeat(), old->count());
+}
+
 void QSpiApplication::notifyKeyboardListenerCallback(const QDBusMessage& message)
 {
-    qDebug() << "QSpiApplication::keyEventCallback" << message.arguments().at(0).toBool();
     Q_ASSERT(message.arguments().length() == 1);
     if (message.arguments().at(0).toBool() == true) {
-        qDebug() << " Special key, INTERRUPT processing!";
+        if (!keyEvents.length()) {
+            qWarning() << "QSpiApplication::notifyKeyboardListenerCallback with no queued key called";
+            return;
+        }
+        keyEvents.dequeue();
     } else {
-        // send pending key events
+        if (!keyEvents.length()) {
+            qWarning() << "QSpiApplication::notifyKeyboardListenerCallback with no queued key called";
+            return;
+        }
+        QPair<QObject*, QKeyEvent*> event = keyEvents.dequeue();
+        QApplication::postEvent(event.first, event.second);
     }
 }
 
 void QSpiApplication::notifyKeyboardListenerError(const QDBusError& error, const QDBusMessage& /*message*/)
 {
     qWarning() << "QSpiApplication::keyEventError " << error.name() << error.message();
+    while (!keyEvents.isEmpty()) {
+        QPair<QObject*, QKeyEvent*> event = keyEvents.dequeue();
+        QApplication::postEvent(event.first, event.second);
+    }
+}
+
+int QSpiApplication::id() const
+{
+    return applicationId;
+}
+
+void QSpiApplication::setId(int value)
+{
+    applicationId = value;
 }

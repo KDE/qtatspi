@@ -1,7 +1,7 @@
 /*
  * D-Bus AT-SPI, Qt Adaptor
  *
- * Copyright 2008, 2009      Nokia.
+ * Copyright 2011      Nokia.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -19,27 +19,23 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef Q_SPI_CACHE_H
-#define Q_SPI_CACHE_H
+#ifndef DBUSCONNECTION_H
+#define DBUSCONNECTION_H
 
-#include <QtCore/QObject>
-#include "struct_marshallers.h"
+#include <QtCore/QString>
+#include <QtDBus/QDBusConnection>
 
-class QSpiDBusCache : public QObject
+class DBusConnection
 {
-    Q_OBJECT
-
 public:
-    QSpiDBusCache(QObject* parent = 0);
-    virtual ~QSpiDBusCache() {};
-    void emitAddAccessible(const QSpiAccessibleCacheItem& item);
+    DBusConnection();
+    QDBusConnection connection() const;
 
-signals:
-    void AddAccessible(const QSpiAccessibleCacheItem &nodeAdded);
-    void RemoveAccessible(const QSpiObjectReference &nodeRemoved);
+private:
+    QString getAccessibilityBusAddress() const;
+    QDBusConnection connectDBus();
 
-public Q_SLOTS:
-    QSpiAccessibleCacheArray GetItems();
+    QDBusConnection dbusConnection;
 };
 
-#endif /* Q_SPI_CACHE_H */
+#endif // DBUSCONNECTION_H

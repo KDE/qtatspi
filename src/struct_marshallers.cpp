@@ -28,7 +28,7 @@
 #define QSPI_OBJECT_PATH_NULL    QSPI_OBJECT_PATH_PREFIX "null"
 
 QSpiObjectReference::QSpiObjectReference()
-    : name(spiBridge->dBusConnection().baseService()), path(QDBusObjectPath(QSPI_OBJECT_PATH_NULL))
+    : path(QDBusObjectPath(QSPI_OBJECT_PATH_NULL))
 {}
 
 /* QSpiAccessibleCacheArray */
@@ -45,7 +45,7 @@ QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAccessibleCacheItem
     argument << item.name;
     argument << item.role;
     argument << item.description;
-    argument << item.states;
+    argument << item.state;
     argument.endStructure();
     return argument;
 }
@@ -61,7 +61,7 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAccessibleCac
     argument >> item.name;
     argument >> item.role;
     argument >> item.description;
-    argument >> item.states;
+    argument >> item.state;
     argument.endStructure();
     return argument;
 }
@@ -72,7 +72,7 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAccessibleCac
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiObjectReference &address)
 {
     argument.beginStructure();
-    argument << address.name;
+    argument << address.service;
     argument << address.path;
     argument.endStructure();
     return argument;
@@ -81,7 +81,7 @@ QDBusArgument &operator<<(QDBusArgument &argument, const QSpiObjectReference &ad
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiObjectReference &address)
 {
     argument.beginStructure();
-    argument >> address.name;
+    argument >> address.service;
     argument >> address.path;
     argument.endStructure();
     return argument;

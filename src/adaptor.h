@@ -50,7 +50,7 @@
 #define QSPI_OBJECT_PATH_NULL    QSPI_OBJECT_PATH_PREFIX "null"
 #define QSPI_OBJECT_PATH_ROOT    QSPI_OBJECT_PATH_PREFIX "root"
 
-
+// FIXME lots of const missing for all the getters...
 
 /*
  * Implements all methods neccessary to adapt calls from AT-SPI to the
@@ -63,6 +63,7 @@ class QSpiAdaptor :public QObject
 
 public:
     QSpiAdaptor(QAccessibleInterface *interface, int index);
+    virtual ~QSpiAdaptor() {};
 
     QStringList getSupportedInterfaces() const;
     QSpiAccessibleCacheItem getCacheItem() const;
@@ -74,6 +75,8 @@ public:
     inline QAccessibleInterface* associatedInterface() const { return interface; }
     inline int childIndex() const { return child; }
 
+    QObject* getObject() const;
+
 public:
     // event stuff
     void signalChildrenChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data);
@@ -82,7 +85,8 @@ Q_SIGNALS:
     void StateChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
     void PropertyChange(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
     void Focus(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
-
+    void TextChanged(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
+    void TextCaretMoved(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
 
 /* AT-SPI Accessible interface */
 public:
@@ -96,16 +100,16 @@ public:
     QSpiObjectReference parent() const;
 
 public Q_SLOTS:
-    QSpiObjectReference GetApplication();
-    QSpiAttributeSet GetAttributes();
-    QSpiObjectReference GetChildAtIndex(int index);
-    QSpiObjectReferenceArray GetChildren();
-    int GetIndexInParent();
-    QString GetLocalizedRoleName();
-    QSpiRelationArray GetRelationSet();
-    uint GetRole();
-    QString GetRoleName();
-    QSpiUIntList GetState();
+    QSpiObjectReference GetApplication() const;
+    QSpiAttributeSet GetAttributes() const;
+    QSpiObjectReference GetChildAtIndex(int index) const;
+    QSpiObjectReferenceArray GetChildren() const;
+    int GetIndexInParent() const;
+    QString GetLocalizedRoleName() const;
+    QSpiRelationArray GetRelationSet() const;
+    uint GetRole() const;
+    QString GetRoleName() const;
+    QSpiUIntList GetState() const;
 
 /* AT-SPI Action interface */
 public:
@@ -127,6 +131,7 @@ public:
     QString toolkitName() const;
     Q_PROPERTY(QString Version READ version)
     QString version() const;
+    QString GetApplicationBusAddress() const;
 
 public Q_SLOTS: // METHODS
     QString GetLocale(uint lctype);
@@ -240,7 +245,7 @@ protected:
     QStringList supportedInterfaces;
 
 private:
-
+    bool checkInterface() const;
     int child;
 };
 

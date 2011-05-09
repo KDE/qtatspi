@@ -19,12 +19,15 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include "accessible.h"
+
 #include <QDBusPendingReply>
 #include <QDebug>
 #include <QtGui/QWidget>
 
+#include <QAccessibleValueInterface>
+
 #include "adaptor.h"
-#include "accessible.h"
 #include "bridge.h"
 #include "cache.h"
 
@@ -55,7 +58,7 @@ QDBusObjectPath QSpiAccessible::getUnique()
 QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
     : QSpiAdaptor(interface, index)
 {
-    reference = QSpiObjectReference(spiBridge->dBusConnection().baseService(),
+    reference = QSpiObjectReference(spiBridge->dBusConnection(),
                                                getUnique());
 
     qDebug() << "ACCESSIBLE: " << interface->object() << reference.path.path();
@@ -90,6 +93,8 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
     {
         new TextAdaptor(this);
         supportedInterfaces << QSPI_INTERFACE_TEXT;
+        oldText = interface->textInterface()->text(0, interface->textInterface()->characterCount());
+        qDebug() << "Old Text: " << interface->object() << oldText;
     }
     if (interface->editableTextInterface())
     {
@@ -109,7 +114,7 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
 
     spiBridge->dBusConnection().registerObject(reference.path.path(),
                                   this, QDBusConnection::ExportAdaptors);
-    state = interface->state(0);
+    state = interface->state(childIndex());
 }
 
 QSpiObjectReference QSpiAccessible::getParentReference() const
@@ -122,17 +127,21 @@ QSpiObjectReference QSpiAccessible::getParentReference() const
         if (parentInterface)
         {
             QSpiAdaptor *parent = spiBridge->objectToAccessible(parentInterface->object());
+            delete parentInterface;
             if (parent)
                 return parent->getReference();
         }
     }
-
     return QSpiObjectReference();
 }
 
 void QSpiAccessible::accessibleEvent(QAccessible::Event event)
 {
-    Q_ASSERT(interface && interface->isValid());
+    Q_ASSERT(interface);
+    if (!interface->isValid()) {
+        spiBridge->removeAdaptor(this);
+        return;
+    }
 
     switch (event) {
     case QAccessible::NameChanged: {
@@ -156,6 +165,47 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         emit Focus("", 0, 0, data, spiBridge->getRootReference());
         break;
     }
+#if (QT_VERSION >= QT_VERSION_CHECK(4, 8, 0))
+    case QAccessible::TextUpdated: {
+        Q_ASSERT(interface->textInterface());
+
+        // at-spi doesn't have a proper text updated/changed, so remove all and re-add the new text
+        qDebug() << "Text changed: " << interface->object();
+        QDBusVariant data;
+        data.setVariant(QVariant::fromValue(oldText));
+        emit TextChanged("delete", 0, oldText.length(), data, spiBridge->getRootReference());
+
+        QString text = interface->textInterface()->text(0, interface->textInterface()->characterCount());
+        data.setVariant(QVariant::fromValue(text));
+        emit TextChanged("insert", 0, text.length(), data, spiBridge->getRootReference());
+        oldText = text;
+
+        QDBusVariant cursorData;
+        int pos = interface->textInterface()->cursorPosition();
+        cursorData.setVariant(QVariant::fromValue(pos));
+        emit TextCaretMoved(QString(), pos ,0, cursorData, spiBridge->getRootReference());
+        break;
+    }
+    case QAccessible::TextCaretMoved: {
+        Q_ASSERT(interface->textInterface());
+        qDebug() << "Text caret moved: " << interface->object();
+        QDBusVariant data;
+        int pos = interface->textInterface()->cursorPosition();
+        data.setVariant(QVariant::fromValue(pos));
+        emit TextCaretMoved(QString(), pos ,0, data, spiBridge->getRootReference());
+        break;
+    }
+#endif
+    case QAccessible::ValueChanged: {
+        Q_ASSERT(interface->valueInterface());
+        qDebug() << "Value changed: " << interface->object() << interface->valueInterface()->currentValue();
+        QSpiObjectReference r = getReference();
+        QDBusVariant data;
+        data.setVariant(QVariant::fromValue(r));
+        // FIXME: values for data1/2?
+        emit PropertyChange("value-changed", 0, 0, data, spiBridge->getRootReference());
+        break;
+    }
     case QAccessible::ObjectShow:
         break;
     case QAccessible::ObjectHide:
@@ -167,8 +217,14 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         Q_ASSERT(0);
         break;
     case QAccessible::StateChanged: {
-        QAccessible::State newState = interface->state(0);
-        qDebug() << "StateChanged: " << (state^newState);
+        QAccessible::State newState = interface->state(childIndex());
+        qDebug() << "StateChanged: old: " << state << " new: " << newState << " xor: " << (state^newState);
+        if ((state^newState) & QAccessible::Checked) {
+            int checked = (newState & QAccessible::Checked) ? 1 : 0;
+            QDBusVariant data;
+            data.setVariant(QVariant::fromValue(getReference()));
+            emit StateChanged("checked", checked, 0, data, spiBridge->getRootReference());
+        }
         state = newState;
         break;
     }

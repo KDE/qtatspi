@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    app.setObjectName("Root app object name");
+    app.setApplicationName("Calculator");
 
     Calculator calc;
     calc.show();
