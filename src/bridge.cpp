@@ -103,6 +103,8 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
     // this gets deleted, so create one if we don't have it yet
     QSpiAdaptor* accessible = interfaceToAccessible(interface, index, false);
 
+    Q_ASSERT(accessible->associatedInterface()->object() == interface->object());
+
     if (reason == QAccessible::Focus) {
         static QSpiAccessible *lastFocused = 0;
         if (lastFocused) {
@@ -139,9 +141,9 @@ QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* i
 {
     Q_ASSERT(interface && interface->isValid());
     if (interface->object()) {
-        QHash<QObject*, QSpiAdaptor*>::const_iterator i = adaptorWithObjectMap.constFind(interface->object());
+        QHash<QObject*, QSpiAdaptor*>::const_iterator i = adaptorWithObjectMap.constBegin();
         while (i != adaptorWithObjectMap.constEnd()) {
-            if (i.value()->childIndex() == index)
+            if (i.key() == interface->object() && i.value()->childIndex() == index)
                 return i.value();
             ++i;
         }
