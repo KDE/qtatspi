@@ -29,10 +29,7 @@
 
 DBusConnection::DBusConnection()
     : dbusConnection(connectDBus())
-{
-    printf("DBUS address: %s", dbusConnection.baseService().toLatin1().data());
-    fflush(stdout);
-}
+{}
 
 QDBusConnection DBusConnection::connectDBus()
 {
@@ -75,9 +72,6 @@ QString DBusConnection::getAccessibilityBusAddress() const
                         (unsigned char **) (void *) &propData);
 
     QString busAddress = QString::fromLocal8Bit(propData);
-
-    if (propData)
-        printf("DBUS bus: %s", propData);
 
     XFree(propData);
     return busAddress;
