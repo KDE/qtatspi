@@ -113,7 +113,6 @@ void tst_QtAtSpi::initTestCase()
     m_window = new AccessibleTestWindow();
     m_window->show();
     QTest::qWaitForWindowShown(m_window);
-    QTest::qWait(1000); // Seems like we need to give dbus some time
 
     address = m_window->dbusAddress();
     registerDbus();
@@ -160,7 +159,14 @@ void tst_QtAtSpi::testLabel()
     QStringList children = getChildren(mainWindow);
 
     QDBusInterface* labelInterface = getInterface(children.at(0), "org.a11y.atspi.Accessible");
+    QVERIFY(labelInterface->isValid());
     QCOMPARE(labelInterface->property("Name").toString(), QLatin1String("Hello A11y"));
+    QCOMPARE(getChildren(labelInterface).count(), 0);
+    QCOMPARE(labelInterface->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("label"));
+    QCOMPARE(labelInterface->call(QDBus::Block, "GetRole").arguments().first().toUInt(), 29u);
+
+    l->setText("New text");
+    QCOMPARE(labelInterface->property("Name").toString(), l->text());
 }
 
 
@@ -202,11 +208,6 @@ void tst_QtAtSpi::testLabel()
 //     QCOMPARE(centralWidget->property("Name").toString(), QString());
 //     QStringList centralWidgetChildren = getChildren(centralWidget);
 //     QCOMPARE(centralWidgetChildren.count(), 7);
-// 
-//     QDBusInterface* label = getInterface(centralWidgetChildren.at(0), "org.a11y.atspi.Accessible");
-//     QVERIFY(label->isValid());
-//     QCOMPARE(label->property("Name").toString(), QLatin1String("Some Text"));
-//     QCOMPARE(getChildren(label).count(), 0);
 // 
 //     QDBusInterface* button = getInterface(centralWidgetChildren.at(1), "org.a11y.atspi.Accessible");
 //     QVERIFY(button->isValid());
