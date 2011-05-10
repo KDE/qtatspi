@@ -28,7 +28,11 @@ public:
 
     void clearChildren()
     {
-        qDeleteAll(children());
+        QHBoxLayout *newLayout = new QHBoxLayout();
+        setLayout(newLayout);
+        qDeleteAll(m_layout->children());
+        delete m_layout;
+        m_layout = newLayout;
     }
 
 private:
