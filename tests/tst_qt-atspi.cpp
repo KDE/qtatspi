@@ -150,7 +150,6 @@ void tst_QtAtSpi::registerDbus()
 
 #define ROOTPATH "/org/a11y/atspi/accessible"
 
-
 void tst_QtAtSpi::testLabel()
 {
     QLabel* l = new QLabel(m_window);
@@ -161,6 +160,9 @@ void tst_QtAtSpi::testLabel()
 
     QDBusInterface* labelInterface = getInterface(children.at(0), "org.a11y.atspi.Accessible");
     QCOMPARE(labelInterface->property("Name").toString(), QLatin1String("Hello A11y"));
+
+    m_window->clearChildren();
+    delete labelInterface;
 }
 
 
