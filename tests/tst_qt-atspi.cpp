@@ -52,6 +52,7 @@ private slots:
     void initTestCase();
 
     void testLabel();
+    void testLineEdit();
 
     void cleanupTestCase();
 //     void rootObject();
@@ -173,6 +174,37 @@ void tst_QtAtSpi::testLabel()
     
     m_window->clearChildren();
     delete labelInterface;
+}
+
+void tst_QtAtSpi::testLineEdit()
+{
+    QLineEdit *lineEdit = new QLineEdit(m_window);
+    m_window->addChild(lineEdit);
+    lineEdit->setText("a11y test QLineEdit");
+
+    QStringList children = getChildren(mainWindow);
+
+    QDBusInterface* accessibleInterface = getInterface(children.at(0), "org.a11y.atspi.Accessible");
+    QDBusInterface* editableTextInterface = getInterface(children.at(0), "org.a11y.atspi.EditableText");
+    QDBusInterface* textInterface = getInterface(children.at(0), "org.a11y.atspi.Text");
+    QVERIFY(accessibleInterface->isValid());
+    QVERIFY(editableTextInterface->isValid());
+    QVERIFY(textInterface->isValid());
+
+    QCOMPARE(accessibleInterface->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("text"));
+    QCOMPARE(textInterface->call(QDBus::Block,"GetText", 5, -1).arguments().first().toString(), QLatin1String("test QLineEdit"));
+    QString newText = "Text has changed!";
+    editableTextInterface->call(QDBus::Block, "SetTextContents", newText);
+    QCOMPARE(lineEdit->text(), newText);
+    QCOMPARE(textInterface->call(QDBus::Block, "GetText", 0, -1).arguments().first().toString(), newText);
+    QCOMPARE(textInterface->call(QDBus::Block, "GetText", 0, 4).arguments().first().toString(), QLatin1String("Text"));
+    editableTextInterface->call(QDBus::Block, "DeleteText", 4, 8);
+    QCOMPARE(lineEdit->text(), QLatin1String("Text changed!"));
+    editableTextInterface->call(QDBus::Block, "InsertText", 12, " again ", 6);
+    QCOMPARE(lineEdit->text(), QLatin1String("Text changed again!"));
+
+    m_window->clearChildren();
+    delete accessibleInterface;
 }
 
 
