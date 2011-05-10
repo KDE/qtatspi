@@ -545,7 +545,7 @@ bool QSpiAdaptor::InsertText(int position, const QString &text, int length)
     if (!checkInterface()) return false;
     QString resized (text);
     resized.resize(length);
-    interface->editableTextInterface()->insertText(position, text);
+    interface->editableTextInterface()->insertText(position, resized);
     return TRUE;
 }
 
