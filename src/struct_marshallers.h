@@ -26,6 +26,7 @@
 #include <QDBusConnection>
 #include <QDBusObjectPath>
 #include <QList>
+#include <QPair>
 
 /* QSpiIntList */
 /*---------------------------------------------------------------------------*/
@@ -107,7 +108,9 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAction &actio
 /* QSpiRelationArray */
 /*---------------------------------------------------------------------------*/
 
-typedef QList < QMap < unsigned int, QSpiObjectReference > > QSpiRelationArray;
+typedef QPair < unsigned int, QList < QSpiObjectReference > > QSpiRelationArrayEntry;
+Q_DECLARE_METATYPE(QSpiRelationArrayEntry)
+typedef QList< QSpiRelationArrayEntry > QSpiRelationArray;
 Q_DECLARE_METATYPE(QSpiRelationArray)
 
 /* QSpiRangeList */

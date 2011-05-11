@@ -145,6 +145,23 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAppUpdate &up
     return argument;
 }
 
+/* QSpiRelationArrayEntry */
+/*---------------------------------------------------------------------------*/
+
+QDBusArgument &operator<<(QDBusArgument &argument, const QSpiRelationArrayEntry &entry) {
+    argument.beginStructure();
+    argument << entry.first << entry.second;
+    argument.endStructure();
+    return argument;
+}
+
+const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiRelationArrayEntry &entry) {
+    argument.beginStructure();
+    argument >> entry.first >> entry.second;
+    argument.endStructure();
+    return argument;
+}
+
 /* QSpiDeviceEvent */
 /*---------------------------------------------------------------------------*/
 
@@ -189,7 +206,8 @@ void qSpiInitializeStructTypes ()
     qDBusRegisterMetaType<QSpiActionArray>();
     qDBusRegisterMetaType<QSpiDeviceEvent>();
     qDBusRegisterMetaType<QSpiAppUpdate>();
-//    qDBusRegisterMetaType<QSpiRelationArray>();
+    qDBusRegisterMetaType<QSpiRelationArrayEntry>();
+    qDBusRegisterMetaType<QSpiRelationArray>();
 }
 
 /*END------------------------------------------------------------------------*/

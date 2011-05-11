@@ -228,9 +228,23 @@ QSpiRelationArray QSpiAdaptor::GetRelationSet() const
 {
     if (!checkInterface()) return QSpiRelationArray();
 
-//    qWarning("Not implemented: QSpiAdaptor::GetRelationSet");
     QSpiRelationArray relations;
-    relations.append(QMap < unsigned int, QSpiObjectReference >());
+    
+    QAccessibleInterface *target;
+    int navigateResult = interface->navigate(QAccessible::Labelled, 1, &target);
+
+    if (navigateResult == 0) {
+        QList<QSpiObjectReference> labelled;
+        QSpiAdaptor *targetAdaptor = spiBridge->interfaceToAccessible(target, 0, false);
+        labelled.append(targetAdaptor->getReference());
+        relations.append(QSpiRelationArrayEntry(QAccessible::Labelled, labelled));
+        delete target;
+    } else if (navigateResult > 0) {
+        QList<QSpiObjectReference> labelled;
+        labelled.append(this->GetChildAtIndex(navigateResult));
+        relations.append(QSpiRelationArrayEntry(QAccessible::Labelled, labelled));
+    }
+
     return relations;
 }
 
