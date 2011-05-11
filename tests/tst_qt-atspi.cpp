@@ -18,28 +18,25 @@ public:
     AccessibleTestWindow() {
         DBusConnection c;
         m_address = c.connection().baseService().toLatin1().data();
-        m_layout = new QHBoxLayout;
-        setLayout(m_layout);
+        new QHBoxLayout(this);
     }
     QString dbusAddress() const {return m_address;}
 
-    void addChild(QWidget* c)
-    {
-        m_layout->addWidget(c);
+    void addWidget(QWidget* widget) {
+        layout()->addWidget(widget);
+        widget->show();
+        QTest::qWaitForWindowShown(widget);
     }
 
     void clearChildren()
     {
         qDeleteAll(children());
-        QHBoxLayout *newLayout = new QHBoxLayout(this);
-        setLayout(newLayout);
-        m_layout = newLayout;
+        new QHBoxLayout(this);
     }
 
 private:
     QString m_address;
     QString m_bus;
-    QHBoxLayout* m_layout;
 };
 
 
@@ -159,7 +156,7 @@ void tst_QtAtSpi::testLabel()
 {
     QLabel* l = new QLabel(m_window);
     l->setText("Hello A11y");
-    m_window->addChild(l);
+    m_window->addWidget(l);
 
     QStringList children = getChildren(mainWindow);
 
@@ -172,7 +169,7 @@ void tst_QtAtSpi::testLabel()
 
     l->setText("New text");
     QCOMPARE(labelInterface->property("Name").toString(), l->text());
-    
+
     m_window->clearChildren();
     delete labelInterface;
 }
@@ -180,8 +177,8 @@ void tst_QtAtSpi::testLabel()
 void tst_QtAtSpi::testLineEdit()
 {
     QLineEdit *lineEdit = new QLineEdit(m_window);
-    m_window->addChild(lineEdit);
     lineEdit->setText("a11y test QLineEdit");
+    m_window->addWidget(lineEdit);
 
     QStringList children = getChildren(mainWindow);
 
