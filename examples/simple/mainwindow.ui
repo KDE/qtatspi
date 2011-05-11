@@ -166,34 +166,86 @@ p, li { white-space: pre-wrap; }
         <string>&amp;List</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="1" column="0">
-         <widget class="QListWidget" name="listWidget">
-          <item>
+        <item row="3" column="0" colspan="3">
+         <widget class="QTableWidget" name="tableWidget">
+          <row>
            <property name="text">
-            <string>Core</string>
+            <string>1</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>2</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>3</string>
+           </property>
+          </row>
+          <column>
+           <property name="text">
+            <string>English</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Spanish</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>German</string>
+           </property>
+          </column>
+          <item row="0" column="0">
+           <property name="text">
+            <string>hello</string>
            </property>
           </item>
-          <item>
+          <item row="0" column="1">
            <property name="text">
-            <string>Gui</string>
+            <string>ola</string>
            </property>
           </item>
-          <item>
+          <item row="0" column="2">
            <property name="text">
-            <string>Declarative</string>
+            <string>hallo</string>
            </property>
           </item>
-          <item>
+          <item row="1" column="0">
            <property name="text">
-            <string>DBus</string>
+            <string>chair</string>
+           </property>
+          </item>
+          <item row="1" column="1">
+           <property name="text">
+            <string>silla</string>
+           </property>
+          </item>
+          <item row="1" column="2">
+           <property name="text">
+            <string>Stuhl</string>
+           </property>
+          </item>
+          <item row="2" column="0">
+           <property name="text">
+            <string>computer</string>
+           </property>
+          </item>
+          <item row="2" column="1">
+           <property name="text">
+            <string>ordenador</string>
+           </property>
+          </item>
+          <item row="2" column="2">
+           <property name="text">
+            <string>Computer</string>
            </property>
           </item>
          </widget>
         </item>
-        <item row="3" column="0" colspan="2">
-         <widget class="QTableWidget" name="tableWidget"/>
-        </item>
-        <item row="1" column="1">
+        <item row="1" column="2">
          <widget class="QTreeWidget" name="treeWidget">
           <property name="alternatingRowColors">
            <bool>true</bool>
@@ -285,6 +337,30 @@ p, li { white-space: pre-wrap; }
           </item>
          </widget>
         </item>
+        <item row="1" column="1">
+         <widget class="QListWidget" name="listWidget">
+          <item>
+           <property name="text">
+            <string>Core</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Gui</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Declarative</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>DBus</string>
+           </property>
+          </item>
+         </widget>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tab_5">
@@ -359,8 +435,39 @@ p, li { white-space: pre-wrap; }
     <addaction name="actionNom_nom_nom"/>
     <addaction name="actionBlah"/>
    </widget>
+   <widget class="QMenu" name="menuSpecial">
+    <property name="title">
+     <string>Special</string>
+    </property>
+    <widget class="QMenu" name="menuSpecial_1">
+     <property name="title">
+      <string>Special 1</string>
+     </property>
+     <addaction name="actionSpecial_1_1"/>
+     <addaction name="actionSpecial_1_2"/>
+    </widget>
+    <addaction name="menuSpecial_1"/>
+   </widget>
+   <widget class="QMenu" name="menuMore_Options">
+    <property name="title">
+     <string>More Options</string>
+    </property>
+    <addaction name="actionOption_1"/>
+    <addaction name="actionOption_2"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout_Simple"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout_Qt"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuSpecial"/>
+   <addaction name="menuMore_Options"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionNew_Button">
@@ -386,6 +493,36 @@ p, li { white-space: pre-wrap; }
   <action name="actionBlah">
    <property name="text">
     <string>Blah</string>
+   </property>
+  </action>
+  <action name="actionAbout_Simple">
+   <property name="text">
+    <string>About Simple</string>
+   </property>
+  </action>
+  <action name="actionAbout_Qt">
+   <property name="text">
+    <string>About Qt</string>
+   </property>
+  </action>
+  <action name="actionOption_1">
+   <property name="text">
+    <string>Option 1</string>
+   </property>
+  </action>
+  <action name="actionOption_2">
+   <property name="text">
+    <string>Option 2</string>
+   </property>
+  </action>
+  <action name="actionSpecial_1_1">
+   <property name="text">
+    <string>Special 1.1</string>
+   </property>
+  </action>
+  <action name="actionSpecial_1_2">
+   <property name="text">
+    <string>Special 1.2</string>
    </property>
   </action>
  </widget>
