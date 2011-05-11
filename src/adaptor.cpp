@@ -788,7 +788,7 @@ bool QSpiAdaptor::AddSelection(int startOffset, int endOffset)
     if (!checkInterface()) return false;
     int lastSelection = interface->textInterface()->selectionCount ();
     interface->textInterface()->setSelection (lastSelection, startOffset, endOffset);
-    return true;
+    return interface->textInterface()->selectionCount() > lastSelection;
 }
 
 QSpiAttributeSet QSpiAdaptor::GetAttributeRun(int offset,
