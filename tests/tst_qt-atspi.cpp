@@ -9,6 +9,8 @@
 #include "../src/dbusconnection.h"
 #include "../src/struct_marshallers.h"
 
+#define COMPARE3(v1, v2, v3) QCOMPARE(v1, v3); QCOMPARE(v2, v3);
+
 class AccessibleTestWindow: public QWidget
 {
     Q_OBJECT
@@ -28,10 +30,9 @@ public:
 
     void clearChildren()
     {
-        QHBoxLayout *newLayout = new QHBoxLayout();
+        qDeleteAll(children());
+        QHBoxLayout *newLayout = new QHBoxLayout(this);
         setLayout(newLayout);
-        qDeleteAll(m_layout->children());
-        delete m_layout;
         m_layout = newLayout;
     }
 
@@ -195,16 +196,35 @@ void tst_QtAtSpi::testLineEdit()
     QCOMPARE(textInterface->call(QDBus::Block,"GetText", 5, -1).arguments().first().toString(), QLatin1String("test QLineEdit"));
     QString newText = "Text has changed!";
     editableTextInterface->call(QDBus::Block, "SetTextContents", newText);
-    QCOMPARE(lineEdit->text(), newText);
-    QCOMPARE(textInterface->call(QDBus::Block, "GetText", 0, -1).arguments().first().toString(), newText);
+    COMPARE3(lineEdit->text(), textInterface->call(QDBus::Block, "GetText", 0, -1).arguments().first().toString(), newText);
     QCOMPARE(textInterface->call(QDBus::Block, "GetText", 0, 4).arguments().first().toString(), QLatin1String("Text"));
     editableTextInterface->call(QDBus::Block, "DeleteText", 4, 8);
-    QCOMPARE(lineEdit->text(), QLatin1String("Text changed!"));
+    COMPARE3(lineEdit->text(), "Te" + textInterface->call(QDBus::Block, "GetText", 2, 10).arguments().first().toString() + "ed!", QLatin1String("Text changed!"));
     editableTextInterface->call(QDBus::Block, "InsertText", 12, " again ", 6);
     QCOMPARE(lineEdit->text(), QLatin1String("Text changed again!"));
+    COMPARE3(lineEdit->text().length(), textInterface->property("CharacterCount").toInt(), 19);
+
+    textInterface->call(QDBus::Block, "SetCaretOffset", 4);
+    COMPARE3(lineEdit->cursorPosition(), textInterface->property("CaretOffset").toInt(), 4);
+
+    textInterface->call(QDBus::Block, "AddSelection", 1, 4);
+    QList<QVariant> data = textInterface->call(QDBus::Block, "GetSelection", 0).arguments();
+    COMPARE3(data.at(0).toInt(), lineEdit->selectionStart(), 1);
+    QCOMPARE(data.at(1).toInt(), 4);
+    QCOMPARE(lineEdit->selectedText().length(), 3);
+    QCOMPARE(textInterface->call(QDBus::Block, "GetNSelections").arguments().first().toInt(), 1); 
+    textInterface->call(QDBus::Block, "SetSelection", 0, 0, 5);
+    data = textInterface->call(QDBus::Block, "GetSelection", 0).arguments();
+    COMPARE3(data.at(0).toInt(), lineEdit->selectionStart(), 0);
+    COMPARE3(data.at(1).toInt(), lineEdit->selectedText().length(), 5);
+    textInterface->call(QDBus::Block, "RemoveSelection", 0);
+    QCOMPARE(lineEdit->selectionStart(), -1);
+    QCOMPARE(textInterface->call(QDBus::Block, "GetNSelections").arguments().first().toInt(), 0);
 
     m_window->clearChildren();
     delete accessibleInterface;
+    delete textInterface;
+    delete editableTextInterface;
 }
 
 
