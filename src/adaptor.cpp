@@ -1050,9 +1050,28 @@ QString QSpiAdaptor::GetTextAfterOffset(int offset, uint type, int &startOffset,
 QString QSpiAdaptor::GetTextAtOffset(int offset, uint type, int &startOffset, int &endOffset)
 {
     if (!checkInterface()) return QString();
-    // FIXME find out if IA2 types are the same as the ones in at-spi
+    QAccessible2::BoundaryType rType;
+    switch (type) {
+    case ATSPI_TEXT_BOUNDARY_CHAR:
+        rType = QAccessible2::CharBoundary;
+        break;
+    case ATSPI_TEXT_BOUNDARY_WORD_START:
+        rType = QAccessible2::WordBoundary;
+        break;
+    case ATSPI_TEXT_BOUNDARY_SENTENCE_START:
+        rType = QAccessible2::SentenceBoundary;
+        break;
+    case ATSPI_TEXT_BOUNDARY_LINE_START:
+        rType = QAccessible2::LineBoundary;
+        break;
+    default:
+        //TODO: Handle ATSPI_TEXT_BOUNDARY_X_END
+        startOffset = -1;
+        endOffset = -1;
+        return QString();
+    }
     QAccessibleTextInterface * t = interface->textInterface();
-    QString text = t->textAtOffset(offset, (QAccessible2::BoundaryType)type, &startOffset, &endOffset);
+    QString text = t->textAtOffset(offset, rType, &startOffset, &endOffset);
     return text;
 }
 
