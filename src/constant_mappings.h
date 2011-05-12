@@ -29,6 +29,8 @@
 
 #include "struct_marshallers.h"
 
+
+#include <atspi/atspi-constants.h>
 #include <QAccessible>
 
 enum QSpiRole

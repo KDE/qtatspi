@@ -51,6 +51,10 @@ QMAKE_CXXFLAGS+=-Werror
 
 CONFIG += qdbus plugin debug
 
+PKGCONFIG += atspi-2
+
+CONFIG += link_pkgconfig
+
 OBJECTS_DIR = .obj
 MOC_DIR = .moc
 
