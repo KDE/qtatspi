@@ -228,21 +228,32 @@ QSpiRelationArray QSpiAdaptor::GetRelationSet() const
 {
     if (!checkInterface()) return QSpiRelationArray();
 
+    const QAccessible::RelationFlag relationsToCheck[] = {QAccessible::Label, QAccessible::Labelled, QAccessible::Controller, QAccessible::Controlled, static_cast<QAccessible::RelationFlag>(-1)};
+    const AtspiRelationType relationTypes[] = {ATSPI_RELATION_LABELLED_BY, ATSPI_RELATION_LABEL_FOR, ATSPI_RELATION_CONTROLLED_BY, ATSPI_RELATION_CONTROLLER_FOR};
+
     QSpiRelationArray relations;
     
     QAccessibleInterface *target;
-    int navigateResult = interface->navigate(QAccessible::Labelled, 1, &target);
 
-    if (navigateResult == 0) {
-        QList<QSpiObjectReference> labelled;
-        QSpiAdaptor *targetAdaptor = spiBridge->interfaceToAccessible(target, 0, false);
-        labelled.append(targetAdaptor->getReference());
-        relations.append(QSpiRelationArrayEntry(QAccessible::Labelled, labelled));
-        delete target;
-    } else if (navigateResult > 0) {
-        QList<QSpiObjectReference> labelled;
-        labelled.append(this->GetChildAtIndex(navigateResult));
-        relations.append(QSpiRelationArrayEntry(QAccessible::Labelled, labelled));
+    for (int i = 0; relationsToCheck[i] >= 0; i++) {
+        QList<QSpiObjectReference> related;
+        int navigateResult = 1;
+
+        for (int j = 1; navigateResult >= 0; j++) {
+            navigateResult = interface->navigate(relationsToCheck[i], j, &target);
+
+            if (navigateResult == 0) {
+                QSpiAdaptor *targetAdaptor = spiBridge->interfaceToAccessible(target, 0, false);
+                related.append(targetAdaptor->getReference());
+                delete target;
+            } else if (navigateResult > 0) {
+                //Then it's a child of the object
+                QList<QSpiObjectReference> labelled;
+                related.append(this->GetChildAtIndex(navigateResult));
+            }
+        }
+        if (!related.isEmpty())
+            relations.append(QSpiRelationArrayEntry(relationTypes[i], related));
     }
 
     return relations;
