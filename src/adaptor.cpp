@@ -864,22 +864,17 @@ QSpiAttributeSet QSpiAdaptor::GetAttributes(int offset, int &startOffset, int &e
     QSpiAttributeSet set;
     if (!checkInterface()) return set;
 
-    int         startOffsetCopy, endOffsetCopy;
     QString     joined;
     QStringList attributes;
 
-    endOffsetCopy = endOffset;
-    startOffsetCopy = startOffset;
-    joined = interface->textInterface()->attributes(offset, &startOffset, &endOffsetCopy);
+    joined = interface->textInterface()->attributes(offset, &startOffset, &endOffset);
     attributes = joined.split (';', QString::SkipEmptyParts, Qt::CaseSensitive);
-    foreach (QString attr, attributes)
+    foreach (const QString &attr, attributes)
     {
         QStringList items;
         items = attr.split(':', QString::SkipEmptyParts, Qt::CaseSensitive);
         set[items[0]] = items[1];
     }
-    endOffset = endOffsetCopy;
-    startOffset = startOffsetCopy;
     return set;
 }
 
