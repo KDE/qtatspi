@@ -31,7 +31,6 @@ class QSpiDBusCache : public QObject
 
 public:
     QSpiDBusCache(QObject* parent = 0);
-    virtual ~QSpiDBusCache() {};
     void emitAddAccessible(const QSpiAccessibleCacheItem& item);
 
 signals:
