@@ -57,16 +57,24 @@ QSpiAccessibleBridge::QSpiAccessibleBridge()
     qSpiInitializeConstantMappings();
 
     /* Create the cache of accessible objects */
-    cache = new QSpiDBusCache(this);
+    cache = new QSpiDBusCache(dBusConnection(), this);
     dec = new DeviceEventControllerProxy(this);
 
     bool reg = dBusConnection().registerObject(QSPI_DEC_OBJECT_PATH, this, QDBusConnection::ExportAdaptors);
     qDebug() << "Registered DEC: " << reg;
 
     QAccessibleInterface* i = QAccessible::queryAccessibleInterface(qApp);
-    QSpiApplication* accessible = new QSpiApplication(i);
-    adaptorWithObjectMap.insert(qApp, accessible);
-    allAdaptors.append(accessible);
+    QSpiApplication* applicationAccessible = new QSpiApplication(dbusConnection->connection(), i);
+    adaptorWithObjectMap.insert(qApp, applicationAccessible);
+    allAdaptors.append(applicationAccessible);
+    connect(applicationAccessible, SIGNAL(windowActivated(QObject*)), this, SLOT(windowActivated(QObject*)));
+}
+
+void QSpiAccessibleBridge::windowActivated(QObject* window)
+{
+    QSpiAdaptor* a = spiBridge->objectToAccessible(window);
+    QSpiAccessible* acc = static_cast<QSpiAccessible*>(a);
+    acc->windowActivated();
 }
 
 QSpiAccessibleBridge::~QSpiAccessibleBridge ()
@@ -105,7 +113,8 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
 
     Q_ASSERT(accessible->associatedInterface()->object() == interface->object());
 
-    if (reason == QAccessible::Focus) {
+    switch (reason) {
+    case QAccessible::Focus: {
         static QSpiAccessible *lastFocused = 0;
         if (lastFocused) {
             QDBusVariant data;
@@ -114,6 +123,7 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
             emit lastFocused->StateChanged("focused", 0, 0, data, getRootReference());
         }
         lastFocused = qobject_cast<QSpiAccessible*>(accessible);
+    }
     }
 //    qDebug() << "QSpiAccessibleBridge::notifyAccessibilityUpdate" << QString::number(reason, 16)
 //             << " obj: " << interface->object()

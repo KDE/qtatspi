@@ -30,6 +30,8 @@
 
 #include "adaptor.h"
 
+class QSpiAccessible;
+
 /*
  * Used for the root object.
  *
@@ -40,18 +42,22 @@ class QSpiApplication : public QSpiAdaptor
     Q_OBJECT
 
 public:
-    QSpiApplication(QAccessibleInterface *interface);
+    QSpiApplication(const QDBusConnection& c, QAccessibleInterface *interface);
     virtual ~QSpiApplication() {}
 
     virtual QSpiObjectReference getParentReference() const;
 
     virtual void accessibleEvent(QAccessible::Event event);
 
+
     // the Id property gets written and read by the accessibility framework
     // we do nothing with it internally, it is only for the at-spi2 to identify us
     Q_PROPERTY(int Id READ id WRITE setId)
     int id() const;
     void setId(int value);
+
+Q_SIGNALS:
+    void windowActivated(QObject* window);
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
@@ -62,8 +68,9 @@ private Q_SLOTS:
 
 private:
     static QKeyEvent* copyKeyEvent(QKeyEvent*);
-
     void callAccessibilityRegistry();
+
+    QDBusConnection dbusConnection;
     QSpiObjectReference accessibilityRegistry;
     int applicationId;
     QQueue<QPair<QObject*, QKeyEvent*> > keyEvents;

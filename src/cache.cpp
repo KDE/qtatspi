@@ -30,11 +30,10 @@
 #define QSPI_OBJECT_PATH_CACHE "/org/a11y/atspi/cache"
 
 
-QSpiDBusCache::QSpiDBusCache(QObject* parent)
+QSpiDBusCache::QSpiDBusCache(QDBusConnection c, QObject* parent)
     : QObject(parent)
 {
     new CacheAdaptor(this);
-    QDBusConnection c = QSpiAccessibleBridge::instance()->dBusConnection();
     c.registerObject(QSPI_OBJECT_PATH_CACHE, this, QDBusConnection::ExportAdaptors);
 }
 

@@ -49,7 +49,6 @@ public:
         virtual ~QSpiAccessibleBridge();
         virtual void setRootObject(QAccessibleInterface *obj);
 
-
         virtual void notifyAccessibilityUpdate(int reason, QAccessibleInterface *obj, int child);
 
         QSpiObjectReference getRootReference() const;
@@ -66,10 +65,11 @@ public:
         { return allAdaptors; }
 
 private Q_SLOTS:
+        void windowActivated(QObject* window);
         void objectDestroyed(QObject*);
+
 private:
         static QSpiAccessibleBridge* self;
-
         QSpiDBusCache *cache;
         DeviceEventControllerProxy *dec;
 
@@ -78,7 +78,6 @@ private:
         QList<QSpiAdaptor*> allAdaptors;
 
         DBusConnection* dbusConnection;
-
         bool initialized;
 };
 

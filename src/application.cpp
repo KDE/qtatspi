@@ -33,10 +33,10 @@
 
 #define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
 
-QSpiApplication::QSpiApplication(QAccessibleInterface *interface)
-    :QSpiAdaptor(interface, 0), applicationId(-1)
+QSpiApplication::QSpiApplication(const QDBusConnection& c, QAccessibleInterface *interface)
+    : QSpiAdaptor(interface, 0), dbusConnection(c), applicationId(-1)
 {
-    reference = QSpiObjectReference(spiBridge->dBusConnection(),
+    reference = QSpiObjectReference(dbusConnection,
                    QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
 
     new AccessibleAdaptor(this);
@@ -45,7 +45,7 @@ QSpiApplication::QSpiApplication(QAccessibleInterface *interface)
     new ApplicationAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_APPLICATION;
 
-    spiBridge->dBusConnection().registerObject(reference.path.path(),
+    dbusConnection.registerObject(reference.path.path(),
                                   this, QDBusConnection::ExportAdaptors);
 
     callAccessibilityRegistry();
@@ -56,7 +56,7 @@ void QSpiApplication::callAccessibilityRegistry()
 {
     SocketProxy *registry;
     registry = new SocketProxy(QSPI_REGISTRY_NAME,
-                               QSPI_OBJECT_PATH_ROOT, spiBridge->dBusConnection());
+                               QSPI_OBJECT_PATH_ROOT, dbusConnection);
 
     QDBusPendingReply<QSpiObjectReference> reply;
     reply = registry->Embed(getReference());
@@ -95,10 +95,7 @@ bool QSpiApplication::eventFilter(QObject *target, QEvent *event)
 
     switch (event->type()) {
         case QEvent::WindowActivate: {
-        qDebug() << " Window activate: " << event->spontaneous() << target;
-        QSpiAdaptor* a = spiBridge->objectToAccessible(target);
-        QSpiAccessible* acc = static_cast<QSpiAccessible*>(a);
-        acc->windowActivated();
+        emit windowActivated(target);
         break;
     }
         case QEvent::KeyPress:
@@ -175,7 +172,7 @@ bool QSpiApplication::eventFilter(QObject *target, QEvent *event)
 
             // FIXME: this is critical, the timeout should probably be pretty low to allow normal processing
             int timeout = 100;
-            bool sent = spiBridge->dBusConnection().callWithCallback(m, this, SLOT(notifyKeyboardListenerCallback(QDBusMessage)),
+            bool sent = dbusConnection.callWithCallback(m, this, SLOT(notifyKeyboardListenerCallback(QDBusMessage)),
                                                         SLOT(notifyKeyboardListenerError(QDBusError, QDBusMessage)), timeout);
             if (!sent)
                 return false;
