@@ -833,15 +833,12 @@ QString QSpiAdaptor::GetAttributeValue(int offset,
 				      bool &defined)
 {
     if (!checkInterface()) return QString();
-    int         startOffsetCopy, endOffsetCopy;
     QString     mapped;
     QString     joined;
     QStringList attributes;
     QSpiAttributeSet map;
 
-    endOffsetCopy = endOffset;
-    startOffsetCopy = startOffset;
-    joined = interface->textInterface()->attributes(offset, &startOffsetCopy, &endOffsetCopy);
+    joined = interface->textInterface()->attributes(offset, &startOffset, &endOffset);
     attributes = joined.split (';', QString::SkipEmptyParts, Qt::CaseSensitive);
     foreach (QString attr, attributes)
     {
@@ -849,8 +846,6 @@ QString QSpiAdaptor::GetAttributeValue(int offset,
         items = attr.split(':', QString::SkipEmptyParts, Qt::CaseSensitive);
         map[items[0]] = items[1];
     }
-    endOffset = endOffsetCopy;
-    endOffset = endOffsetCopy;
     mapped = map[attributeName];
     if (mapped == "")
        defined = TRUE;
