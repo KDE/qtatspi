@@ -43,22 +43,46 @@
 
 #define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
 
-QDBusObjectPath QSpiAccessible::getUnique()
-{
-    static int id = 1;
-    QString prefix(QSPI_OBJECT_PATH_PREFIX);
-    QString num;
-
-    if (id == 0)
-       id++;
-    return QDBusObjectPath(prefix + num.setNum(id++));
-}
-
 QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
     : QSpiAdaptor(interface, index)
 {
+    QString path;
+    QAccessibleInterface* interfaceWithObject = interface;
+    while(!interfaceWithObject->object()) {
+        QAccessibleInterface* parentInterface;
+        interfaceWithObject->navigate(QAccessible::Ancestor, 1, &parentInterface);
+        Q_ASSERT(parentInterface->isValid());
+        int index = parentInterface->indexOfChild(interfaceWithObject);
+        //Q_ASSERT(index >= 0);
+        if (index < 0) {
+
+
+
+            index = 999;
+            path.prepend("/BROKEN_OBJECT_HIERARCHY");
+            qWarning() << "Object claims to have child that we cannot navigate to. FIX IT!" << parentInterface->object();
+
+            qDebug() << "Original interface: " << interface->object() << index;
+            qDebug() << "Parent interface: " << parentInterface->object() << " childcount:" << parentInterface->childCount();
+            QObject* p = parentInterface->object();
+            qDebug() << p->children();
+
+            QAccessibleInterface* tttt;
+            int id = parentInterface->navigate(QAccessible::Child, 1, &tttt);
+            qDebug() << "Nav child: " << id << tttt->object();
+
+
+
+        }
+        path.prepend('/' + QString::number(index));
+        interfaceWithObject = parentInterface;
+    }
+    path.prepend(QSPI_OBJECT_PATH_PREFIX + QString::number(reinterpret_cast<size_t>(interfaceWithObject->object())));
+
+    QDBusObjectPath dbusPath = QDBusObjectPath(path);
+
     reference = QSpiObjectReference(spiBridge->dBusConnection(),
-                                               getUnique());
+                                               dbusPath);
 #ifdef ACCESSIBLE_CREATION_DEBUG
     qDebug() << "ACCESSIBLE: " << interface->object() << reference.path.path();
 #endif
