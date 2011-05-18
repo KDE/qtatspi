@@ -5,10 +5,15 @@ This is a Qt plugin that bridges Qt's accessibility API to AT-SPI2.
 With recent versions of AT-SPI2 this should make Qt applications accessible
 with the help of tools such as Gnome's Orca screen-reader.
 
+Switch gnome to use at-spi2:
+gconftool-2 --set /desktop/gnome/interface/at-spi-dbus --type bool true
+gconftool-2 --set /desktop/gnome/interface/at-spi-corba --type bool false
+
+To run gnome apps with at-spi2 in a non-gnome session:
+export GTK_MODULES=gail:atk-bridge
+
 Qt will only load this plugin when the environment variable
 QT_ACCESSIBILITY is set to 1.
 
 $ export QT_ACCESSIBILITY=1
 
-~                                                                                                                                                            
-~                       
