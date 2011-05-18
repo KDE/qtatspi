@@ -39,8 +39,9 @@
 #include "generated/text_adaptor.h"
 #include "generated/value_adaptor.h"
 
-#define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
+//#define ACCESSIBLE_CREATION_DEBUG
 
+#define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
 
 QDBusObjectPath QSpiAccessible::getUnique()
 {
@@ -58,8 +59,9 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
 {
     reference = QSpiObjectReference(spiBridge->dBusConnection(),
                                                getUnique());
-
+#ifdef ACCESSIBLE_CREATION_DEBUG
     qDebug() << "ACCESSIBLE: " << interface->object() << reference.path.path();
+#endif
 
     new AccessibleAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;
@@ -72,12 +74,17 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
             QWidget *w = qobject_cast<QWidget*>(interface->object());
             if (w->isWindow()) {
                 new WindowAdaptor(this);
-                qDebug() << " + window";
+#ifdef ACCESSIBLE_CREATION_DEBUG
+                qDebug() << " IS a window";
+#endif
             }
         }
-    } else {
-        qDebug() << " - component";
     }
+#ifdef ACCESSIBLE_CREATION_DEBUG
+    else {
+        qDebug() << " IS NOT a component";
+    }
+#endif
 
     new ObjectAdaptor(this);
     new FocusAdaptor(this);
@@ -92,7 +99,6 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
         new TextAdaptor(this);
         supportedInterfaces << QSPI_INTERFACE_TEXT;
         oldText = interface->textInterface()->text(0, interface->textInterface()->characterCount());
-        qDebug() << "Old Text: " << interface->object() << oldText;
     }
     if (interface->editableTextInterface())
     {
@@ -207,16 +213,16 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
     case QAccessible::ObjectShow:
         break;
     case QAccessible::ObjectHide:
-        // TODO
-        qWarning() << "Object hide";
+        // TODO - send status changed
+//        qWarning() << "Object hide";
         break;
     case QAccessible::ObjectDestroyed:
-        qWarning() << "Object destroyed";
-        Q_ASSERT(0);
+        // TODO - maybe send children-changed and cache Removed
+//        qWarning() << "Object destroyed";
         break;
     case QAccessible::StateChanged: {
         QAccessible::State newState = interface->state(childIndex());
-        qDebug() << "StateChanged: old: " << state << " new: " << newState << " xor: " << (state^newState);
+//        qDebug() << "StateChanged: old: " << state << " new: " << newState << " xor: " << (state^newState);
         if ((state^newState) & QAccessible::Checked) {
             int checked = (newState & QAccessible::Checked) ? 1 : 0;
             QDBusVariant data;
@@ -227,6 +233,7 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         break;
     }
     case QAccessible::ParentChanged:
+        // TODO - send parent changed
     default:
 //        qWarning() << "QSpiAccessible::accessibleEvent not handled: " << QString::number(event, 16)
 //                   << " obj: " << interface->object()

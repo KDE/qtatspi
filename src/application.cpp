@@ -30,6 +30,8 @@
 #include "generated/application_adaptor.h"
 #include "generated/socket_proxy.h"
 
+//#define KEYBOARD_DEBUG
+
 #define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
 
 QSpiApplication::QSpiApplication(const QDBusConnection& c, QAccessibleInterface *interface)
@@ -158,11 +160,13 @@ bool QSpiApplication::eventFilter(QObject *target, QEvent *event)
             // FIXME
             de.isText = !keyEvent->text().trimmed().isEmpty();
 
+#ifdef KEYBOARD_DEBUG
             qDebug() << "Key event text: " << event->type() << de.isText << " " << de.text
                      << " hardware code: " << de.hardwareCode
                      << " native sc: " << keyEvent->nativeScanCode()
                      << " native mod: " << keyEvent->nativeModifiers()
                      << "native virt: " << keyEvent->nativeVirtualKey();
+#endif
 
             QDBusMessage m = QDBusMessage::createMethodCall("org.a11y.atspi.Registry",
                                                             "/org/a11y/atspi/registry/deviceeventcontroller",

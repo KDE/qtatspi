@@ -117,7 +117,6 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
         if (lastFocused) {
             QDBusVariant data;
             data.setVariant(QVariant::fromValue(lastFocused->getReference()));
-            qDebug() << "last focus: " << lastFocused;
             emit lastFocused->StateChanged("focused", 0, 0, data, getRootReference());
         }
         lastFocused = qobject_cast<QSpiAccessible*>(accessible);
@@ -194,17 +193,6 @@ QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* i
         adaptorWithoutObjectList.append(accessible);
     }
     allAdaptors.append(accessible);
-
-    // FIXME relations
-//    QAccessibleInterface* labelInterface;
-//    interface->navigate(QAccessible::Labelled, 1, &labelInterface);
-//    if (labelInterface) {
-//        qDebug() << "Found a label. No I didn't believe that possible either.";
-//        QSpiAdaptor *labelAdaptor = interfaceToAccessible(labelInterface, 0, true);
-//        labelAdaptor->addRelation(this);
-
-//        addRelation(labelAdaptor);
-//    }
 
     // say hello to d-bus
     cache->emitAddAccessible(accessible->getCacheItem());
