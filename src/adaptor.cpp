@@ -648,12 +648,22 @@ QSpiObjectReference QSpiAdaptor::GetAccessibleAt(int row, int column)
     if (!checkInterface()) return QSpiObjectReference();
     Q_ASSERT(interface->tableInterface());
 
-    QAccessibleInterface* cell = interface->tableInterface()->accessibleAt(row, column);
-    if (cell && cell->object()) {
-        return spiBridge->objectToAccessible(cell->object())->getReference();
-    }
-    qWarning() << "Invalid table cell: " << row << ", " << column;
-    return QSpiObjectReference();
+    Q_ASSERT(row >= 0);
+    Q_ASSERT(column >= 0);
+
+    int index = interface->tableInterface()->childIndex(row, column);
+
+    Q_ASSERT(index >= 0);
+
+    QAccessibleInterface* rowInterface;
+    interface->navigate(QAccessible::Child, row+1, &rowInterface);
+    Q_ASSERT(rowInterface);
+    return spiBridge->interfaceToAccessible(rowInterface, column+1, true)->getReference();
+
+
+//    qWarning() << "Invalid table cell: " << row << ", " << column;
+//    Q_ASSERT(0);
+//    return QSpiObjectReference();
 }
 
 int QSpiAdaptor::GetColumnAtIndex(int index)
