@@ -247,7 +247,6 @@ QSpiRelationArray QSpiAdaptor::GetRelationSet() const
                 delete target;
             } else if (navigateResult > 0) {
                 //Then it's a child of the object
-                QList<QSpiObjectReference> labelled;
                 related.append(this->GetChildAtIndex(navigateResult));
             }
         }
