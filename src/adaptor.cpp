@@ -1050,29 +1050,92 @@ QString QSpiAdaptor::GetTextAfterOffset(int offset, uint type, int &startOffset,
 QString QSpiAdaptor::GetTextAtOffset(int offset, uint type, int &startOffset, int &endOffset)
 {
     if (!checkInterface()) return QString();
+    QAccessibleTextInterface * t = interface->textInterface();
     QAccessible2::BoundaryType rType;
     switch (type) {
     case ATSPI_TEXT_BOUNDARY_CHAR:
         rType = QAccessible2::CharBoundary;
         break;
-    case ATSPI_TEXT_BOUNDARY_WORD_START:
-        rType = QAccessible2::WordBoundary;
-        break;
+    case ATSPI_TEXT_BOUNDARY_WORD_START: {
+        QString text = t->textAtOffset(offset, QAccessible2::WordBoundary, &startOffset, &endOffset);
+
+        if ((startOffset < 0) || (endOffset < 0))
+            return text;
+
+        int limit = t->characterCount();
+        for (int i=endOffset + 1; i < limit; i++) {
+            int j;
+            int k;
+            t->textAtOffset(i, QAccessible2::WordBoundary, &j, &k);
+            if (j <= i) {
+                endOffset = j;
+                break;
+            }
+        }
+        return t->text(startOffset, endOffset); }
+    case ATSPI_TEXT_BOUNDARY_WORD_END: {
+        QString text = t->textAtOffset(offset, QAccessible2::WordBoundary, &startOffset, &endOffset);
+
+        if ((startOffset < 0) || (endOffset < 0))
+            return text;
+
+        for (int i=startOffset - 1; i >= 0; i--) {
+            int j;
+            int k;
+            t->textAtOffset(i, QAccessible2::WordBoundary, &j, &k);
+            if (k >= i) {
+                startOffset = k;
+                break;
+            }
+        }
+        return t->text(startOffset, endOffset); }
+    case ATSPI_TEXT_BOUNDARY_SENTENCE_END:
     case ATSPI_TEXT_BOUNDARY_SENTENCE_START:
         rType = QAccessible2::SentenceBoundary;
         break;
-    case ATSPI_TEXT_BOUNDARY_LINE_START:
-        rType = QAccessible2::LineBoundary;
-        break;
+    case ATSPI_TEXT_BOUNDARY_LINE_START: {
+        QString text = t->textAtOffset(offset, QAccessible2::LineBoundary, &startOffset, &endOffset);
+
+        if ((startOffset < 0) || (endOffset < 0))
+            return text;
+
+        int limit = t->characterCount();
+        for (int i=endOffset + 1; i < limit; i++) {
+            int j;
+            int k;
+            t->textAtOffset(i, QAccessible2::LineBoundary, &j, &k);
+            if (j <= i) {
+                endOffset = j;
+                break;
+            }
+        }
+        return t->text(startOffset, endOffset); }
+    case ATSPI_TEXT_BOUNDARY_LINE_END: {
+        QString text = t->textAtOffset(offset, QAccessible2::LineBoundary, &startOffset, &endOffset);
+
+        if ((startOffset < 0) || (endOffset < 0))
+            return text;
+
+        if (startOffset <= offset)
+            text = t->textAtOffset(offset + 1, QAccessible2::LineBoundary, &startOffset, &endOffset);
+
+        for (int i=startOffset - 1; i >= 0; i--) {
+            int j;
+            int k;
+            t->textAtOffset(i, QAccessible2::LineBoundary, &j, &k);
+            if (k >= i) {
+                startOffset = k;
+                break;
+            }
+        }
+        return t->text(startOffset, endOffset); }
     default:
-        //TODO: Handle ATSPI_TEXT_BOUNDARY_X_END
         startOffset = -1;
         endOffset = -1;
         return QString();
     }
-    QAccessibleTextInterface * t = interface->textInterface();
-    QString text = t->textAtOffset(offset, rType, &startOffset, &endOffset);
-    return text;
+
+    return t->textAtOffset(offset, rType, &startOffset, &endOffset);
 }
 
 QString QSpiAdaptor::GetTextBeforeOffset(int offset, uint type, int &startOffset, int &endOffset)
