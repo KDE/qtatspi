@@ -24,6 +24,8 @@
 #include <QDBusMessage>
 #include <QDBusInterface>
 
+#include <atspi/atspi-constants.h>
+
 #include "../src/dbusconnection.h"
 #include "../src/struct_marshallers.h"
 
@@ -70,6 +72,7 @@ private slots:
     void testLabel();
     void testLineEdit();
     void testListWidget();
+    void testTextEdit();
 
     void cleanupTestCase();
 //     void rootObject();
@@ -277,6 +280,38 @@ void tst_QtAtSpi::testListWidget()
     delete layoutIface;
 }
 
+void tst_QtAtSpi::testTextEdit()
+{
+    QTextEdit *textEdit = new QTextEdit(m_window);
+    textEdit->setText("<html><head></head><body>This is a <b>sample</b> text.<br />"
+                      "How are you today</body></html>");
+    textEdit->show();
+    m_window->addWidget(textEdit);
+
+    QStringList children = getChildren(mainWindow);
+    QDBusInterface* accessibleInterface = getInterface(children.at(0), "org.a11y.atspi.Accessible");
+    QDBusInterface* editableTextInterface = getInterface(children.at(0), "org.a11y.atspi.EditableText");
+    QDBusInterface* textInterface = getInterface(children.at(0), "org.a11y.atspi.Text");
+    QVERIFY(accessibleInterface->isValid());
+    QVERIFY(editableTextInterface->isValid());
+    QVERIFY(textInterface->isValid());
+
+    QList<QVariant> callResult;
+
+    QDBusMessage msg = textInterface->call(QDBus::Block, "GetText", 0, 5);
+    callResult = msg.arguments();
+    QCOMPARE(callResult.at(0).toString(), QLatin1String("This "));
+
+    msg = textInterface->call(QDBus::Block, "GetTextAtOffset", 12, (uint) ATSPI_TEXT_BOUNDARY_WORD_START);
+    callResult = msg.arguments();
+
+    QCOMPARE(callResult.at(0).toString(), QLatin1String("sample "));
+    QCOMPARE(callResult.at(1).toInt(), 10);
+    QCOMPARE(callResult.at(2).toInt(), 17);
+
+    m_window->clearChildren();
+    delete textInterface;
+}
 
 // void tst_QtAtSpi::rootObject()
 // {

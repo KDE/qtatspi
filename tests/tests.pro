@@ -13,5 +13,10 @@ OBJECTS_DIR = .obj
 MOC_DIR = .moc
 
 TEMPLATE = app
+
+PKGCONFIG += atspi-2
+
+CONFIG += link_pkgconfig
+
 TARGET =  tst_qt-atspi
 
