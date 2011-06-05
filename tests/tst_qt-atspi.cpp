@@ -69,6 +69,7 @@ private slots:
 
     void testLabel();
     void testLineEdit();
+    void testListWidget();
 
     void cleanupTestCase();
 //     void rootObject();
@@ -242,6 +243,39 @@ void tst_QtAtSpi::testLineEdit()
     delete editableTextInterface;
 }
 
+void tst_QtAtSpi::testListWidget()
+{
+    QListWidget *lw = new QListWidget;
+    lw->addItem("Hello");
+    lw->addItem("Good morning");
+    lw->addItem("Good bye");
+    m_window->addWidget(lw);
+
+    QStringList children = getChildren(mainWindow);
+    QDBusInterface* layoutIface = getInterface(children.at(0), "org.a11y.atspi.Accessible");
+    QDBusInterface* listIface = getInterface(getChildren(layoutIface).at(0), "org.a11y.atspi.Accessible");
+    QCOMPARE(listIface->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("list"));
+    QStringList tableChildren = getChildren(listIface);
+    QCOMPARE(tableChildren.size(), 3);
+
+    QDBusInterface* row1 = getInterface(tableChildren.at(0), "org.a11y.atspi.Accessible");
+    QCOMPARE(row1->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("list item"));
+    QCOMPARE(row1->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("list item"));
+    QCOMPARE(row1->property("Name").toString(), QLatin1String("Hello"));
+
+    QDBusInterface* row2 = getInterface(tableChildren.at(1), "org.a11y.atspi.Accessible");
+    QDBusInterface* row3 = getInterface(tableChildren.at(2), "org.a11y.atspi.Accessible");
+
+    QDBusInterface* cell1 = getInterface(getChildren(row1).at(0), "org.a11y.atspi.Accessible");
+    QDBusInterface* cell2 = getInterface(getChildren(row2).at(0), "org.a11y.atspi.Accessible");
+    QDBusInterface* cell3 = getInterface(getChildren(row3).at(0), "org.a11y.atspi.Accessible");
+
+    delete cell1; delete cell2; delete cell3;
+    delete row1; delete row2; delete row3;
+    m_window->clearChildren();
+    delete listIface;
+    delete layoutIface;
+}
 
 
 // void tst_QtAtSpi::rootObject()
