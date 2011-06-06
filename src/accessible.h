@@ -42,15 +42,13 @@ class QSpiAccessible : public QSpiAdaptor
 public:
     QSpiAccessible(QAccessibleInterface *interface, int index = 0);
     virtual ~QSpiAccessible() {}
-
     virtual QSpiObjectReference getParentReference() const;
-
     virtual void accessibleEvent(QAccessible::Event event);
-
     void windowActivated();
 
-Q_SIGNALS:
+    static QString pathForInterface(QAccessibleInterface *interface, int index);
 
+Q_SIGNALS:
     // window
     void Activate(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);
     void Create(const QString &type, int detail1, int detail2, const QDBusVariant &data, const QSpiObjectReference &parent);

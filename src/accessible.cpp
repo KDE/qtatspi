@@ -43,8 +43,7 @@
 
 #define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
 
-QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
-    : QSpiAdaptor(interface, index)
+QString QSpiAccessible::pathForInterface(QAccessibleInterface *interface, int childIndex)
 {
     QString path;
     QAccessibleInterface* interfaceWithObject = interface;
@@ -54,9 +53,8 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
         Q_ASSERT(parentInterface->isValid());
         int index = parentInterface->indexOfChild(interfaceWithObject);
         //Q_ASSERT(index >= 0);
+        // FIXME: This should never happen!
         if (index < 0) {
-
-
 
             index = 999;
             path.prepend("/BROKEN_OBJECT_HIERARCHY");
@@ -70,15 +68,21 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
             QAccessibleInterface* tttt;
             int id = parentInterface->navigate(QAccessible::Child, 1, &tttt);
             qDebug() << "Nav child: " << id << tttt->object();
-
-
-
         }
         path.prepend('/' + QString::number(index));
         interfaceWithObject = parentInterface;
     }
     path.prepend(QSPI_OBJECT_PATH_PREFIX + QString::number(reinterpret_cast<size_t>(interfaceWithObject->object())));
+    if (childIndex > 0) {
+        path.append('/' + QString::number(childIndex));
+    }
+    return path;
+}
 
+QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
+    : QSpiAdaptor(interface, index)
+{
+    QString path = pathForInterface(interface, index);
     QDBusObjectPath dbusPath = QDBusObjectPath(path);
 
     reference = QSpiObjectReference(spiBridge->dBusConnection(),
