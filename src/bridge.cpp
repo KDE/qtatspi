@@ -62,9 +62,8 @@ QSpiAccessibleBridge::QSpiAccessibleBridge()
     qDebug() << "Registered DEC: " << reg;
 
     QAccessibleInterface* i = QAccessible::queryAccessibleInterface(qApp);
-    QSpiApplication* applicationAccessible = new QSpiApplication(dbusConnection->connection(), i);
-    adaptorWithObjectMap.insert(qApp, applicationAccessible);
-    allAdaptors.append(applicationAccessible);
+    QSpiAdaptor* applicationAccessible = new QSpiApplication(dbusConnection->connection(), i);
+    adaptors.insert(QString(QSPI_OBJECT_PATH_ROOT), applicationAccessible);
     connect(applicationAccessible, SIGNAL(windowActivated(QObject*)), this, SLOT(windowActivated(QObject*)));
 }
 
@@ -75,7 +74,7 @@ void QSpiAccessibleBridge::windowActivated(QObject* window)
     acc->windowActivated();
 }
 
-QSpiAccessibleBridge::~QSpiAccessibleBridge ()
+QSpiAccessibleBridge::~QSpiAccessibleBridge()
 {
     delete dbusConnection;
 } // Qt currently doesn't delete plugins.
@@ -108,7 +107,6 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
 
     // this gets deleted, so create one if we don't have it yet
     QSpiAdaptor* accessible = interfaceToAccessible(interface, index, false);
-
     Q_ASSERT(accessible->associatedInterface()->object() == interface->object());
 
     switch (reason) {
@@ -132,8 +130,10 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
 QSpiAdaptor* QSpiAccessibleBridge::objectToAccessible(QObject *object)
 {
     Q_ASSERT(object);
-    if (adaptorWithObjectMap.contains(object))
-        return adaptorWithObjectMap.value(object);
+
+    QString path = QSpiAccessible::pathForObject(object);
+    if (adaptors.contains(path))
+        return adaptors.value(path);
 
     QAccessibleInterface* interface = QAccessible::queryAccessibleInterface(object);
     if (!interface) {
@@ -147,26 +147,14 @@ QSpiAdaptor* QSpiAccessibleBridge::objectToAccessible(QObject *object)
 QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* interface, int index, bool takeOwnershipOfInterface)
 {
     Q_ASSERT(interface && interface->isValid());
-    if (interface->object()) {
-        QHash<QObject*, QSpiAdaptor*>::const_iterator i = adaptorWithObjectMap.constBegin();
-        while (i != adaptorWithObjectMap.constEnd()) {
-            if (i.key() == interface->object() && i.value()->childIndex() == index)
-                return i.value();
-            ++i;
-        }
-    }
 
-    // FIXME maybe cache (QHash<QAccessibleInterface*, QSpiAdaptor*> for things that don't have an object associated?
-    if (interface->object() == 0) {
-        foreach (QSpiAdaptor* a, adaptorWithoutObjectList) {
-            if (a->associatedInterface() == interface && a->childIndex() == index)
-                return a;
-        }
-        qDebug() << "      QSpiAccessibleBridge::interfaceToAccessible new with no object";
-    } else {
-        qDebug() << "      QSpiAccessibleBridge::interfaceToAccessible new: " << interface->object()
-                 << interface->text(QAccessible::Name, index) << qSpiRoleMapping.value(interface->role(index)).name();
-    }
+    QString path = QSpiAccessible::pathForInterface(interface, index);
+    // optimize?
+    if (adaptors.contains(path))
+        return adaptors.value(path);
+
+// FIXME if this works, we can save code below...
+//    QAccessibleInterface* copy(QAccessibleInterface(*interface));
 
     // if we cannot keep the interface around (notifyAccessibility will delete interfaces)
     // we need to ask for one that we can keep
@@ -186,13 +174,7 @@ QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* i
     QSpiAdaptor *accessible = new QSpiAccessible(interface, index);
 
     // put ourself in the list of accessibles
-    if (interface->object()) {
-        adaptorWithObjectMap.insertMulti(interface->object(), accessible);
-        connect(interface->object(), SIGNAL(destroyed(QObject*)), this, SLOT(objectDestroyed(QObject*)));
-    } else {
-        adaptorWithoutObjectList.append(accessible);
-    }
-    allAdaptors.append(accessible);
+    adaptors.insert(path, accessible);
 
     // say hello to d-bus
     cache->emitAddAccessible(accessible->getCacheItem());
@@ -224,20 +206,11 @@ QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* i
 
 void QSpiAccessibleBridge::objectDestroyed(QObject* o)
 {
-    QHash<QObject*, QSpiAdaptor*>::iterator i = adaptorWithObjectMap.find(o);
-    if (i != adaptorWithObjectMap.end()) {
-        allAdaptors.removeAll(i.value());
-        adaptorWithObjectMap.erase(i);
-    }
+    QString path = QSpiAccessible::pathForObject(o);
+    adaptors.remove(path);
 }
 
 void QSpiAccessibleBridge::removeAdaptor(QSpiAdaptor *adaptor)
 {
-    if (adaptorWithoutObjectList.contains(adaptor)) {
-        adaptorWithoutObjectList.removeAll(adaptor);
-    } else {
-        adaptorWithObjectMap.remove(adaptor->getObject());
-    }
-
-    allAdaptors.removeAll(adaptor);
+    adaptors.remove(adaptor->getReference().path.path());
 }

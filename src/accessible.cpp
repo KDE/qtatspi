@@ -39,9 +39,16 @@
 #include "generated/text_adaptor.h"
 #include "generated/value_adaptor.h"
 
-//#define ACCESSIBLE_CREATION_DEBUG
+#define ACCESSIBLE_CREATION_DEBUG
 
 #define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
+
+
+QString QSpiAccessible::pathForObject(QObject *object)
+{
+    Q_ASSERT(object);
+    return QSPI_OBJECT_PATH_PREFIX + QString::number(reinterpret_cast<size_t>(object));
+}
 
 QString QSpiAccessible::pathForInterface(QAccessibleInterface *interface, int childIndex)
 {

@@ -47,6 +47,7 @@ public:
     void windowActivated();
 
     static QString pathForInterface(QAccessibleInterface *interface, int index);
+    static QString pathForObject(QObject *object);
 
 Q_SIGNALS:
     // window

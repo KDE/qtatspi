@@ -60,7 +60,7 @@ public:
         QDBusConnection dBusConnection() const;
 
         QList<QSpiAdaptor*> cacheObjects() const
-        { return allAdaptors; }
+        { return adaptors.values(); }
 
 private Q_SLOTS:
         void windowActivated(QObject* window);
@@ -71,9 +71,7 @@ private:
         QSpiDBusCache *cache;
         DeviceEventControllerProxy *dec;
 
-        QHash<QObject*, QSpiAdaptor*> adaptorWithObjectMap;
-        QList<QSpiAdaptor*> adaptorWithoutObjectList;
-        QList<QSpiAdaptor*> allAdaptors;
+        QHash<QString, QSpiAdaptor*> adaptors;
 
         DBusConnection* dbusConnection;
         bool initialized;
