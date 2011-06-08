@@ -36,6 +36,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QWidget>
 
+#include "accessible.h"
 #include "adaptor.h"
 #include "bridge.h"
 #include "constant_mappings.h"
@@ -167,14 +168,18 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren() const
     QList<QSpiObjectReference> children;
     if (!checkInterface()) return children;
 
-    // when we are a child that means that we cannot have children of our own
-    if (child)
-        return children;
-
     for (int i = 1; i <= interface->childCount(); ++i) {
-        QSpiAdaptor* child = getChild(i);
-        if (child)
-            children << child->getReference();
+        // use navigate and return refernces
+        QAccessibleInterface* childInterface;
+        int childIndex = interface->navigate(QAccessible::Child, i, &childInterface);
+        QString path;
+        if (childIndex) {
+            path = QSpiAccessible::pathForInterface(interface, childIndex);
+        } else {
+            Q_ASSERT(childInterface);
+            path = QSpiAccessible::pathForInterface(childInterface, childIndex);
+        }
+        children.append(QSpiObjectReference(spiBridge->dBusConnection(), QDBusObjectPath(path)));
     }
     return children;
 }
