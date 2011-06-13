@@ -1192,7 +1192,7 @@ double QSpiAdaptor::currentValue() const
     }
 }
 
-void QSpiAdaptor::setCurrentValue(double value)
+void QSpiAdaptor::SetCurrentValue(double value)
 {
     if (!checkInterface()) return;
     interface->valueInterface()->setCurrentValue(QVariant (value));

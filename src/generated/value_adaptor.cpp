@@ -39,7 +39,7 @@ double ValueAdaptor::currentValue() const
     return qvariant_cast< double >(parent()->property("CurrentValue"));
 }
 
-void ValueAdaptor::setCurrentValue(double value)
+void ValueAdaptor::SetCurrentValue(double value)
 {
     // set the value of property CurrentValue
     parent()->setProperty("CurrentValue", qVariantFromValue(value));

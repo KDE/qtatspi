@@ -35,16 +35,23 @@ class ValueAdaptor: public QDBusAbstractAdaptor
 "    <property access=\"read\" type=\"d\" name=\"MaximumValue\"/>\n"
 "    <property access=\"read\" type=\"d\" name=\"MinimumIncrement\"/>\n"
 "    <property access=\"readwrite\" type=\"d\" name=\"CurrentValue\"/>\n"
+"    <method name=\"SetCurrentValue\">\n"
+"      <arg direction=\"in\" type=\"d\" name=\"value\"/>\n"
+"    </method>\n"
 "  </interface>\n"
         "")
 public:
     ValueAdaptor(QObject *parent);
     virtual ~ValueAdaptor();
 
+public slots:
+    //Temporal fix
+    //See https://bugzilla.gnome.org/show_bug.cgi?id=652596
+    void SetCurrentValue(double value);
+
 public: // PROPERTIES
-    Q_PROPERTY(double CurrentValue READ currentValue WRITE setCurrentValue)
+    Q_PROPERTY(double CurrentValue READ currentValue WRITE SetCurrentValue)
     double currentValue() const;
-    void setCurrentValue(double value);
 
     Q_PROPERTY(double MaximumValue READ maximumValue)
     double maximumValue() const;

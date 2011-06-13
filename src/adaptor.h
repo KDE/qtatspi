@@ -223,9 +223,9 @@ public Q_SLOTS:
 
 /* AT-SPI Text interface */
 public:
-    Q_PROPERTY(double CurrentValue READ currentValue WRITE setCurrentValue)
+    Q_PROPERTY(double CurrentValue READ currentValue WRITE SetCurrentValue)
     double currentValue() const;
-    void setCurrentValue(double value);
+    void SetCurrentValue(double value);
     Q_PROPERTY(double MaximumValue READ maximumValue)
     double maximumValue() const;
     Q_PROPERTY(double MinimumIncrement READ minimumIncrement)
