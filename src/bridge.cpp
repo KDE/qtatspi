@@ -107,7 +107,10 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
 
     // this gets deleted, so create one if we don't have it yet
     QSpiAdaptor* accessible = interfaceToAccessible(interface, index, false);
-    Q_ASSERT(accessible->associatedInterface()->object() == interface->object());
+    //Q_ASSERT(accessible->associatedInterface()->object() == interface->object());
+    if (accessible->associatedInterface()->object() == interface->object()) {
+        qWarning() << "Creating accessible with different object than the original interface!";
+    }
 
     switch (reason) {
     case QAccessible::Focus: {
