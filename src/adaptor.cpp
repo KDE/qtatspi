@@ -168,19 +168,34 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren() const
     QList<QSpiObjectReference> children;
     if (!checkInterface()) return children;
 
+    // TODO: become independent of caching the interfaces...
+    //    QPair<QAccessibleInterface*, int> pair = QSpiAccessible::interfaceFromPath(getReference().path.path());
+
+    qDebug() << "CHILDREN: " << getReference().path.path();
+    // when we are a child that means that we cannot have children of our own
+    Q_ASSERT(!child);
+
     for (int i = 1; i <= interface->childCount(); ++i) {
-        // use navigate and return refernces
-        QAccessibleInterface* childInterface;
-        int childIndex = interface->navigate(QAccessible::Child, i, &childInterface);
-        QString path;
-        if (childIndex) {
-            path = QSpiAccessible::pathForInterface(interface, childIndex);
-        } else {
-            Q_ASSERT(childInterface);
-            path = QSpiAccessible::pathForInterface(childInterface, childIndex);
-        }
-        children.append(QSpiObjectReference(spiBridge->dBusConnection(), QDBusObjectPath(path)));
+        QSpiAdaptor* child = getChild(i);
+        if (child)
+            children << child->getReference();
+
+//        // use navigate and return refernces
+//        QAccessibleInterface* childInterface;
+//        int childIndex = interface->navigate(QAccessible::Child, i, &childInterface);
+//        QString path;
+//        if (childIndex) {
+//            path = QSpiAccessible::pathForInterface(interface, childIndex);
+//        } else {
+//            Q_ASSERT(childInterface);
+//            path = QSpiAccessible::pathForInterface(childInterface, childIndex);
+//        }
+//        qDebug() << "   CHILD: " << path;
+//        children.append(QSpiObjectReference(spiBridge->dBusConnection(), QDBusObjectPath(path)));
     }
+
+    Q_ASSERT(interface->childCount() == children.count());
+
     return children;
 }
 
