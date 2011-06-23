@@ -113,6 +113,16 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
     }
 
     switch (reason) {
+
+
+    case QAccessible::ObjectCreated:
+        qDebug() << "created" << interface->object();
+        break;
+
+    case QAccessible::ObjectShow:
+        qDebug() << "show" << interface->object();
+        break;
+
     case QAccessible::Focus: {
         static QSpiAccessible *lastFocused = 0;
         if (lastFocused) {

@@ -173,7 +173,10 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren() const
 
     qDebug() << "CHILDREN: " << getReference().path.path();
     // when we are a child that means that we cannot have children of our own
-    Q_ASSERT(!child);
+    if (child) {
+        qWarning() << "Requesting child objects for an interface that is a virtual child itself.";
+        return children;
+    }
 
     for (int i = 1; i <= interface->childCount(); ++i) {
         QSpiAdaptor* child = getChild(i);
