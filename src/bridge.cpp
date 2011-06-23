@@ -153,8 +153,26 @@ QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* i
 
     QString path = QSpiAccessible::pathForInterface(interface, index);
     // optimize?
-    if (adaptors.contains(path))
-        return adaptors.value(path);
+    if (adaptors.contains(path)) {
+        if (adaptors.value(path)->associatedInterface()->object() != interface->object()) {
+
+            QSpiAdaptor* originalAdaptor = adaptors.take(path);
+            qDebug() << "not the same: " << originalAdaptor->associatedInterface()->object() << interface->object()
+                     << " at path: " << path;
+
+
+            // ItemViews create qobjects for rows/cells later as needed.
+            // Those may initially be 0.
+
+            // remove object
+            // add new interface
+            cache->emitRemoveAccessible(originalAdaptor->getReference());
+            delete originalAdaptor;
+//            Q_ASSERT(0);
+        } else {
+            return adaptors.value(path);
+        }
+    }
 
 // FIXME if this works, we can save code below...
 //    QAccessibleInterface* copy(QAccessibleInterface(*interface));
@@ -172,6 +190,7 @@ QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* i
             delete parentInterface;
         }
         Q_ASSERT(ownedInterface);
+        Q_ASSERT(interface->object() == ownedInterface->object());
         interface = ownedInterface;
     }
     QSpiAdaptor *accessible = new QSpiAccessible(interface, index);
@@ -179,22 +198,28 @@ QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* i
     // put ourself in the list of accessibles
     adaptors.insert(path, accessible);
 
+    notifyAboutCreation(accessible);
+    return accessible;
+}
+
+void QSpiAccessibleBridge::notifyAboutCreation(QSpiAdaptor* accessible)
+{
     // say hello to d-bus
     cache->emitAddAccessible(accessible->getCacheItem());
 
     // notify about the new child of our parent
     int childCount = 0;
     QSpiAdaptor* parentAdaptor = 0;
-    if (index == 0) {
+    if (accessible->childIndex() == 0) {
         QAccessibleInterface *parent = 0;
-        interface->navigate(QAccessible::Ancestor, 1, &parent);
+        accessible->associatedInterface()->navigate(QAccessible::Ancestor, 1, &parent);
         if (parent) {
             parentAdaptor = interfaceToAccessible(parent, 0, true);
             childCount = parent->childCount();
         }
     } else {
-        parentAdaptor = interfaceToAccessible(interface, 0, true);
-        childCount = interface->childCount();
+        parentAdaptor = interfaceToAccessible(accessible->associatedInterface(), 0, true);
+        childCount = accessible->associatedInterface()->childCount();
     }
 
     if (parentAdaptor) {
@@ -203,8 +228,6 @@ QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* i
         data.setVariant(QVariant::fromValue(r));
         parentAdaptor->signalChildrenChanged("add", childCount, 0, data);
     }
-
-    return accessible;
 }
 
 void QSpiAccessibleBridge::objectDestroyed(QObject* o)

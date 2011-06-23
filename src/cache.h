@@ -41,8 +41,9 @@ class QSpiDBusCache : public QObject
 public:
     QSpiDBusCache(QDBusConnection c, QObject* parent = 0);
     void emitAddAccessible(const QSpiAccessibleCacheItem& item);
+    void emitRemoveAccessible(const QSpiObjectReference& item);
 
-signals:
+Q_SIGNALS:
     void AddAccessible(const QSpiAccessibleCacheItem &nodeAdded);
     void RemoveAccessible(const QSpiObjectReference &nodeRemoved);
 

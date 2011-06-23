@@ -67,6 +67,7 @@ private Q_SLOTS:
         void objectDestroyed(QObject*);
 
 private:
+        void notifyAboutCreation(QSpiAdaptor* accessible);
         static QSpiAccessibleBridge* self;
         QSpiDBusCache *cache;
         DeviceEventControllerProxy *dec;

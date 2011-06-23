@@ -40,6 +40,11 @@ void QSpiDBusCache::emitAddAccessible(const QSpiAccessibleCacheItem& item)
     emit AddAccessible(item);
 }
 
+void QSpiDBusCache::emitRemoveAccessible(const QSpiObjectReference& item)
+{
+    emit RemoveAccessible(item);
+}
+
 QSpiAccessibleCacheArray QSpiDBusCache::GetItems()
 {
     QList <QSpiAccessibleCacheItem> cacheArray;
