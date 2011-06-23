@@ -48,6 +48,7 @@ public:
 
     static QString pathForInterface(QAccessibleInterface *interface, int index);
     static QString pathForObject(QObject *object);
+    static QPair<QAccessibleInterface*, int> interfaceFromPath(const QString& dbusPath);
 
 Q_SIGNALS:
     // window

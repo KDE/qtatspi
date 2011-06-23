@@ -79,11 +79,45 @@ QString QSpiAccessible::pathForInterface(QAccessibleInterface *interface, int ch
         path.prepend('/' + QString::number(index));
         interfaceWithObject = parentInterface;
     }
-    path.prepend(QSPI_OBJECT_PATH_PREFIX + QString::number(reinterpret_cast<size_t>(interfaceWithObject->object())));
+    path.prepend(QSPI_OBJECT_PATH_PREFIX + QString::number(reinterpret_cast<quintptr>(interfaceWithObject->object())));
+
     if (childIndex > 0) {
         path.append('/' + QString::number(childIndex));
     }
     return path;
+}
+
+QPair<QAccessibleInterface*, int> QSpiAccessible::interfaceFromPath(const QString& dbusPath)
+{
+    QStringList parts = dbusPath.split('/');
+
+    Q_ASSERT(parts.size() > 5);
+
+    // ignore the first /org/a11y/atspi/accessible/
+    QString objectString = parts.at(5);
+
+    quintptr uintptr = objectString.toULongLong();
+
+    if (!uintptr)
+        return QPair<QAccessibleInterface*, int>(0, 0);
+
+    QObject* object = reinterpret_cast<QObject*>(uintptr);
+
+    qDebug() << object;
+    QAccessibleInterface* inter = QAccessible::queryAccessibleInterface(object);
+    QAccessibleInterface* childInter;
+
+    int index = 0;
+
+    for (int i = 6; i < parts.size(); ++i) {
+        index = inter->navigate(QAccessible::Child, parts.at(i).toInt(), &childInter);
+        if (index == 0) {
+            delete inter;
+            inter = childInter;
+        }
+    }
+
+    return QPair<QAccessibleInterface*, int>(inter, index);
 }
 
 QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
