@@ -170,8 +170,8 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren() const
 
     // TODO: become independent of caching the interfaces...
     //    QPair<QAccessibleInterface*, int> pair = QSpiAccessible::interfaceFromPath(getReference().path.path());
+//    qDebug() << "CHILDREN: " << getReference().path.path();
 
-    qDebug() << "CHILDREN: " << getReference().path.path();
     // when we are a child that means that we cannot have children of our own
     if (child) {
         qWarning() << "Requesting child objects for an interface that is a virtual child itself.";
