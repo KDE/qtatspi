@@ -135,7 +135,13 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
     new AccessibleAdaptor(this);
     supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;
 
-    if ((!interface->rect(index).isEmpty()) || (interface->object() && interface->object()->isWidgetType())) {
+    if (    (!interface->rect(index).isEmpty()) ||
+            (interface->object() && interface->object()->isWidgetType()) ||
+            (interface->role(index) == QAccessible::ListItem) ||
+            (interface->role(index) == QAccessible::Cell) ||
+            (interface->role(index) == QAccessible::TreeItem) ||
+            (interface->role(index) == QAccessible::Row)
+            ) {
         new ComponentAdaptor(this);
         supportedInterfaces << QSPI_INTERFACE_COMPONENT;
 

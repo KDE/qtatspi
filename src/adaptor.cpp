@@ -624,25 +624,25 @@ QSpiObjectReference QSpiAdaptor::caption() const
 int QSpiAdaptor::nColumns() const
 {
     if (!checkInterface()) return 0;
-    return interface->tableInterface()->columnCount ();
+    return interface->tableInterface()->columnCount();
 }
 
 int QSpiAdaptor::nRows() const
 {
     if (!checkInterface()) return 0;
-    return interface->tableInterface()->rowCount ();
+    return interface->tableInterface()->rowCount();
 }
 
 int QSpiAdaptor::nSelectedColumns() const
 {
     if (!checkInterface()) return 0;
-    return interface->tableInterface()->selectedColumnCount ();
+    return interface->tableInterface()->selectedColumnCount();
 }
 
 int QSpiAdaptor::nSelectedRows() const
 {
     if (!checkInterface()) return 0;
-    return interface->tableInterface()->selectedRowCount ();
+    return interface->tableInterface()->selectedRowCount();
 }
 
 QSpiObjectReference QSpiAdaptor::summary() const
