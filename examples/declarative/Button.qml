@@ -3,7 +3,7 @@ import QtQuick 1.0
 
 FocusScope {
     property alias text: label.text
-    accessibleRole: Qt.PushButton
+    Accessible.role: Accessible.Button
 
     id: scope
 

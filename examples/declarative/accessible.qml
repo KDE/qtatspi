@@ -6,7 +6,7 @@ Rectangle {
 
     Text {
         text: "Hello World!"
-        accessibleRole: Qt.StaticText
+        Accessible.role: Accessible.StaticText
 
         focus: true
 
@@ -25,7 +25,7 @@ Rectangle {
     TextInput {
         text: "Input..."
         focus: true
-        accessibleRole: Qt.StaticText
+        Accessible.role: Accessible.StaticText
 
         Rectangle {
             anchors.centerIn: parent
