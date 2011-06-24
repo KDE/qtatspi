@@ -140,7 +140,8 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
             (interface->role(index) == QAccessible::ListItem) ||
             (interface->role(index) == QAccessible::Cell) ||
             (interface->role(index) == QAccessible::TreeItem) ||
-            (interface->role(index) == QAccessible::Row)
+            (interface->role(index) == QAccessible::Row) ||
+            (interface->object() && interface->object()->inherits("QSGItem"))
             ) {
         new ComponentAdaptor(this);
         supportedInterfaces << QSPI_INTERFACE_COMPONENT;
@@ -203,14 +204,14 @@ QSpiObjectReference QSpiAccessible::getParentReference() const
     if (interface->isValid()) {
         QAccessibleInterface *parentInterface = 0;
         interface->navigate(QAccessible::Ancestor, 1, &parentInterface);
-        if (parentInterface)
-        {
+        if (parentInterface) {
             QSpiAdaptor *parent = spiBridge->objectToAccessible(parentInterface->object());
             delete parentInterface;
             if (parent)
                 return parent->getReference();
         }
     }
+    qWarning() << "Invalid parent: " << interface << interface->object();
     return QSpiObjectReference();
 }
 
