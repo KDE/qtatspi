@@ -117,6 +117,8 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
 
     case QAccessible::ObjectCreated:
         qDebug() << "created" << interface->object();
+        // make sure we don't duplicate this. seems to work for qml loaders.
+        notifyAboutCreation(accessible);
         break;
 
     case QAccessible::ObjectShow:
