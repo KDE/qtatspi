@@ -39,7 +39,7 @@
 #include "generated/text_adaptor.h"
 #include "generated/value_adaptor.h"
 
-// #define ACCESSIBLE_CREATION_DEBUG
+#define ACCESSIBLE_CREATION_DEBUG
 
 #define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
 
@@ -129,7 +129,7 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
     reference = QSpiObjectReference(spiBridge->dBusConnection(),
                                                dbusPath);
 #ifdef ACCESSIBLE_CREATION_DEBUG
-    qDebug() << "ACCESSIBLE: " << interface->object() << reference.path.path();
+    qDebug() << "ACCESSIBLE: " << interface->object() << reference.path.path() << interface->text(QAccessible::Name, index);
 #endif
 
     new AccessibleAdaptor(this);
@@ -186,7 +186,7 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
         new ValueAdaptor(this);
         supportedInterfaces << QSPI_INTERFACE_VALUE;
     }
-    if (interface->tableInterface())
+    if (interface->table2Interface())
     {
         new TableAdaptor(this);
         supportedInterfaces << QSPI_INTERFACE_TABLE;
@@ -239,6 +239,9 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         break;
     }
     case QAccessible::Focus: {
+
+        qDebug() << "Focus: " << getReference().path.path() << interface->object();
+
         QDBusVariant data;
         data.setVariant(QVariant::fromValue(getReference()));
         emit StateChanged("focused", 1, 0, data, spiBridge->getRootReference());
