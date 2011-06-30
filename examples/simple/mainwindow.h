@@ -35,6 +35,8 @@ public:
 
 public Q_SLOTS:
     void createButton();
+    void addListItem();
+    void removeListItem();
 
 private:
     Ui::MainWindow *ui;

@@ -30,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(createButton()));
     connect(ui->action_Quit, SIGNAL(triggered()), qApp, SLOT(quit()));
+    connect(ui->addListButton, SIGNAL(clicked()), this, SLOT(addListItem()));
+    connect(ui->removeListButton, SIGNAL(clicked()), this, SLOT(removeListItem()));
 
     if (qgetenv("QT_ACCESSIBILITY") != "1")
         QMessageBox::warning(this, tr("Qt Accessibility not enabled"),
@@ -48,5 +50,15 @@ void MainWindow::createButton()
     button->setAccessibleDescription("This is an accessible description for a button.");
     ui->centralWidget->layout()->addWidget(button);
     ui->statusBar->showMessage("Button created.");
+}
+
+void MainWindow::addListItem()
+{
+    ui->listWidget->addItem("Foo");
+}
+
+void MainWindow::removeListItem()
+{
+    delete ui->listWidget->takeItem(ui->listWidget->count()-1);
 }
 
