@@ -309,13 +309,10 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         break;
     }
     case QAccessible::TableModelChanged: {
-        // FIXME: react to table layout changes - added rows etc
-//        QAccessible2::TableModelChange change = interface->table2Interface()->modelChange();
-//        QDBusVariant data;
-//        data.setVariant(QVariant::fromValue(getReference()));
-//        signalChildrenChanged("add", interface->childCount(), 0, data);
-//        // model-changed
-//         emit ChildrenChanged(type, detail1, detail2, data, spiBridge->getRootReference());
+        // This is rather evil. We don't send data and hope that at-spi fetches the right child.
+        // This hack fails when a row gets removed and a different one added in its place.
+        QDBusVariant data;
+        emit ChildrenChanged("add", 0, 0, data, spiBridge->getRootReference());
         break;
     }
     case QAccessible::ParentChanged:
