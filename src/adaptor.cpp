@@ -168,7 +168,11 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren() const
 
     // when we are a child that means that we cannot have children of our own
     if (child) {
-        qWarning() << "Requesting child objects for an interface that is a virtual child itself.";
+        QAccessibleInterface *iface;
+        interface->navigate(QAccessible::Ancestor, 1, &iface);
+        qWarning() << "WARNING: Request child of virtual child: "
+                   << getReference().path.path() << interface->object() << "child: " << childIndex() << " parent: " << iface->object();
+        delete iface;
         return children;
     }
 
