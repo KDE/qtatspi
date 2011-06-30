@@ -151,7 +151,7 @@ QSpiObjectReference QSpiAdaptor::GetChildAtIndex(int index) const
     Q_ASSERT(index < interface->childCount());
     QSpiAdaptor* child = getChild(index+1);
     if (!child) {
-        qWarning() << "QSpiAdaptor::GetChildAtIndex could not find child!";
+        qWarning() << "WARNING:QSpiAdaptor::GetChildAtIndex no child: " << index << getReference().path.path() << interface->object();
         return QSpiObjectReference();
     }
     return child->getReference();
@@ -170,7 +170,7 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren() const
     if (child) {
         QAccessibleInterface *iface;
         interface->navigate(QAccessible::Ancestor, 1, &iface);
-        qWarning() << "WARNING: Request child of virtual child: "
+        qWarning() << "WARNING:QSpiAdaptor::GetChildren Request child of virtual child: "
                    << getReference().path.path() << interface->object() << "child: " << childIndex() << " parent: " << iface->object();
         delete iface;
         return children;
