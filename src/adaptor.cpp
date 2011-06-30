@@ -146,20 +146,14 @@ QSpiAttributeSet QSpiAdaptor::GetAttributes() const
 QSpiObjectReference QSpiAdaptor::GetChildAtIndex(int index) const
 {
     if (!checkInterface()) return QSpiObjectReference();
-
     // if we are the child of a complex widget, we cannot have any children
     Q_ASSERT(child == 0);
     Q_ASSERT(index < interface->childCount());
-
-    qDebug() << "QSpiAdaptor::GetChildAtIndex get child " << index << " of " << interface->childCount()
-             << interface->text(QAccessible::Name, 0) << interface->object();
-
     QSpiAdaptor* child = getChild(index+1);
     if (!child) {
         qWarning() << "QSpiAdaptor::GetChildAtIndex could not find child!";
         return QSpiObjectReference();
     }
-
     return child->getReference();
 }
 
