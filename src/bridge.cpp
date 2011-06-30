@@ -113,18 +113,14 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
     }
 
     switch (reason) {
-
-
     case QAccessible::ObjectCreated:
         qDebug() << "created" << interface->object();
         // make sure we don't duplicate this. seems to work for qml loaders.
         notifyAboutCreation(accessible);
         break;
-
     case QAccessible::ObjectShow:
         qDebug() << "show" << interface->object();
         break;
-
     case QAccessible::Focus: {
         static QSpiAccessible *lastFocused = 0;
         if (lastFocused) {
@@ -162,6 +158,10 @@ QSpiAdaptor* QSpiAccessibleBridge::objectToAccessible(QObject *object)
 QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* interface, int index, bool takeOwnershipOfInterface)
 {
     Q_ASSERT(interface && interface->isValid());
+
+    if (interface->object() == qApp) {
+        return adaptors.value(QSPI_OBJECT_PATH_ROOT);
+    }
 
     QString path = QSpiAccessible::pathForInterface(interface, index);
     // optimize?
