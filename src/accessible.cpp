@@ -308,6 +308,16 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         state = newState;
         break;
     }
+    case QAccessible::TableModelChanged: {
+        // FIXME: react to table layout changes - added rows etc
+//        QAccessible2::TableModelChange change = interface->table2Interface()->modelChange();
+//        QDBusVariant data;
+//        data.setVariant(QVariant::fromValue(getReference()));
+//        signalChildrenChanged("add", interface->childCount(), 0, data);
+//        // model-changed
+//         emit ChildrenChanged(type, detail1, detail2, data, spiBridge->getRootReference());
+        break;
+    }
     case QAccessible::ParentChanged:
         // TODO - send parent changed
     default:
