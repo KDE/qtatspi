@@ -278,12 +278,9 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
 #endif
     case QAccessible::ValueChanged: {
         Q_ASSERT(interface->valueInterface());
-        qDebug() << "Value changed: " << interface->object() << interface->valueInterface()->currentValue();
-        QSpiObjectReference r = getReference();
         QDBusVariant data;
-        data.setVariant(QVariant::fromValue(r));
-        // FIXME: values for data1/2?
-        emit PropertyChange("value-changed", 0, 0, data, spiBridge->getRootReference());
+        data.setVariant(QVariant::fromValue(getReference()));
+        emit PropertyChange("accessible-value", 0, 0, data, spiBridge->getRootReference());
         break;
     }
     case QAccessible::ObjectShow:
