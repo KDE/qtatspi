@@ -31,113 +31,18 @@
 #include <atspi/atspi-constants.h>
 #include <QAccessible>
 
-enum QSpiRole
-{
-    ROLE_INVALID,
-    ROLE_ACCELERATOR_LABEL,
-    ROLE_ALERT,
-    ROLE_ANIMATION,
-    ROLE_ARROW,
-    ROLE_CALENDAR,
-    ROLE_CANVAS,
-    ROLE_CHECK_BOX,
-    ROLE_CHECK_MENU_ITEM,
-    ROLE_COLOR_CHOOSER,
-    ROLE_COLUMN_HEADER, //10
-    ROLE_COMBO_BOX,
-    ROLE_DATE_EDITOR,
-    ROLE_DESKTOP_ICON,
-    ROLE_DESKTOP_FRAME,
-    ROLE_DIAL,
-    ROLE_DIALOG,
-    ROLE_DIRECTORY_PANE,
-    ROLE_DRAWING_AREA,
-    ROLE_FILE_CHOOSER,
-    ROLE_FILLER, //20
-    ROLE_FOCUS_TRAVERSABLE,
-    ROLE_FONT_CHOOSER,
-    ROLE_FRAME,
-    ROLE_GLASS_PANE,
-    ROLE_HTML_CONTAINER,
-    ROLE_ICON,
-    ROLE_IMAGE,
-    ROLE_INTERNAL_FRAME,
-    ROLE_LABEL,
-    ROLE_LAYERED_PANE, //30
-    ROLE_LIST,
-    ROLE_LIST_ITEM,
-    ROLE_MENU,
-    ROLE_MENU_BAR,
-    ROLE_MENU_ITEM,
-    ROLE_OPTION_PANE,
-    ROLE_PAGE_TAB,
-    ROLE_PAGE_TAB_LIST,
-    ROLE_PANEL,
-    ROLE_PASSWORD_TEXT, //40
-    ROLE_POPUP_MENU,
-    ROLE_PROGRESS_BAR,
-    ROLE_PUSH_BUTTON,
-    ROLE_RADIO_BUTTON,
-    ROLE_RADIO_MENU_ITEM,
-    ROLE_ROOT_PANE,
-    ROLE_ROW_HEADER,
-    ROLE_SCROLL_BAR,
-    ROLE_SCROLL_PANE,
-    ROLE_SEPARATOR, //50
-    ROLE_SLIDER,
-    ROLE_SPIN_BUTTON,
-    ROLE_SPLIT_PANE,
-    ROLE_STATUS_BAR,
-    ROLE_TABLE,
-    ROLE_TABLE_CELL,
-    ROLE_TABLE_COLUMN_HEADER,
-    ROLE_TABLE_ROW_HEADER,
-    ROLE_TEAROFF_MENU_ITEM,
-    ROLE_TERMINAL, //60
-    ROLE_TEXT,
-    ROLE_TOGGLE_BUTTON,
-    ROLE_TOOL_BAR,
-    ROLE_TOOL_TIP,
-    ROLE_TREE,
-    ROLE_TREE_TABLE,
-    ROLE_UNKNOWN,
-    ROLE_VIEWPORT,
-    ROLE_WINDOW,
-    ROLE_EXTENDED, //70
-    ROLE_HEADER,
-    ROLE_FOOTER,
-    ROLE_PARAGRAPH,
-    ROLE_RULER,
-    ROLE_APPLICATION,
-    ROLE_AUTOCOMPLETE,
-    ROLE_EDITBAR,
-    ROLE_EMBEDDED,
-    ROLE_ENTRY,
-    ROLE_CHART, //80
-    ROLE_CAPTION,
-    ROLE_DOCUMENT_FRAME,
-    ROLE_HEADING,
-    ROLE_PAGE,
-    ROLE_SECTION,
-    ROLE_REDUNDANT_OBJECT,
-    ROLE_FORM,
-    ROLE_LINK,
-    ROLE_INPUT_METHOD_WINDOW,
-    ROLE_LAST_DEFINED //90
-};
-
 struct RoleNames {
     RoleNames() {}
-    RoleNames(QSpiRole r, const QString& n, const QString& ln)
+    RoleNames(AtspiRole r, const QString& n, const QString& ln)
         :spiRole_(r), name_(n), localizedName_(ln)
     {}
 
-    QSpiRole spiRole() const {return spiRole_;}
+    AtspiRole spiRole() const {return spiRole_;}
     QString name() const {return name_;}
     QString localizedName() const {return localizedName_;}
 
 private:
-    QSpiRole spiRole_;
+    AtspiRole spiRole_;
     QString name_;
     QString localizedName_;
 };
