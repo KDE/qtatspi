@@ -33,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->addListButton, SIGNAL(clicked()), this, SLOT(addListItem()));
     connect(ui->removeListButton, SIGNAL(clicked()), this, SLOT(removeListItem()));
 
+    ui->treeWidget->expandAll();
+
     if (qgetenv("QT_ACCESSIBILITY") != "1")
         QMessageBox::warning(this, tr("Qt Accessibility not enabled"),
             tr("In order to test accessibility, please export \"QT_ACCESSIBILITY=1\" before starting this applicaton."));
