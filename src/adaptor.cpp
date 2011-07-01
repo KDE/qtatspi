@@ -684,8 +684,6 @@ QSpiObjectReference QSpiAdaptor::GetAccessibleAt(int row, int column)
 int QSpiAdaptor::GetColumnAtIndex(int index)
 {
     if (!checkInterface()) return 0;
-
-    Q_ASSERT(0);
     int cols = interface->table2Interface()->columnCount();
     return index%cols;
 }
@@ -721,7 +719,6 @@ int QSpiAdaptor::GetIndexAt(int row, int column)
 int QSpiAdaptor::GetRowAtIndex(int index)
 {
     if (!checkInterface()) return 0;
-    Q_ASSERT(0);
     int cols = interface->table2Interface()->columnCount();
     return index/cols;
 }
