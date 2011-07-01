@@ -30,9 +30,7 @@
 #include "generated/dec_proxy.h"
 #include "generated/event_adaptor.h"
 
-#include <QEvent>
-#include <QKeyEvent>
-
+#include <qaccessible2.h>
 
 #define QSPI_DEC_NAME        "/org/a11y/atspi/Registry"
 #define QSPI_DEC_OBJECT_PATH "/org/a11y/atspi/registry/deviceeventcontroller"
@@ -108,6 +106,17 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int /*reason*/, QAccessible
 //    Q_ASSERT(interface && interface->isValid());
 
 //    return;
+//        break;
+//    }
+//    case QAccessible::TableModelChanged:
+//        QAccessible2::TableModelChange change = interface->table2Interface()->modelChange();
+//        // assume we should reset if everything is 0
+//        if (change.firstColumn == 0 && change.firstRow == 0 && change.lastColumn == 0 && change.lastRow == 0) {
+//            notifyAboutDestruction(accessible);
+//            notifyAboutCreation(accessible);
+//        }
+//        // FIXME: react to other changes properly
+//        break;
 
 //    if (!initialized)
 //        return;
@@ -230,6 +239,32 @@ void QSpiAccessibleBridge::notifyAboutCreation(QSpiAdaptor* /*accessible*/)
 //        data.setVariant(QVariant::fromValue(r));
 //        parentAdaptor->signalChildrenChanged("add", childCount, 0, data);
 //    }
+}
+
+void QSpiAccessibleBridge::notifyAboutDestruction(QSpiAdaptor* accessible)
+{
+    int childCount = 0;
+    QSpiAdaptor* parentAdaptor = 0;
+    if (accessible->childIndex() == 0) {
+        QAccessibleInterface *parent = 0;
+        accessible->associatedInterface()->navigate(QAccessible::Ancestor, 1, &parent);
+        if (parent) {
+            parentAdaptor = interfaceToAccessible(parent, 0, true);
+            childCount = parent->childCount();
+        }
+    } else {
+        parentAdaptor = interfaceToAccessible(accessible->associatedInterface(), 0, true);
+        childCount = accessible->associatedInterface()->childCount();
+    }
+
+    if (parentAdaptor) {
+        QSpiObjectReference r = accessible->getReference();
+        QDBusVariant data;
+        data.setVariant(QVariant::fromValue(r));
+        parentAdaptor->signalChildrenChanged("remove", 1, 0, data);
+    }
+
+    cache->emitRemoveAccessible(accessible->getReference());
 }
 
 void QSpiAccessibleBridge::objectDestroyed(QObject*)
