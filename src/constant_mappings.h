@@ -147,60 +147,14 @@ extern QHash <QAccessible::Role, RoleNames> qSpiRoleMapping;
 /* State mapping */
 /*---------------------------------------------------------------------------*/
 
-enum QSpiState {
-    STATE_INVALID,
-    STATE_ACTIVE,
-    STATE_ARMED,
-    STATE_BUSY,
-    STATE_CHECKED,
-    STATE_COLLAPSED,
-    STATE_DEFUNCT,
-    STATE_EDITABLE,
-    STATE_ENABLED,
-    STATE_EXPANDABLE, //10
-    STATE_EXPANDED,
-    STATE_FOCUSABLE,
-    STATE_FOCUSED,
-    STATE_HAS_TOOLTIP,
-    STATE_HORIZONTAL,
-    STATE_ICONIFIED,
-    STATE_MODAL,
-    STATE_MULTI_LINE,
-    STATE_MULTISELECTABLE,
-    STATE_OPAQUE, //20
-    STATE_PRESSED,
-    STATE_RESIZABLE,
-    STATE_SELECTABLE,
-    STATE_SELECTED,
-    STATE_SENSITIVE,
-    STATE_SHOWING,
-    STATE_SINGLE_LINE,
-    STATE_STALE,
-    STATE_TRANSIENT,
-    STATE_VERTICAL, //30
-    STATE_VISIBLE,
-    STATE_MANAGES_DESCENDANTS,
-    STATE_INDETERMINATE,
-    STATE_REQUIRED,
-    STATE_TRUNCATED,
-    STATE_ANIMATED,
-    STATE_INVALID_ENTRY,
-    STATE_SUPPORTS_AUTOCOMPLETION,
-    STATE_SELECTABLE_TEXT,
-    STATE_IS_DEFAULT, //40
-    STATE_VISITED,
-    STATE_UNKNOWN,
-    STATE_LAST_DEFINED
-};
+extern QHash <int, AtspiStateType> qSpiStateMapping;
 
-extern QHash <int, QSpiState> qSpiStateMapping;
-
-inline void setSpiStateBit(quint64* state, QSpiState spiState)
+inline void setSpiStateBit(quint64* state, AtspiStateType spiState)
 {
     *state |= quint64(1) << spiState;
 }
 
-inline void unsetSpiStateBit(quint64* state, QSpiState spiState)
+inline void unsetSpiStateBit(quint64* state, AtspiStateType spiState)
 {
     *state &= ~(quint64(1) << spiState);
 }

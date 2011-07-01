@@ -299,7 +299,7 @@ QSpiUIntList QSpiAdaptor::GetState() const
 
     quint64 spiState = spiStatesFromQState(interface->state(child));
     if (interface->tableInterface()) {
-        setSpiStateBit(&spiState, STATE_MANAGES_DESCENDANTS);
+        setSpiStateBit(&spiState, ATSPI_STATE_MANAGES_DESCENDANTS);
     }
     return spiStateSetFromSpiStates(spiState);
 }

@@ -102,11 +102,11 @@ quint64 spiStatesFromQState(QAccessible::State state)
 {
     quint64 spiState = 0;
 
-    setSpiStateBit(&spiState, STATE_EDITABLE);
-    setSpiStateBit(&spiState, STATE_ENABLED);
-    setSpiStateBit(&spiState, STATE_SHOWING);
-    setSpiStateBit(&spiState, STATE_VISIBLE);
-    setSpiStateBit(&spiState, STATE_SENSITIVE);
+    setSpiStateBit(&spiState, ATSPI_STATE_EDITABLE);
+    setSpiStateBit(&spiState, ATSPI_STATE_ENABLED);
+    setSpiStateBit(&spiState, ATSPI_STATE_SHOWING);
+    setSpiStateBit(&spiState, ATSPI_STATE_VISIBLE);
+    setSpiStateBit(&spiState, ATSPI_STATE_SENSITIVE);
 
     for (int mask = 1; mask <= int(QAccessible::HasInvokeExtension); mask <<= 1)
     {
@@ -114,40 +114,40 @@ quint64 spiStatesFromQState(QAccessible::State state)
         {
         case QAccessible::Unavailable:
         {
-            unsetSpiStateBit(&spiState, STATE_ENABLED);
-            unsetSpiStateBit(&spiState, STATE_SHOWING);
-            unsetSpiStateBit(&spiState, STATE_VISIBLE);
-            unsetSpiStateBit(&spiState, STATE_SENSITIVE);
+            unsetSpiStateBit(&spiState, ATSPI_STATE_ENABLED);
+            unsetSpiStateBit(&spiState, ATSPI_STATE_SHOWING);
+            unsetSpiStateBit(&spiState, ATSPI_STATE_VISIBLE);
+            unsetSpiStateBit(&spiState, ATSPI_STATE_SENSITIVE);
             break;
         }
         case QAccessible::Selected:
         {
-            setSpiStateBit(&spiState, STATE_SELECTED);
+            setSpiStateBit(&spiState, ATSPI_STATE_SELECTED);
             break;
         }
         case QAccessible::Focused:
         {
-            setSpiStateBit(&spiState, STATE_FOCUSED);
+            setSpiStateBit(&spiState, ATSPI_STATE_FOCUSED);
             break;
         }
         case QAccessible::Pressed:
         {
-            setSpiStateBit(&spiState, STATE_PRESSED);
+            setSpiStateBit(&spiState, ATSPI_STATE_PRESSED);
             break;
         }
         case QAccessible::Checked:
         {
-            setSpiStateBit(&spiState, STATE_CHECKED);
+            setSpiStateBit(&spiState, ATSPI_STATE_CHECKED);
             break;
         }
         case QAccessible::Mixed:
         {
-            setSpiStateBit(&spiState, STATE_INDETERMINATE);
+            setSpiStateBit(&spiState, ATSPI_STATE_INDETERMINATE);
             break;
         }
         case QAccessible::ReadOnly:
         {
-            unsetSpiStateBit(&spiState, STATE_EDITABLE);
+            unsetSpiStateBit(&spiState, ATSPI_STATE_EDITABLE);
             break;
         }
         case QAccessible::HotTracked:
@@ -156,39 +156,39 @@ quint64 spiStatesFromQState(QAccessible::State state)
         }
         case QAccessible::DefaultButton:
         {
-            setSpiStateBit(&spiState, STATE_IS_DEFAULT);
+            setSpiStateBit(&spiState, ATSPI_STATE_IS_DEFAULT);
             break;
         }
         case QAccessible::Expanded:
         {
-            setSpiStateBit(&spiState, STATE_EXPANDED);
+            setSpiStateBit(&spiState, ATSPI_STATE_EXPANDED);
             break;
         }
         case QAccessible::Collapsed:
         {
-            setSpiStateBit(&spiState, STATE_COLLAPSED);
+            setSpiStateBit(&spiState, ATSPI_STATE_COLLAPSED);
             break;
         }
         case QAccessible::Busy:
         {
-            setSpiStateBit(&spiState, STATE_BUSY);
+            setSpiStateBit(&spiState, ATSPI_STATE_BUSY);
             break;
         }
         case QAccessible::Marqueed:
         case QAccessible::Animated:
         {
-            setSpiStateBit(&spiState, STATE_ANIMATED);
+            setSpiStateBit(&spiState, ATSPI_STATE_ANIMATED);
             break;
         }
         case QAccessible::Invisible:
         case QAccessible::Offscreen:
         {
-            unsetSpiStateBit(&spiState, STATE_SHOWING);
+            unsetSpiStateBit(&spiState, ATSPI_STATE_SHOWING);
             break;
         }
         case QAccessible::Sizeable:
         {
-            setSpiStateBit(&spiState, STATE_RESIZABLE);
+            setSpiStateBit(&spiState, ATSPI_STATE_RESIZABLE);
             break;
         }
         case QAccessible::Movable:
@@ -198,12 +198,12 @@ quint64 spiStatesFromQState(QAccessible::State state)
         }
         case QAccessible::Focusable:
         {
-            setSpiStateBit(&spiState, STATE_FOCUSABLE);
+            setSpiStateBit(&spiState, ATSPI_STATE_FOCUSABLE);
             break;
         }
         case QAccessible::Selectable:
         {
-            setSpiStateBit(&spiState, STATE_SELECTABLE);
+            setSpiStateBit(&spiState, ATSPI_STATE_SELECTABLE);
             break;
         }
         case QAccessible::Linked:
@@ -212,17 +212,17 @@ quint64 spiStatesFromQState(QAccessible::State state)
         }
         case QAccessible::Traversed:
         {
-            setSpiStateBit(&spiState, STATE_VISITED);
+            setSpiStateBit(&spiState, ATSPI_STATE_VISITED);
             break;
         }
         case QAccessible::MultiSelectable:
         {
-            setSpiStateBit(&spiState, STATE_MULTISELECTABLE);
+            setSpiStateBit(&spiState, ATSPI_STATE_MULTISELECTABLE);
             break;
         }
         case QAccessible::ExtSelectable:
         {
-            setSpiStateBit(&spiState, STATE_SELECTABLE);
+            setSpiStateBit(&spiState, ATSPI_STATE_SELECTABLE);
             break;
         }
         case QAccessible::Protected:
@@ -232,7 +232,7 @@ quint64 spiStatesFromQState(QAccessible::State state)
         }
         case QAccessible::Modal:
         {
-            setSpiStateBit(&spiState, STATE_MODAL);
+            setSpiStateBit(&spiState, ATSPI_STATE_MODAL);
             break;
         }
         case QAccessible::HasInvokeExtension:
@@ -241,7 +241,7 @@ quint64 spiStatesFromQState(QAccessible::State state)
         }
 //        case QAccessible::SingleLine:
 //        {
-//            setSpiStateBit(&spiState, STATE_SINGLE_LINE);
+//            setSpiStateBit(&spiState, ATSPI_STATE_SINGLE_LINE);
 //            break;
 //        }
         default:
