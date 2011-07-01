@@ -219,18 +219,13 @@ int QSpiAdaptor::GetIndexInParent() const
 {
     if (!checkInterface()) return -1;
 
-//    qDebug() << "QSpiAdaptor::GetIndexInParent" << interface->text(QAccessible::Name, 0);
-//    qDebug() << "  obj: " << interface->object();
     if (child)
         return child;
 
     QAccessibleInterface* parent;
     interface->navigate(QAccessible::Ancestor, 1, &parent);
     if (parent) {
-        qDebug() << "QSpiAdaptor::GetIndexInParent" << parent->text(QAccessible::Name, 0);
-        int index = parent->indexOfChild(interface);
-        qDebug() << "Index: " << index;
-        return index;
+        return parent->indexOfChild(interface) - 1; // damn you one based indexes!!!
     }
     return -1;
 }
@@ -670,10 +665,10 @@ QSpiObjectReference QSpiAdaptor::GetAccessibleAt(int row, int column)
     Q_ASSERT(interface->table2Interface());
     Q_ASSERT(row >= 0);
     Q_ASSERT(column >= 0);
-    qDebug() << "GetAccessibleAt" << row << column;
+    Q_ASSERT(row < interface->table2Interface()->rowCount());
+    Q_ASSERT(column < interface->table2Interface()->columnCount());
 
     QAccessibleInterface* cell = interface->table2Interface()->cellAt(row, column);
-
     if (!cell) {
         qWarning() << "WARNING: no row interface returned for " << interface->object();
         return QSpiObjectReference();
