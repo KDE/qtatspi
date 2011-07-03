@@ -69,7 +69,7 @@ static void initializeRoleMapping ()
     qSpiRoleMapping.insert(QAccessible::List, RoleNames(ATSPI_ROLE_LIST, "list", QObject::tr("list")));
     qSpiRoleMapping.insert(QAccessible::ListItem, RoleNames(ATSPI_ROLE_LIST_ITEM, "list item", QObject::tr("list item")));
     qSpiRoleMapping.insert(QAccessible::Tree, RoleNames(ATSPI_ROLE_TREE, "tree", QObject::tr("tree")));
-    qSpiRoleMapping.insert(QAccessible::TreeItem, RoleNames(ATSPI_ROLE_TABLE_CELL, "table cell", QObject::tr("tree item")));
+    qSpiRoleMapping.insert(QAccessible::TreeItem, RoleNames(ATSPI_ROLE_TABLE_CELL, "tree item", QObject::tr("tree item")));
     qSpiRoleMapping.insert(QAccessible::PageTab, RoleNames(ATSPI_ROLE_PAGE_TAB, "page tab", QObject::tr("page tab")));
     qSpiRoleMapping.insert(QAccessible::PropertyPage, RoleNames(ATSPI_ROLE_PAGE_TAB, "page tab", QObject::tr("property page")));
     qSpiRoleMapping.insert(QAccessible::Indicator, RoleNames(ATSPI_ROLE_UNKNOWN, "unknown", QObject::tr("indicator")));
