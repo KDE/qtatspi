@@ -72,6 +72,7 @@ private slots:
     void testLabel();
     void testLineEdit();
     void testListWidget();
+    void testTreeWidget();
     void testTextEdit();
 
     void cleanupTestCase();
@@ -255,29 +256,54 @@ void tst_QtAtSpi::testListWidget()
     m_window->addWidget(lw);
 
     QStringList children = getChildren(mainWindow);
-    QDBusInterface* layoutIface = getInterface(children.at(0), "org.a11y.atspi.Accessible");
-    QDBusInterface* listIface = getInterface(getChildren(layoutIface).at(0), "org.a11y.atspi.Accessible");
+    QDBusInterface* listIface = getInterface(children.at(0), "org.a11y.atspi.Accessible");
     QCOMPARE(listIface->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("list"));
     QStringList tableChildren = getChildren(listIface);
     QCOMPARE(tableChildren.size(), 3);
 
-    QDBusInterface* row1 = getInterface(tableChildren.at(0), "org.a11y.atspi.Accessible");
-    QCOMPARE(row1->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("list item"));
-    QCOMPARE(row1->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("list item"));
-    QCOMPARE(row1->property("Name").toString(), QLatin1String("Hello"));
+    QDBusInterface* cell1 = getInterface(tableChildren.at(0), "org.a11y.atspi.Accessible");
+    QCOMPARE(cell1->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("list item"));
+    QCOMPARE(cell1->property("Name").toString(), QLatin1String("Hello"));
 
-    QDBusInterface* row2 = getInterface(tableChildren.at(1), "org.a11y.atspi.Accessible");
-    QDBusInterface* row3 = getInterface(tableChildren.at(2), "org.a11y.atspi.Accessible");
+    QDBusInterface* cell2 = getInterface(tableChildren.at(1), "org.a11y.atspi.Accessible");
+    QCOMPARE(cell2->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("list item"));
+    QCOMPARE(cell2->property("Name").toString(), QLatin1String("Good morning"));
 
-    QDBusInterface* cell1 = getInterface(getChildren(row1).at(0), "org.a11y.atspi.Accessible");
-    QDBusInterface* cell2 = getInterface(getChildren(row2).at(0), "org.a11y.atspi.Accessible");
-    QDBusInterface* cell3 = getInterface(getChildren(row3).at(0), "org.a11y.atspi.Accessible");
+    QDBusInterface* cell3 = getInterface(tableChildren.at(2), "org.a11y.atspi.Accessible");
+    QCOMPARE(cell3->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("list item"));
+    QCOMPARE(cell3->property("Name").toString(), QLatin1String("Good bye"));
 
     delete cell1; delete cell2; delete cell3;
-    delete row1; delete row2; delete row3;
     m_window->clearChildren();
     delete listIface;
-    delete layoutIface;
+}
+
+void tst_QtAtSpi::testTreeWidget()
+{
+    QTreeWidget *tree = new QTreeWidget;
+    tree->setColumnCount(2);
+    QTreeWidgetItem *root = new QTreeWidgetItem(QStringList() << "0.0" << "0.1");
+    tree->addTopLevelItem(root);
+
+    m_window->addWidget(tree);
+
+    QStringList children = getChildren(mainWindow);
+    QDBusInterface* treeIface = getInterface(children.at(0), "org.a11y.atspi.Accessible");
+    QCOMPARE(treeIface->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("tree"));
+    QStringList tableChildren = getChildren(treeIface);
+    QCOMPARE(tableChildren.size(), 2);
+
+    QDBusInterface* cell1 = getInterface(tableChildren.at(0), "org.a11y.atspi.Accessible");
+    QCOMPARE(cell1->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("tree item"));
+    QCOMPARE(cell1->property("Name").toString(), QLatin1String("0.0"));
+
+    QDBusInterface* cell2 = getInterface(tableChildren.at(1), "org.a11y.atspi.Accessible");
+    QCOMPARE(cell2->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("tree item"));
+    QCOMPARE(cell2->property("Name").toString(), QLatin1String("0.1"));
+
+    delete cell1; delete cell2;
+    m_window->clearChildren();
+    delete treeIface;
 }
 
 void tst_QtAtSpi::testTextEdit()
