@@ -74,10 +74,6 @@ private:
 };
 
 extern QHash <QAccessible::Role, RoleNames> qSpiRoleMapping;
-
-/* State mapping */
-/*---------------------------------------------------------------------------*/
-
 extern QHash <int, AtspiStateType> qSpiStateMapping;
 
 inline void setSpiStateBit(quint64* state, AtspiStateType spiState)
