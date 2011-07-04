@@ -28,6 +28,7 @@
 #include "adaptor.h"
 #include "bridge.h"
 #include "cache.h"
+#include "constant_mappings.h"
 
 #include "generated/accessible_adaptor.h"
 #include "generated/action_adaptor.h"
@@ -129,7 +130,7 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
     reference = QSpiObjectReference(spiBridge->dBusConnection(),
                                                dbusPath);
 #ifdef ACCESSIBLE_CREATION_DEBUG
-    qDebug() << "ACCESSIBLE: " << interface->object() << reference.path.path() << interface->text(QAccessible::Name, index);
+    qDebug() << "ACCESSIBLE: " << interface->object() << reference.path.path() << interface->text(QAccessible::Name, index) << qSpiRoleMapping[interface->role(index)].name();
 #endif
 
     new AccessibleAdaptor(this);

@@ -282,8 +282,14 @@ void tst_QtAtSpi::testTreeWidget()
 {
     QTreeWidget *tree = new QTreeWidget;
     tree->setColumnCount(2);
-    QTreeWidgetItem *root = new QTreeWidgetItem(QStringList() << "0.0" << "0.1");
-    tree->addTopLevelItem(root);
+    QTreeWidgetItem *top1 = new QTreeWidgetItem(QStringList() << "0.0" << "0.1");
+    tree->addTopLevelItem(top1);
+
+    QTreeWidgetItem *top2 = new QTreeWidgetItem(QStringList() << "1.0" << "1.1");
+    tree->addTopLevelItem(top2);
+
+    QTreeWidgetItem *child1 = new QTreeWidgetItem(QStringList() << "1.0 0.0" << "1.0 0.1");
+    top2->addChild(child1);
 
     m_window->addWidget(tree);
 
@@ -291,7 +297,8 @@ void tst_QtAtSpi::testTreeWidget()
     QDBusInterface* treeIface = getInterface(children.at(0), "org.a11y.atspi.Accessible");
     QCOMPARE(treeIface->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("tree"));
     QStringList tableChildren = getChildren(treeIface);
-    QCOMPARE(tableChildren.size(), 2);
+
+    QCOMPARE(tableChildren.size(), 4);
 
     QDBusInterface* cell1 = getInterface(tableChildren.at(0), "org.a11y.atspi.Accessible");
     QCOMPARE(cell1->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("tree item"));
@@ -300,6 +307,23 @@ void tst_QtAtSpi::testTreeWidget()
     QDBusInterface* cell2 = getInterface(tableChildren.at(1), "org.a11y.atspi.Accessible");
     QCOMPARE(cell2->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("tree item"));
     QCOMPARE(cell2->property("Name").toString(), QLatin1String("0.1"));
+
+    QDBusInterface* cell3 = getInterface(tableChildren.at(0), "org.a11y.atspi.Accessible");
+    QCOMPARE(cell3->property("Name").toString(), QLatin1String("0.0"));
+
+    QDBusInterface* cell4 = getInterface(tableChildren.at(1), "org.a11y.atspi.Accessible");
+    QCOMPARE(cell4->property("Name").toString(), QLatin1String("0.1"));
+
+    tree->expandItem(top2);
+
+    QCOMPARE(tableChildren.size(), 6);
+
+    QDBusInterface* cell5 = getInterface(tableChildren.at(0), "org.a11y.atspi.Accessible");
+    QCOMPARE(cell5->property("Name").toString(), QLatin1String("1.0 0.0"));
+
+    QDBusInterface* cell6 = getInterface(tableChildren.at(1), "org.a11y.atspi.Accessible");
+    QCOMPARE(cell6->property("Name").toString(), QLatin1String("1.0 0.1"));
+
 
     delete cell1; delete cell2;
     m_window->clearChildren();
