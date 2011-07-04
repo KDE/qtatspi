@@ -318,10 +318,10 @@ void tst_QtAtSpi::testTreeWidget()
     tableChildren = getChildren(treeIface);
     QCOMPARE(tableChildren.size(), 6);
 
-    QDBusInterface* cell5 = getInterface(tableChildren.at(0), "org.a11y.atspi.Accessible");
+    QDBusInterface* cell5 = getInterface(tableChildren.at(4), "org.a11y.atspi.Accessible");
     QCOMPARE(cell5->property("Name").toString(), QLatin1String("1.0 0.0"));
 
-    QDBusInterface* cell6 = getInterface(tableChildren.at(1), "org.a11y.atspi.Accessible");
+    QDBusInterface* cell6 = getInterface(tableChildren.at(5), "org.a11y.atspi.Accessible");
     QCOMPARE(cell6->property("Name").toString(), QLatin1String("1.0 0.1"));
 
 
