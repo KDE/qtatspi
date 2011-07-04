@@ -315,7 +315,7 @@ void tst_QtAtSpi::testTreeWidget()
     QCOMPARE(cell4->property("Name").toString(), QLatin1String("1.1"));
 
     tree->expandItem(top2);
-
+    tableChildren = getChildren(treeIface);
     QCOMPARE(tableChildren.size(), 6);
 
     QDBusInterface* cell5 = getInterface(tableChildren.at(0), "org.a11y.atspi.Accessible");
