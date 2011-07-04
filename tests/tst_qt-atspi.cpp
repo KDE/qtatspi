@@ -308,10 +308,10 @@ void tst_QtAtSpi::testTreeWidget()
     QCOMPARE(cell2->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("tree item"));
     QCOMPARE(cell2->property("Name").toString(), QLatin1String("0.1"));
 
-    QDBusInterface* cell3 = getInterface(tableChildren.at(0), "org.a11y.atspi.Accessible");
+    QDBusInterface* cell3 = getInterface(tableChildren.at(2), "org.a11y.atspi.Accessible");
     QCOMPARE(cell3->property("Name").toString(), QLatin1String("1.0"));
 
-    QDBusInterface* cell4 = getInterface(tableChildren.at(1), "org.a11y.atspi.Accessible");
+    QDBusInterface* cell4 = getInterface(tableChildren.at(3), "org.a11y.atspi.Accessible");
     QCOMPARE(cell4->property("Name").toString(), QLatin1String("1.1"));
 
     tree->expandItem(top2);
