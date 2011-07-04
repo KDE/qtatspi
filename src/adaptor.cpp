@@ -195,7 +195,12 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren() const
 //        children.append(QSpiObjectReference(spiBridge->dBusConnection(), QDBusObjectPath(path)));
     }
 
-    Q_ASSERT(interface->childCount() == children.count());
+//    Q_ASSERT(interface->childCount() == children.count());
+    if (interface->childCount() != children.count()) {
+        qWarning() << "WARNING: Widget reports more children than it has. This will lead to inconsistent behavior."
+                   << interface->object() << qSpiRoleMapping[interface->role(child)].name() << getReference().path.path();
+    }
+
 
     return children;
 }
