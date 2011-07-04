@@ -309,10 +309,10 @@ void tst_QtAtSpi::testTreeWidget()
     QCOMPARE(cell2->property("Name").toString(), QLatin1String("0.1"));
 
     QDBusInterface* cell3 = getInterface(tableChildren.at(0), "org.a11y.atspi.Accessible");
-    QCOMPARE(cell3->property("Name").toString(), QLatin1String("0.0"));
+    QCOMPARE(cell3->property("Name").toString(), QLatin1String("1.0"));
 
     QDBusInterface* cell4 = getInterface(tableChildren.at(1), "org.a11y.atspi.Accessible");
-    QCOMPARE(cell4->property("Name").toString(), QLatin1String("0.1"));
+    QCOMPARE(cell4->property("Name").toString(), QLatin1String("1.1"));
 
     tree->expandItem(top2);
 
@@ -325,7 +325,7 @@ void tst_QtAtSpi::testTreeWidget()
     QCOMPARE(cell6->property("Name").toString(), QLatin1String("1.0 0.1"));
 
 
-    delete cell1; delete cell2;
+    delete cell1; delete cell2; delete cell3; delete cell4;
     m_window->clearChildren();
     delete treeIface;
 }
