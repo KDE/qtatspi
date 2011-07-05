@@ -299,6 +299,9 @@ QSpiUIntList QSpiAdaptor::GetState() const
     quint64 spiState = spiStatesFromQState(interface->state(child));
     if (interface->table2Interface()) {
         setSpiStateBit(&spiState, ATSPI_STATE_MANAGES_DESCENDANTS);
+    } else if (interface->role(child) == QAccessible::TreeItem
+               && static_cast<QAccessibleTable2CellInterface*>(interface)->isExpandable()) {
+        setSpiStateBit(&spiState, ATSPI_STATE_EXPANDABLE);
     }
     return spiStateSetFromSpiStates(spiState);
 }
