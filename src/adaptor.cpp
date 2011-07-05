@@ -471,11 +471,12 @@ QSpiObjectReference QSpiAdaptor::GetAccessibleAtPoint(int x, int y, uint coord_t
     if (!checkInterface()) return QSpiObjectReference();
     Q_UNUSED (coord_type)
 
-    qDebug() << "QSpiAdaptor::GetAccessibleAtPoint " << x << ", " << y;
 
     // Grab the top level widget. For complex widgets we want to return a child
     // at the right position instead.
     QWidget* w = qApp->widgetAt(x,y);
+    qDebug() << "QSpiAdaptor::GetAccessibleAtPoint " << x << ", " << y << " Coord: " << coord_type << w;
+
     if (w) {
         QSpiAdaptor* adaptor = spiBridge->objectToAccessible(w);
 
