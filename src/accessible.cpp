@@ -241,7 +241,7 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
     }
     case QAccessible::Focus: {
 
-        qDebug() << "Focus: " << getReference().path.path() << interface->object();
+        qDebug() << "Focus: " << getReference().path.path() << interface->object() << interface->text(QAccessible::Name, 0);
 
         QDBusVariant data;
         data.setVariant(QVariant::fromValue(getReference()));
