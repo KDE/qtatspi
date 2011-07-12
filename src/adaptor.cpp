@@ -697,6 +697,8 @@ int QSpiAdaptor::GetColumnAtIndex(int index)
     if (!checkInterface()) return 0;
 
     qDebug() << "QSpiAdaptor::GetColumnAtIndex" << index;
+    if (index < 2)
+        return -1;
 
     QAccessibleInterface *iface;
     interface->navigate(QAccessible::Child, index, &iface);
@@ -756,7 +758,7 @@ int QSpiAdaptor::GetRowAtIndex(int index)
 {
     if (!checkInterface()) return 0;
 
-    if (index < 1)
+    if (index < 2) // 0 is self, 1 the corner button
         return -1;
 
     qDebug() << "QSpiAdaptor::GetRowAtIndex" << index;
@@ -764,7 +766,7 @@ int QSpiAdaptor::GetRowAtIndex(int index)
     interface->navigate(QAccessible::Child, index, &iface);
     if (iface) {
         qDebug() << "iface: " << iface->text(QAccessible::Name, 0);
-        // FIXME cast helper
+
         QAccessibleTable2CellInterface *cell = static_cast<QAccessibleTable2CellInterface*>(iface);
         int i = cell->rowIndex();
         delete cell;

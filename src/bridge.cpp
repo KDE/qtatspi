@@ -171,7 +171,6 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int /*reason*/, QAccessible
 //            qDebug() << "not the same: " << originalAdaptor->associatedInterface()->object() << interface->object()
 //                     << " at path: " << path;
 
-
 //            // ItemViews create qobjects for rows/cells later as needed.
 //            // Those may initially be 0.
 
