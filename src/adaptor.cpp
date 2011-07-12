@@ -164,7 +164,7 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren() const
 
     // TODO: become independent of caching the interfaces...
     //    QPair<QAccessibleInterface*, int> pair = QSpiAccessible::interfaceFromPath(getReference().path.path());
-//    qDebug() << "CHILDREN: " << getReference().path.path();
+    qDebug() << "CHILDREN: " << getReference().path.path();
 
     // when we are a child that means that we cannot have children of our own
     if (child) {
@@ -178,8 +178,10 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren() const
 
     for (int i = 1; i <= interface->childCount(); ++i) {
         QSpiAdaptor* child = getChild(i);
-        if (child)
+        if (child) {
             children << child->getReference();
+            qDebug() << "   CHILD: " << child->getReference().path.path();
+        }
 
 //        // use navigate and return refernces
 //        QAccessibleInterface* childInterface;
@@ -191,7 +193,6 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren() const
 //            Q_ASSERT(childInterface);
 //            path = QSpiAccessible::pathForInterface(childInterface, childIndex);
 //        }
-//        qDebug() << "   CHILD: " << path;
 //        children.append(QSpiObjectReference(spiBridge->dBusConnection(), QDBusObjectPath(path)));
     }
 
@@ -230,7 +231,10 @@ int QSpiAdaptor::GetIndexInParent() const
     QAccessibleInterface* parent;
     interface->navigate(QAccessible::Ancestor, 1, &parent);
     if (parent) {
-        return parent->indexOfChild(interface) - 1; // damn you one based indexes!!!
+        int index = parent->indexOfChild(interface);
+        Q_ASSERT(index != 0);
+        delete parent;
+        return index;
     }
     return -1;
 }
@@ -261,7 +265,6 @@ QSpiRelationArray QSpiAdaptor::GetRelationSet() const
 
         for (int j = 1; navigateResult >= 0; j++) {
             navigateResult = interface->navigate(relationsToCheck[i], j, &target);
-
             if (navigateResult == 0) {
                 QSpiAdaptor *targetAdaptor = spiBridge->interfaceToAccessible(target, 0, false);
                 related.append(targetAdaptor->getReference());
@@ -475,7 +478,7 @@ QSpiObjectReference QSpiAdaptor::GetAccessibleAtPoint(int x, int y, uint coord_t
     // Grab the top level widget. For complex widgets we want to return a child
     // at the right position instead.
     QWidget* w = qApp->widgetAt(x,y);
-    qDebug() << "QSpiAdaptor::GetAccessibleAtPoint " << x << ", " << y << " Coord: " << coord_type << w;
+//    qDebug() << "QSpiAdaptor::GetAccessibleAtPoint " << x << ", " << y << " Coord: " << coord_type << w;
 
     if (w) {
         QSpiAdaptor* adaptor = spiBridge->objectToAccessible(w);
@@ -672,6 +675,9 @@ bool QSpiAdaptor::AddRowSelection(int row)
 QSpiObjectReference QSpiAdaptor::GetAccessibleAt(int row, int column)
 {
     if (!checkInterface()) return QSpiObjectReference();
+
+    qDebug() << "QSpiAdaptor::GetAccessibleAt" << row << column;
+
     Q_ASSERT(interface->table2Interface());
     Q_ASSERT(row >= 0);
     Q_ASSERT(column >= 0);
@@ -680,7 +686,7 @@ QSpiObjectReference QSpiAdaptor::GetAccessibleAt(int row, int column)
 
     QAccessibleInterface* cell = interface->table2Interface()->cellAt(row, column);
     if (!cell) {
-        qWarning() << "WARNING: no row interface returned for " << interface->object();
+        qWarning() << "WARNING: no cell interface returned for " << interface->object() << row << column;
         return QSpiObjectReference();
     }
     return spiBridge->interfaceToAccessible(cell, 0, true)->getReference();
@@ -689,8 +695,20 @@ QSpiObjectReference QSpiAdaptor::GetAccessibleAt(int row, int column)
 int QSpiAdaptor::GetColumnAtIndex(int index)
 {
     if (!checkInterface()) return 0;
-    int cols = interface->table2Interface()->columnCount();
-    return index%cols;
+
+    qDebug() << "QSpiAdaptor::GetColumnAtIndex" << index;
+
+    QAccessibleInterface *iface;
+    interface->navigate(QAccessible::Child, index, &iface);
+    if (iface) {
+        qDebug() << "iface: " << iface->text(QAccessible::Name, 0);
+
+        QAccessibleTable2CellInterface *cell = static_cast<QAccessibleTable2CellInterface*>(iface);
+        int i = cell->columnIndex();
+        delete cell;
+        return i;
+    }
+    return 0;
 }
 
 QString QSpiAdaptor::GetColumnDescription(int column)
@@ -708,24 +726,51 @@ int QSpiAdaptor::GetColumnExtentAt(int row, int column)
 QSpiObjectReference QSpiAdaptor::GetColumnHeader(int column)
 {
     if (!checkInterface()) return QSpiObjectReference();
-    Q_UNUSED (column);
-    // TODO There should be a column param in this function right?
 
+    QAccessibleTable2CellInterface *cell = interface->table2Interface()->cellAt(0, column);
+    if (cell) {
+        QList<QAccessibleInterface*> header = cell->columnHeaderCells();
+        delete cell;
+        if (header.size() > 0)
+            return spiBridge->interfaceToAccessible(header.at(0), 0, true)->getReference();
+    }
     return QSpiObjectReference();
-//    return spiBridge->objectToAccessible(interface->tableInterface()->columnHeader()->object())->getReference();
 }
 
 int QSpiAdaptor::GetIndexAt(int row, int column)
 {
     if (!checkInterface()) return 0;
-    return row*interface->table2Interface()->columnCount()+column;
+
+    QAccessibleInterface *cell = interface->table2Interface()->cellAt(row, column);
+    int index = interface->indexOfChild(cell);
+
+    qDebug() << "QSpiAdaptor::GetIndexAt" << row << column << index;
+
+    Q_ASSERT(index > 0);
+
+    delete cell;
+    return index;
 }
 
 int QSpiAdaptor::GetRowAtIndex(int index)
 {
     if (!checkInterface()) return 0;
-    int cols = interface->table2Interface()->columnCount();
-    return index/cols;
+
+    if (index < 1)
+        return -1;
+
+    qDebug() << "QSpiAdaptor::GetRowAtIndex" << index;
+    QAccessibleInterface *iface;
+    interface->navigate(QAccessible::Child, index, &iface);
+    if (iface) {
+        qDebug() << "iface: " << iface->text(QAccessible::Name, 0);
+        // FIXME cast helper
+        QAccessibleTable2CellInterface *cell = static_cast<QAccessibleTable2CellInterface*>(iface);
+        int i = cell->rowIndex();
+        delete cell;
+        return i;
+    }
+    return 0;
 }
 
 bool QSpiAdaptor::GetRowColumnExtentsAtIndex(int index,
