@@ -660,18 +660,6 @@ QSpiObjectReference QSpiAdaptor::summary() const
     return QSpiObjectReference();
 }
 
-bool QSpiAdaptor::AddColumnSelection(int column)
-{
-    if (!checkInterface()) return false;
-    return interface->table2Interface()->selectColumn(column);
-}
-
-bool QSpiAdaptor::AddRowSelection(int row)
-{
-    if (!checkInterface()) return false;
-    return interface->table2Interface()->selectRow(row);
-}
-
 QSpiObjectReference QSpiAdaptor::GetAccessibleAt(int row, int column)
 {
     if (!checkInterface()) return QSpiObjectReference();
@@ -690,6 +678,21 @@ QSpiObjectReference QSpiAdaptor::GetAccessibleAt(int row, int column)
         return QSpiObjectReference();
     }
     return spiBridge->interfaceToAccessible(cell, 0, true)->getReference();
+}
+
+int QSpiAdaptor::GetIndexAt(int row, int column)
+{
+    if (!checkInterface()) return 0;
+
+    QAccessibleInterface *cell = interface->table2Interface()->cellAt(row, column);
+    int index = interface->indexOfChild(cell);
+
+    qDebug() << "QSpiAdaptor::GetIndexAt" << row << column << index;
+
+    Q_ASSERT(index > 0);
+
+    delete cell;
+    return index;
 }
 
 int QSpiAdaptor::GetColumnAtIndex(int index)
@@ -713,47 +716,6 @@ int QSpiAdaptor::GetColumnAtIndex(int index)
     return 0;
 }
 
-QString QSpiAdaptor::GetColumnDescription(int column)
-{
-    if (!checkInterface()) return QString();
-    return interface->table2Interface()->columnDescription(column);
-}
-
-int QSpiAdaptor::GetColumnExtentAt(int row, int column)
-{
-    if (!checkInterface()) return 0;
-    return interface->table2Interface()->cellAt(row, column)->columnExtent();
-}
-
-QSpiObjectReference QSpiAdaptor::GetColumnHeader(int column)
-{
-    if (!checkInterface()) return QSpiObjectReference();
-
-    QAccessibleTable2CellInterface *cell = interface->table2Interface()->cellAt(0, column);
-    if (cell) {
-        QList<QAccessibleInterface*> header = cell->columnHeaderCells();
-        delete cell;
-        if (header.size() > 0)
-            return spiBridge->interfaceToAccessible(header.at(0), 0, true)->getReference();
-    }
-    return QSpiObjectReference();
-}
-
-int QSpiAdaptor::GetIndexAt(int row, int column)
-{
-    if (!checkInterface()) return 0;
-
-    QAccessibleInterface *cell = interface->table2Interface()->cellAt(row, column);
-    int index = interface->indexOfChild(cell);
-
-    qDebug() << "QSpiAdaptor::GetIndexAt" << row << column << index;
-
-    Q_ASSERT(index > 0);
-
-    delete cell;
-    return index;
-}
-
 int QSpiAdaptor::GetRowAtIndex(int index)
 {
     if (!checkInterface()) return 0;
@@ -775,12 +737,24 @@ int QSpiAdaptor::GetRowAtIndex(int index)
     return 0;
 }
 
+QString QSpiAdaptor::GetColumnDescription(int column)
+{
+    if (!checkInterface()) return QString();
+    return interface->table2Interface()->columnDescription(column);
+}
+
+QString QSpiAdaptor::GetRowDescription(int row)
+{
+    if (!checkInterface()) return QString();
+    return interface->table2Interface()->rowDescription(row);
+}
+
 bool QSpiAdaptor::GetRowColumnExtentsAtIndex(int index,
-						  int &row,
-						  int &col,
-						  int &row_extents,
-						  int &col_extents,
-						  bool &is_selected)
+                                                  int &row,
+                                                  int &col,
+                                                  int &row_extents,
+                                                  int &col_extents,
+                                                  bool &is_selected)
 {
     if (!checkInterface()) return false;
 
@@ -796,16 +770,30 @@ bool QSpiAdaptor::GetRowColumnExtentsAtIndex(int index,
     return false;
 }
 
-QString QSpiAdaptor::GetRowDescription(int row)
+int QSpiAdaptor::GetColumnExtentAt(int row, int column)
 {
-    if (!checkInterface()) return QString();
-    return interface->table2Interface()->rowDescription(row);
+    if (!checkInterface()) return 0;
+    return interface->table2Interface()->cellAt(row, column)->columnExtent();
 }
 
 int QSpiAdaptor::GetRowExtentAt(int row, int column)
 {
     if (!checkInterface()) return 0;
     return interface->table2Interface()->cellAt(row, column)->rowExtent();
+}
+
+QSpiObjectReference QSpiAdaptor::GetColumnHeader(int column)
+{
+    if (!checkInterface()) return QSpiObjectReference();
+
+    QAccessibleTable2CellInterface *cell = interface->table2Interface()->cellAt(0, column);
+    if (cell) {
+        QList<QAccessibleInterface*> header = cell->columnHeaderCells();
+        delete cell;
+        if (header.size() > 0)
+            return spiBridge->interfaceToAccessible(header.at(0), 0, true)->getReference();
+    }
+    return QSpiObjectReference();
 }
 
 QSpiObjectReference QSpiAdaptor::GetRowHeader(int row)
@@ -854,6 +842,18 @@ bool QSpiAdaptor::IsSelected(int row, int column)
     bool selected = cell->isSelected();
     delete cell;
     return selected;
+}
+
+bool QSpiAdaptor::AddColumnSelection(int column)
+{
+    if (!checkInterface()) return false;
+    return interface->table2Interface()->selectColumn(column);
+}
+
+bool QSpiAdaptor::AddRowSelection(int row)
+{
+    if (!checkInterface()) return false;
+    return interface->table2Interface()->selectRow(row);
 }
 
 bool QSpiAdaptor::RemoveColumnSelection(int column)
