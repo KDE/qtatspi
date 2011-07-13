@@ -62,7 +62,8 @@ QString QSpiAdaptorV2::introspect(const QString &path) const
 bool QSpiAdaptorV2::handleMessage(const QDBusMessage &message, const QDBusConnection &connection)
 {
     Q_UNUSED(connection)
-    qDebug() << "QSpiAdaptorV2::handleMessage" << message.arguments() << message.member() << message.path();
+    qDebug() << "QSpiAdaptorV2::handleMessage" << message.path() << message.interface() << message.member()
+           << "\n                   signature" << message.signature() << message.arguments();
 
     if (message.path() == QSPI_OBJECT_PATH_ROOT) {
         return handleMessageForRoot(message, connection);
