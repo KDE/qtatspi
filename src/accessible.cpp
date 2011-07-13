@@ -142,6 +142,8 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
             (interface->role(index) == QAccessible::Cell) ||
             (interface->role(index) == QAccessible::TreeItem) ||
             (interface->role(index) == QAccessible::Row) ||
+            (interface->role(index) == QAccessible::RowHeader) ||
+            (interface->role(index) == QAccessible::ColumnHeader) ||
             (interface->object() && interface->object()->inherits("QSGItem"))
             ) {
         new ComponentAdaptor(this);
