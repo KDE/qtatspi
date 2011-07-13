@@ -21,7 +21,8 @@ HEADERS += \
            struct_marshallers.h \
            constant_mappings.h \
            accessible.h \
-    dbusconnection.h
+    dbusconnection.h \
+    qspiadaptorv2.h
 
 SOURCES += \
            generated/dec_proxy.cpp \
@@ -44,7 +45,8 @@ SOURCES += \
            constant_mappings.cpp \
            accessible.cpp \
            main.cpp \
-    dbusconnection.cpp
+    dbusconnection.cpp \
+    qspiadaptorv2.cpp
 
 QMAKE_CFLAGS+=-Werror
 QMAKE_CXXFLAGS+=-Werror
@@ -62,3 +64,5 @@ TARGET = qspiaccessiblebridge
 target.path = $$[QT_INSTALL_PLUGINS]/accessiblebridge
 
 INSTALLS += target
+
+

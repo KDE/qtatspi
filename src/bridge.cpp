@@ -20,6 +20,9 @@
 
 #include "bridge.h"
 
+#include "qspiadaptorv2.h"
+
+
 #include "adaptor.h"
 #include "accessible.h"
 #include "application.h"
@@ -37,6 +40,8 @@
 
 #define QSPI_DEC_NAME        "/org/a11y/atspi/Registry"
 #define QSPI_DEC_OBJECT_PATH "/org/a11y/atspi/registry/deviceeventcontroller"
+
+#define QSPI_OBJECT_PATH_ACCESSIBLE  "/org/a11y/atspi/accessible"
 
 QSpiAccessibleBridge* QSpiAccessibleBridge::self = 0;
 
@@ -61,18 +66,21 @@ QSpiAccessibleBridge::QSpiAccessibleBridge()
     bool reg = dBusConnection().registerObject(QSPI_DEC_OBJECT_PATH, this, QDBusConnection::ExportAdaptors);
     qDebug() << "Registered DEC: " << reg;
 
-    QAccessibleInterface* i = QAccessible::queryAccessibleInterface(qApp);
-    QSpiAdaptor* applicationAccessible = new QSpiApplication(dbusConnection->connection(), i);
-    adaptors.insert(QString(QSPI_OBJECT_PATH_ROOT), applicationAccessible);
-    connect(applicationAccessible, SIGNAL(windowActivated(QObject*)), this, SLOT(windowActivated(QObject*)));
+    QSpiAdaptorV2 *dbusAdaptor = new QSpiAdaptorV2(dbusConnection, this);
+    dBusConnection().registerVirtualObject(QSPI_OBJECT_PATH_ACCESSIBLE, dbusAdaptor, QDBusConnection::SubPath);
+
+//    QAccessibleInterface* i = QAccessible::queryAccessibleInterface(qApp);
+//    QSpiAdaptor* applicationAccessible = new QSpiApplication(dbusConnection->connection(), i);
+//    adaptors.insert(QString(QSPI_OBJECT_PATH_ROOT), applicationAccessible);
+//    connect(applicationAccessible, SIGNAL(windowActivated(QObject*)), this, SLOT(windowActivated(QObject*)));
 }
 
-void QSpiAccessibleBridge::windowActivated(QObject* window)
-{
-    QSpiAdaptor* a = spiBridge->objectToAccessible(window);
-    QSpiAccessible* acc = static_cast<QSpiAccessible*>(a);
-    acc->windowActivated();
-}
+//void QSpiAccessibleBridge::windowActivated(QObject* window)
+//{
+//    QSpiAdaptor* a = spiBridge->objectToAccessible(window);
+//    QSpiAccessible* acc = static_cast<QSpiAccessible*>(a);
+//    acc->windowActivated();
+//}
 
 QSpiAccessibleBridge::~QSpiAccessibleBridge()
 {

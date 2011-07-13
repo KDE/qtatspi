@@ -32,55 +32,9 @@
 
 //#define KEYBOARD_DEBUG
 
-#define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
-
-QSpiApplication::QSpiApplication(const QDBusConnection& c, QAccessibleInterface *interface)
-    : QSpiAdaptor(interface, 0), dbusConnection(c), applicationId(-1)
+QSpiApplicationAdaptor::QSpiApplicationAdaptor()
 {
-    reference = QSpiObjectReference(dbusConnection,
-                   QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
-
-    new AccessibleAdaptor(this);
-    supportedInterfaces << QSPI_INTERFACE_ACCESSIBLE;
-
-    new ApplicationAdaptor(this);
-    supportedInterfaces << QSPI_INTERFACE_APPLICATION;
-
-    dbusConnection.registerObject(reference.path.path(),
-                                  this, QDBusConnection::ExportAdaptors);
-
-    callAccessibilityRegistry();
     qApp->installEventFilter(this);
-}
-
-void QSpiApplication::callAccessibilityRegistry()
-{
-    SocketProxy *registry;
-    registry = new SocketProxy(QSPI_REGISTRY_NAME,
-                               QSPI_OBJECT_PATH_ROOT, dbusConnection);
-
-    QDBusPendingReply<QSpiObjectReference> reply;
-    reply = registry->Embed(getReference());
-    reply.waitForFinished();
-    if (reply.isValid ()) {
-        const QSpiObjectReference &socket = reply.value();
-        accessibilityRegistry = QSpiObjectReference(socket);
-    } else {
-        qDebug() << "Error in contacting registry";
-        qDebug() << reply.error().name();
-        qDebug() << reply.error().message();
-    }
-    delete registry;
-}
-
-QSpiObjectReference QSpiApplication::getParentReference() const
-{
-    return accessibilityRegistry;
-}
-
-void QSpiApplication::accessibleEvent(QAccessible::Event event)
-{
-    qDebug() << "Event in QSpiApplication: " << QString::number(event, 16);
 }
 
 enum QSpiKeyEventType {
@@ -89,7 +43,7 @@ enum QSpiKeyEventType {
       QSPI_KEY_EVENT_LAST_DEFINED
 };
 
-bool QSpiApplication::eventFilter(QObject *target, QEvent *event)
+bool QSpiApplicationAdaptor::eventFilter(QObject *target, QEvent *event)
 {
     if (!event->spontaneous())
         return false;
@@ -174,9 +128,12 @@ bool QSpiApplication::eventFilter(QObject *target, QEvent *event)
             m.setArguments(QVariantList() <<QVariant::fromValue(de));
 
             // FIXME: this is critical, the timeout should probably be pretty low to allow normal processing
-            int timeout = 100;
-            bool sent = dbusConnection.callWithCallback(m, this, SLOT(notifyKeyboardListenerCallback(QDBusMessage)),
-                                                        SLOT(notifyKeyboardListenerError(QDBusError, QDBusMessage)), timeout);
+//            int timeout = 100;
+
+
+            // FIXME
+            bool sent =  false; // = dbusConnection.callWithCallback(m, this, SLOT(notifyKeyboardListenerCallback(QDBusMessage)),
+                                  //                      SLOT(notifyKeyboardListenerError(QDBusError, QDBusMessage)), timeout);
             if (!sent)
                 return false;
 
@@ -190,12 +147,12 @@ bool QSpiApplication::eventFilter(QObject *target, QEvent *event)
     return false;
 }
 
-QKeyEvent* QSpiApplication::copyKeyEvent(QKeyEvent* old)
+QKeyEvent* QSpiApplicationAdaptor::copyKeyEvent(QKeyEvent* old)
 {
     return new QKeyEvent(old->type(), old->key(), old->modifiers(), old->text(), old->isAutoRepeat(), old->count());
 }
 
-void QSpiApplication::notifyKeyboardListenerCallback(const QDBusMessage& message)
+void QSpiApplicationAdaptor::notifyKeyboardListenerCallback(const QDBusMessage& message)
 {
     Q_ASSERT(message.arguments().length() == 1);
     if (message.arguments().at(0).toBool() == true) {
@@ -214,7 +171,7 @@ void QSpiApplication::notifyKeyboardListenerCallback(const QDBusMessage& message
     }
 }
 
-void QSpiApplication::notifyKeyboardListenerError(const QDBusError& error, const QDBusMessage& /*message*/)
+void QSpiApplicationAdaptor::notifyKeyboardListenerError(const QDBusError& error, const QDBusMessage& /*message*/)
 {
     qWarning() << "QSpiApplication::keyEventError " << error.name() << error.message();
     while (!keyEvents.isEmpty()) {
@@ -223,12 +180,12 @@ void QSpiApplication::notifyKeyboardListenerError(const QDBusError& error, const
     }
 }
 
-int QSpiApplication::id() const
+int QSpiApplicationAdaptor::id() const
 {
     return applicationId;
 }
 
-void QSpiApplication::setId(int value)
+void QSpiApplicationAdaptor::setId(int value)
 {
     applicationId = value;
 }
