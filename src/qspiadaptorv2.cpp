@@ -51,7 +51,6 @@
 QSpiAdaptorV2::QSpiAdaptorV2(DBusConnection *connection, QObject *parent)
     :QDBusVirtualObject(parent), m_dbus(connection)
 {
-    callAccessibilityRegistry();
 }
 
 QString QSpiAdaptorV2::introspect(const QString &path) const
@@ -64,10 +63,48 @@ bool QSpiAdaptorV2::handleMessage(const QDBusMessage &message, const QDBusConnec
 {
     Q_UNUSED(connection)
     qDebug() << "QSpiAdaptorV2::handleMessage" << message.arguments() << message.member() << message.path();
+
+    if (message.path() == QSPI_OBJECT_PATH_ROOT) {
+        return handleMessageForRoot(message, connection);
+    }
     return false;
 }
 
-void QSpiAdaptorV2::callAccessibilityRegistry()
+bool QSpiAdaptorV2::handleMessageForRoot(const QDBusMessage &message, const QDBusConnection &connection)
+{
+    if (message.interface() == "org.freedesktop.DBus.Properties") {
+        if (message.member() == "Set") {
+            Q_ASSERT(message.signature() == "ssv");
+            QString interface = message.arguments().at(0).toString();
+            Q_ASSERT(interface == "org.a11y.atspi.Application");
+            QString property = message.arguments().at(1).toString();
+            QVariant value = qvariant_cast<QDBusVariant>(message.arguments().at(2)).variant();
+            if (property == "Id")
+                m_applicationId = value.toInt();
+
+        } else if (message.member() == QLatin1String("Get") && message.signature() == QLatin1String("ss")) {
+            Q_ASSERT(message.signature() == "ss");
+            QString interface = message.arguments().at(0).toString();
+            QString property = message.arguments().at(1).toString();
+            if (interface == "org.a11y.atspi.Application") {
+                if (property == "Id") {
+                    QDBusMessage reply = message.createReply(QVariant::fromValue(QDBusVariant(m_applicationId)));
+                    return connection.send(reply);
+                }
+            } else if (interface == "org.a11y.atspi.Accessible") {
+                if (property == "Name") {
+                    QDBusMessage reply = message.createReply(QVariant::fromValue(QDBusVariant(QString("foo barz"))));
+                    return connection.send(reply);
+
+                }
+            }
+
+        }
+    }
+    return false;
+}
+
+void QSpiAdaptorV2::registerApplication()
 {
     SocketProxy *registry;
     registry = new SocketProxy(QSPI_REGISTRY_NAME,

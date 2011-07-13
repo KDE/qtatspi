@@ -68,6 +68,7 @@ QSpiAccessibleBridge::QSpiAccessibleBridge()
 
     QSpiAdaptorV2 *dbusAdaptor = new QSpiAdaptorV2(dbusConnection, this);
     dBusConnection().registerVirtualObject(QSPI_OBJECT_PATH_ACCESSIBLE, dbusAdaptor, QDBusConnection::SubPath);
+    dbusAdaptor->registerApplication();
 
 //    QAccessibleInterface* i = QAccessible::queryAccessibleInterface(qApp);
 //    QSpiAdaptor* applicationAccessible = new QSpiApplication(dbusConnection->connection(), i);
@@ -109,6 +110,8 @@ QSpiObjectReference QSpiAccessibleBridge::getRootReference() const
 void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface, int index)
 {
     Q_ASSERT(interface && interface->isValid());
+
+    return;
 
     if (!initialized)
         return;

@@ -32,14 +32,22 @@ public:
     virtual ~QSpiAdaptorV2()
     {}
 
+    /**
+      Register this application as accessible on the accessibility DBus.
+      */
+    void registerApplication();
+
     virtual QString introspect(const QString &path) const;
     virtual bool handleMessage(const QDBusMessage &message, const QDBusConnection &connection);
 
 private:
-    void callAccessibilityRegistry();
+    bool handleMessageForRoot(const QDBusMessage &message, const QDBusConnection &connection);
 
     QSpiObjectReference accessibilityRegistry;
     DBusConnection *m_dbus;
+
+    /// Assigned from the accessibility registry.
+    int m_applicationId;
 };
 
 #endif // QSPIADAPTORV2_H
