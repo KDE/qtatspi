@@ -58,6 +58,33 @@ bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int
         if (parent != interface)
             delete parent;
         return true;
+    } else if (function == "GetChildAtIndex") {
+        QString path;
+        if (child) {
+            path = pathForInterface(interface, child + 1);
+        } else {
+            QAccessibleInterface *childInterface = 0;
+            int childIndex = interface->navigate(QAccessible::Child, child + 1, &childInterface);
+            if (childIndex < 0)
+                return false;
+            path = pathForInterface(childInterface, childIndex);
+            delete childInterface;
+        }
+        QVariantList v;
+        v.append(connection.baseService());
+        v.append(QVariant::fromValue(QDBusObjectPath(path)));
+        sendReply(connection, message, v);
+        return true;
+    } else if (function == "GetInterfaces") {
+        return false;
+    } else if (function == "Description") {
+        return false;
+    } else if (function == "GetState") {
+        return false;
+    } else if (function == "GetAttributes") {
+        return false;
+    } else if (function == "GetRelationSet") {
+        return false;
     } else {
         qWarning() << "WARNING: QSpiAccessibleInterface::handleMessage does not implement " << function << message.path();
     }
