@@ -23,14 +23,17 @@
 #include "dbusconnection.h"
 #include "struct_marshallers.h"
 
+class QAccessibleInterface;
+class QSpiAccessibleInterface;
+
 class QSpiAdaptorV2 :public QDBusVirtualObject
 {
 public:
     QSpiAdaptorV2();
 
     explicit QSpiAdaptorV2(DBusConnection *connection, QObject *parent = 0);
-    virtual ~QSpiAdaptorV2()
-    {}
+    virtual ~QSpiAdaptorV2();
+
 
     /**
       Register this application as accessible on the accessibility DBus.
@@ -41,10 +44,14 @@ public:
     virtual bool handleMessage(const QDBusMessage &message, const QDBusConnection &connection);
 
 private:
-    bool handleMessageForRoot(const QDBusMessage &message, const QDBusConnection &connection);
+    //bool handleMessageForRoot(const QDBusMessage &message, const QDBusConnection &connection);
+
+    QPair<QAccessibleInterface*, int> interfaceFromPath(const QString& dbusPath);
 
     QSpiObjectReference accessibilityRegistry;
     DBusConnection *m_dbus;
+
+    QSpiAccessibleInterface *m_accessibleInterface;
 
     /// Assigned from the accessibility registry.
     int m_applicationId;
