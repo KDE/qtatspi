@@ -283,12 +283,18 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         emit PropertyChange("accessible-value", 0, 0, data, spiBridge->getRootReference());
         break;
     }
-    case QAccessible::ObjectShow:
+    case QAccessible::ObjectShow:{
+        QDBusVariant data;
+        data.setVariant(QVariant::fromValue(getReference()));
+        emit StateChanged("showing", 1, 0, data, spiBridge->getRootReference());
         break;
-    case QAccessible::ObjectHide:
-        // TODO - send status changed
-//        qWarning() << "Object hide";
+    }
+    case QAccessible::ObjectHide: {
+        QDBusVariant data;
+        data.setVariant(QVariant::fromValue(getReference()));
+        emit StateChanged("showing", 0, 0, data, spiBridge->getRootReference());
         break;
+    }
     case QAccessible::ObjectDestroyed:
         // TODO - maybe send children-changed and cache Removed
 //        qWarning() << "Object destroyed";
