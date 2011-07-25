@@ -59,24 +59,22 @@ bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int
         return true;
     } else if (function == "GetParent") {
         QAccessibleInterface *parent = accessibleParent(interface, child);
+
+        QString path;
         if (!parent || parent->role(0) == QAccessible::Application) {
-            QVariant ref;
-            QSpiObjectReference v(connection, QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
-            ref.setValue(v);
-            sendReply(connection, message, ref);
-            return true;
+            path = QSPI_OBJECT_PATH_ROOT;
+        } else {
+            path = pathForInterface(parent, 0);
         }
+        if (parent != interface)
+            delete parent;
 
-        return false;
+        QVariant ref;
+        QSpiObjectReference v(connection, QDBusObjectPath(path));
+        ref.setValue(v);
+        sendReply(connection, message, ref);
+        return true;
 
-//        QString path = pathForInterface(parent, 0);
-//        QVariantList v;
-//        v.append(connection.baseService());
-//        v.append(QVariant::fromValue(QDBusObjectPath(path)));
-//        sendReply(connection, message, v);
-//        if (parent != interface)
-//            delete parent;
-//        return true;
     } else if (function == "GetChildAtIndex") {
         QString path;
         if (child) {
