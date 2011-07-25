@@ -15,16 +15,31 @@ QSpiAccessibleInterface::QSpiAccessibleInterface()
 bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
     if (function == "GetRole") {
-        sendReply(connection, message, (int) qSpiRoleMapping[interface->role(child)].spiRole());
+        QVariant v;
+        v.setValue((uint) qSpiRoleMapping[interface->role(child)].spiRole());
+        QDBusMessage reply = message.createReply(v);
+        connection.send(reply);
+
         return true;
     } else if (function == "GetName") {
         sendReply(connection, message, interface->text(QAccessible::Name, child));
         return true;
     } else if (function == "GetRoleName") {
-        sendReply(connection, message, qSpiRoleMapping[interface->role(child)].name());
+
+        QVariant v;
+        v.setValue(qSpiRoleMapping[interface->role(child)].name());
+        QDBusMessage reply = message.createReply(v);
+        connection.send(reply);
+
         return true;
     } else if (function == "GetLocalizedRoleName") {
-        sendReply(connection, message, qSpiRoleMapping[interface->role(child)].localizedName());
+
+        QVariant v;
+        v.setValue(qSpiRoleMapping[interface->role(child)].localizedName());
+        QDBusMessage reply = message.createReply(v);
+        connection.send(reply);
+
+
         return true;
     } else if (function == "GetChildCount") {
         int childCount = child ? 0 : interface->childCount();
@@ -44,8 +59,7 @@ bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int
         return true;
     } else if (function == "GetParent") {
         QAccessibleInterface *parent = accessibleParent(interface, child);
-        if (!parent) {
-
+        if (!parent || parent->role(0) == QAccessible::Application) {
             QVariant ref;
             QSpiObjectReference v(connection, QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
             ref.setValue(v);
