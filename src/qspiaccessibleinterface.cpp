@@ -83,8 +83,13 @@ bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int
         int childIndex = interface->navigate(QAccessible::Child, index+1, &childInterface);
         if (childIndex < 0)
             return false;
-        path = pathForInterface(childInterface, childIndex);
-        delete childInterface;
+        if (childIndex == 0) {
+            Q_ASSERT(childInterface);
+            path = pathForInterface(childInterface, childIndex);
+            delete childInterface;
+        } else {
+            path = pathForInterface(interface, childIndex);
+        }
 
         QVariant ref;
         QSpiObjectReference v(connection, QDBusObjectPath(path));

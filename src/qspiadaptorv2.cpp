@@ -89,7 +89,10 @@ bool QSpiAdaptorV2::handleMessage(const QDBusMessage &message, const QDBusConnec
 {
     // get accessible interface
     QPair<QAccessibleInterface*, int> accessible = interfaceFromPath(message.path());
-
+    if (!accessible.first) {
+        qWarning() << "Could not find accessible on path: " << message.path();
+        return false;
+    }
 
     QString interface = message.interface();
     QString function = message.member();
