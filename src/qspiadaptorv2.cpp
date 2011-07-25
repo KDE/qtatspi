@@ -25,6 +25,13 @@
 #include "generated/socket_proxy.h"
 #include "qspiaccessibleinterface.h"
 
+#define QSPI_OBJECT_PATH_PREFIX  "/org/a11y/atspi/accessible/"
+#define QSPI_OBJECT_PATH_NULL    QSPI_OBJECT_PATH_PREFIX "null"
+#define QSPI_OBJECT_PATH_ROOT    QSPI_OBJECT_PATH_PREFIX "root"
+
+#define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
+
+
 #define QSPI_INTERFACE_PREFIX "org.a11y.atspi"
 
 #define QSPI_INTERFACE_ACCESSIBLE            QSPI_INTERFACE_PREFIX ".Accessible"
@@ -44,11 +51,6 @@
 #define QSPI_INTERFACE_TREE                  QSPI_INTERFACE_PREFIX ".Tree"
 #define QSPI_INTERFACE_VALUE                 QSPI_INTERFACE_PREFIX ".Value"
 
-#define QSPI_OBJECT_PATH_PREFIX  "/org/a11y/atspi/accessible/"
-#define QSPI_OBJECT_PATH_NULL    QSPI_OBJECT_PATH_PREFIX "null"
-#define QSPI_OBJECT_PATH_ROOT    QSPI_OBJECT_PATH_PREFIX "root"
-
-#define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
 
 QSpiAdaptorV2::QSpiAdaptorV2(DBusConnection *connection, QObject *parent)
     :QDBusVirtualObject(parent), m_dbus(connection)
@@ -117,53 +119,41 @@ bool QSpiAdaptorV2::handleMessage(const QDBusMessage &message, const QDBusConnec
     // handle properties like regular functions
     if (interface == "org.freedesktop.DBus.Properties") {
         interface = message.arguments().at(0).toString();
-        function = message.arguments().at(1).toString();
+        // Get/Set + Name
+        function = message.member() + message.arguments().at(1).toString();
     }
 
     // switch interface to call
     if (interface == QSPI_INTERFACE_ACCESSIBLE) {
         return m_accessibleInterface->handleMessage(accessible.first, accessible.second, function, message, connection);
+    } else if (interface == QSPI_INTERFACE_APPLICATION) {
+        return handleApplicationMessage(accessible.first, accessible.second, function, message, connection);
     } else {
         qDebug() << "QSpiAdaptorV2::handleMessage " << message.path() << interface << function;
     }
     return false;
 }
 
-//bool QSpiAdaptorV2::handleMessageForRoot(const QDBusMessage &message, const QDBusConnection &connection)
-//{
-//    if (message.interface() == "org.freedesktop.DBus.Properties") {
-//        if (message.member() == "Set") {
-//            Q_ASSERT(message.signature() == "ssv");
-//            QString interface = message.arguments().at(0).toString();
-//            Q_ASSERT(interface == "org.a11y.atspi.Application");
-//            QString property = message.arguments().at(1).toString();
-//            QVariant value = qvariant_cast<QDBusVariant>(message.arguments().at(2)).variant();
-//            if (property == "Id")
-//                m_applicationId = value.toInt();
 
-//        } else if (message.member() == QLatin1String("Get") && message.signature() == QLatin1String("ss")) {
-//            Q_ASSERT(message.signature() == "ss");
-//            QString interface = message.arguments().at(0).toString();
-//            QString property = message.arguments().at(1).toString();
-//            if (interface == "org.a11y.atspi.Application") {
-//                if (property == "Id") {
-//                    QDBusMessage reply = message.createReply(QVariant::fromValue(QDBusVariant(m_applicationId)));
-//                    return connection.send(reply);
-//                }
-//            } else if (interface == "org.a11y.atspi.Accessible") {
-//                if (property == "Name") {
-//                    QAccessibleInterface *iface = QAccessible::queryAccessibleInterface(qApp);
-//                    QString name = iface->text(QAccessible::Name, 0);
-//                    QDBusMessage reply = message.createReply(QVariant::fromValue(QDBusVariant(name)));
-//                    return connection.send(reply);
+bool QSpiAdaptorV2::handleApplicationMessage(QAccessibleInterface *, int, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+{
 
-//                }
-//            }
+        if (function == "SetId") {
+            Q_ASSERT(message.signature() == "ssv");
+            QVariant value = qvariant_cast<QDBusVariant>(message.arguments().at(2)).variant();
 
-//        }
-//    }
-//    return false;
-//}
+            m_applicationId = value.toInt();
+            return true;
+
+        } else if (function == "GetId") {
+            Q_ASSERT(message.signature() == "ss");
+            QDBusMessage reply = message.createReply(QVariant::fromValue(QDBusVariant(m_applicationId)));
+            return connection.send(reply);
+        }
+
+        return false;
+}
+
 
 void QSpiAdaptorV2::registerApplication()
 {

@@ -47,6 +47,9 @@ private:
     //bool handleMessageForRoot(const QDBusMessage &message, const QDBusConnection &connection);
 
     QPair<QAccessibleInterface*, int> interfaceFromPath(const QString& dbusPath);
+    bool handleApplicationMessage(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
+
+
 
     QSpiObjectReference accessibilityRegistry;
     DBusConnection *m_dbus;
