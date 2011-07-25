@@ -25,31 +25,7 @@
 #include "generated/socket_proxy.h"
 #include "qspiaccessibleinterface.h"
 
-#define QSPI_OBJECT_PATH_PREFIX  "/org/a11y/atspi/accessible/"
-#define QSPI_OBJECT_PATH_NULL    QSPI_OBJECT_PATH_PREFIX "null"
-#define QSPI_OBJECT_PATH_ROOT    QSPI_OBJECT_PATH_PREFIX "root"
-
-#define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
-
-
-#define QSPI_INTERFACE_PREFIX "org.a11y.atspi"
-
-#define QSPI_INTERFACE_ACCESSIBLE            QSPI_INTERFACE_PREFIX ".Accessible"
-#define QSPI_INTERFACE_ACTION                QSPI_INTERFACE_PREFIX ".Action"
-#define QSPI_INTERFACE_APPLICATION           QSPI_INTERFACE_PREFIX ".Application"
-#define QSPI_INTERFACE_COLLECTION            QSPI_INTERFACE_PREFIX ".Collection"
-#define QSPI_INTERFACE_COMPONENT             QSPI_INTERFACE_PREFIX ".Component"
-#define QSPI_INTERFACE_DOCUMENT              QSPI_INTERFACE_PREFIX ".Document"
-#define QSPI_INTERFACE_EDITABLE_TEXT         QSPI_INTERFACE_PREFIX ".EditableText"
-#define QSPI_INTERFACE_HYPERLINK             QSPI_INTERFACE_PREFIX ".Hyperlink"
-#define QSPI_INTERFACE_HYPERTEXT             QSPI_INTERFACE_PREFIX ".Hypertext"
-#define QSPI_INTERFACE_IMAGE                 QSPI_INTERFACE_PREFIX ".Image"
-#define QSPI_INTERFACE_REGISTRY              QSPI_INTERFACE_PREFIX ".Registry"
-#define QSPI_INTERFACE_SELECTION             QSPI_INTERFACE_PREFIX ".Selection"
-#define QSPI_INTERFACE_TABLE                 QSPI_INTERFACE_PREFIX ".Table"
-#define QSPI_INTERFACE_TEXT                  QSPI_INTERFACE_PREFIX ".Text"
-#define QSPI_INTERFACE_TREE                  QSPI_INTERFACE_PREFIX ".Tree"
-#define QSPI_INTERFACE_VALUE                 QSPI_INTERFACE_PREFIX ".Value"
+#include "constant_mappings.h"
 
 
 QSpiAdaptorV2::QSpiAdaptorV2(DBusConnection *connection, QObject *parent)
@@ -82,7 +58,10 @@ QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString
 
     QStringList parts = dbusPath.split('/');
 
-    Q_ASSERT(parts.size() > 5);
+    if (parts.size() <= 5) {
+        qWarning() << "invalid path: " << dbusPath;
+        return QPair<QAccessibleInterface*, int>(0, 0);
+    }
 
     QString objectString = parts.at(5);
 
@@ -94,7 +73,6 @@ QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString
     QObject* object = reinterpret_cast<QObject*>(uintptr);
     inter = QAccessible::queryAccessibleInterface(object);
     QAccessibleInterface* childInter;
-
 
     for (int i = 6; i < parts.size(); ++i) {
         index = inter->navigate(QAccessible::Child, parts.at(i).toInt(), &childInter);
