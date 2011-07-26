@@ -44,22 +44,28 @@ public:
     virtual bool handleMessage(const QDBusMessage &message, const QDBusConnection &connection);
 
 private:
-    //bool handleMessageForRoot(const QDBusMessage &message, const QDBusConnection &connection);
 
-    QPair<QAccessibleInterface*, int> interfaceFromPath(const QString& dbusPath);
+    // handlers for the different accessible interfaces
     bool applicationInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
     bool accessibleInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
+    bool componentInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
 
     void sendReply(const QDBusConnection &connection, const QDBusMessage &message, const QVariant &argument);
     QAccessibleInterface *accessibleParent(QAccessibleInterface *iface, int child);
 
+    QPair<QAccessibleInterface*, int> interfaceFromPath(const QString& dbusPath);
     static QString pathForInterface(QAccessibleInterface *interface, int index);
     static QString pathForObject(QObject *object);
 
+    // accessible helper functions
     QSpiRelationArray relationSet(QAccessibleInterface *interface, int child, const QDBusConnection &connection) const;
     QStringList accessibleInterfaces(QAccessibleInterface *interface, int child) const;
 
+    // component helper functions
+    static QSpiRect getExtents(QAccessibleInterface *interface, int child, uint coordType);
 
+
+    // private vars
     QSpiObjectReference accessibilityRegistry;
     DBusConnection *m_dbus;
 

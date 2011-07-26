@@ -18,9 +18,12 @@
 
 #include "qspiadaptorv2.h"
 
-#include <QDBusMessage>
-#include <QDebug>
 #include <qaccessible.h>
+#include <qapplication.h>
+#include <qdbusmessage.h>
+#include <qwidget.h>
+
+#include <qdebug.h>
 
 #include "generated/socket_proxy.h"
 
@@ -106,12 +109,15 @@ bool QSpiAdaptorV2::handleMessage(const QDBusMessage &message, const QDBusConnec
         return accessibleInterface(accessible.first, accessible.second, function, message, connection);
     } else if (interface == QSPI_INTERFACE_APPLICATION) {
         return applicationInterface(accessible.first, accessible.second, function, message, connection);
+    } else if (interface == QSPI_INTERFACE_COMPONENT) {
+        return componentInterface(accessible.first, accessible.second, function, message, connection);
     } else {
         qDebug() << "QSpiAdaptorV2::handleMessage " << message.path() << interface << function;
     }
     return false;
 }
 
+// Application
 
 bool QSpiAdaptorV2::applicationInterface(QAccessibleInterface *, int, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
@@ -154,12 +160,7 @@ void QSpiAdaptorV2::registerApplication()
     delete registry;
 }
 
-
-
-
-
-
-
+// Accessible
 
 bool QSpiAdaptorV2::accessibleInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
@@ -394,4 +395,155 @@ QString QSpiAdaptorV2::pathForInterface(QAccessibleInterface *interface, int chi
     }
     delete childInterface;
     return path;
+}
+
+// Component
+
+static QAccessibleInterface *getWindow(QAccessibleInterface* interface)
+{
+    QAccessibleInterface *current=NULL, *tmp=NULL;
+
+    interface->navigate(QAccessible::Ancestor, 0, &current);
+
+    while (current &&
+           current->role(0) != QAccessible::Window &&
+           current->role(0) != QAccessible::Application)
+    {
+        tmp = NULL;
+        current->navigate (QAccessible::Ancestor, 1, &tmp);
+        current = tmp;
+    }
+
+    if (current) {
+        return current;
+    } else {
+        return NULL;
+    }
+}
+
+static QRect getRelativeRect(QAccessibleInterface* interface, int child)
+{
+    QAccessibleInterface *window;
+    QRect wr, cr;
+
+    cr = interface->rect(child);
+
+    window = getWindow(interface);
+    if (window)
+    {
+        wr = window->rect(child);
+
+        cr.setX(cr.x() - wr.x());
+        cr.setY(cr.x() - wr.y());
+    }
+    return cr;
+}
+
+bool QSpiAdaptorV2::componentInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+{
+    Q_ASSERT(child >= 0);
+
+    if (function == "Contains") {
+        bool ret = false;
+        int x = message.arguments().at(0).toInt();
+        int y = message.arguments().at(1).toInt();
+        uint coordType = message.arguments().at(2).toUInt();
+        if (coordType == ATSPI_COORD_TYPE_SCREEN)
+            ret = interface->rect(child).contains(x, y);
+        else
+            ret = getRelativeRect(interface, child).contains(x, y);
+        sendReply(connection, message, ret);
+    } else if (function == "GetAccessibleAtPoint") {
+        int x = message.arguments().at(0).toInt();
+        int y = message.arguments().at(1).toInt();
+        uint coordType = message.arguments().at(2).toUInt();
+        Q_UNUSED (coordType) // FIXME
+
+        // Grab the top level widget. For complex widgets we want to return a child
+        // at the right position instead.
+        QWidget* w = qApp->widgetAt(x, y);
+        if (w) {
+            QAccessibleInterface *iface = QAccessible::queryAccessibleInterface(w);
+            if (!iface) {
+                return false;
+            }
+            int childIndex = iface->childAt(x, y);
+            QString path = pathForInterface(iface, childIndex);
+            sendReply(connection, message, QVariant::fromValue(
+                          QSpiObjectReference(connection, QDBusObjectPath(path))));
+        } else {
+            sendReply(connection, message, QVariant::fromValue(
+                          QSpiObjectReference(connection, QDBusObjectPath(QSPI_OBJECT_PATH_NULL))));
+        }
+    } else if (function == "GetAlpha") {
+        sendReply(connection, message, (double) 1.0);
+    } else if (function == "GetExtents") {
+        uint coordType = message.arguments().at(0).toUInt();
+        sendReply(connection, message, QVariant::fromValue(getExtents(interface, child, coordType)));
+    } else if (function == "GetLayer") {
+        sendReply(connection, message, QVariant::fromValue((uint)1));
+    } else if (function == "GetMDIZOrder") {
+        sendReply(connection, message, QVariant::fromValue((short)0));
+    } else if (function == "GetPosition") {
+        uint coordType = message.arguments().at(0).toUInt();
+        QRect rect;
+        if (coordType == ATSPI_COORD_TYPE_SCREEN)
+            rect = interface->rect(child);
+        else
+            rect = getRelativeRect(interface, child);
+        QVariantList pos;
+        pos << rect.x() << rect.y();
+        connection.send(message.createReply(pos));
+    } else if (function == "GetSize") {
+        QRect rect = interface->rect(child);
+        QVariantList size;
+        size << rect.width() << rect.height();
+        connection.send(message.createReply(size));
+    } else if (function == "GrabFocus") {
+        if (interface->object() && interface->object()->isWidgetType()) {
+            QWidget* w = static_cast<QWidget*>(interface->object());
+            w->setFocus(Qt::OtherFocusReason);
+            sendReply(connection, message, true);
+        }
+        sendReply(connection, message, false);
+    } else if (function == "SetExtents") {
+//        int x = message.arguments().at(0).toInt();
+//        int y = message.arguments().at(1).toInt();
+//        int width = message.arguments().at(2).toInt();
+//        int height = message.arguments().at(3).toInt();
+//        uint coordinateType = message.arguments().at(4).toUInt();
+        qWarning() << "SetExtents is not implemented.";
+        sendReply(connection, message, false);
+    } else if (function == "SetPosition") {
+//        int x = message.arguments().at(0).toInt();
+//        int y = message.arguments().at(1).toInt();
+//        uint coordinateType = message.arguments().at(2).toUInt();
+        qWarning() << "SetPosition is not implemented.";
+        sendReply(connection, message, false);
+    } else if (function == "SetSize") {
+//        int width = message.arguments().at(0).toInt();
+//        int height = message.arguments().at(1).toInt();
+        qWarning() << "SetSize is not implemented.";
+        sendReply(connection, message, false);
+    } else {
+        qWarning() << "WARNING: QSpiAdaptorV2::handleMessage does not implement " << function << message.path();
+        return false;
+    }
+    return true;
+}
+
+QSpiRect QSpiAdaptorV2::getExtents(QAccessibleInterface *interface, int child, uint coordType)
+{
+    QSpiRect val;
+    QRect rect;
+    if (coordType == 0)
+        rect = interface->rect(child);
+    else
+        rect = getRelativeRect(interface, child);
+
+    val.x = rect.x();
+    val.y = rect.y();
+    val.width = rect.width();
+    val.height = rect.height();
+    return val;
 }
