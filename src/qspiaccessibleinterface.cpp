@@ -34,29 +34,20 @@ QSpiAccessibleInterface::QSpiAccessibleInterface()
 bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
     if (function == "GetRole") {
-        QVariant v;
-        v.setValue((uint) qSpiRoleMapping[interface->role(child)].spiRole());
-        QDBusMessage reply = message.createReply(v);
-        connection.send(reply);
+        sendReply(connection, message, (uint) qSpiRoleMapping[interface->role(child)].spiRole());
         return true;
     } else if (function == "GetName") {
-        sendReply(connection, message, interface->text(QAccessible::Name, child));
+        sendReply(connection, message, QVariant::fromValue(QDBusVariant(interface->text(QAccessible::Name, child))));
         return true;
     } else if (function == "GetRoleName") {
-        QVariant v;
-        v.setValue(qSpiRoleMapping[interface->role(child)].name());
-        QDBusMessage reply = message.createReply(v);
-        connection.send(reply);
+        sendReply(connection, message, qSpiRoleMapping[interface->role(child)].name());
         return true;
     } else if (function == "GetLocalizedRoleName") {
-        QVariant v;
-        v.setValue(qSpiRoleMapping[interface->role(child)].localizedName());
-        QDBusMessage reply = message.createReply(v);
-        connection.send(reply);
+        sendReply(connection, message, QVariant::fromValue(qSpiRoleMapping[interface->role(child)].localizedName()));
         return true;
     } else if (function == "GetChildCount") {
         int childCount = child ? 0 : interface->childCount();
-        sendReply(connection, message, childCount);
+        sendReply(connection, message, QVariant::fromValue(QDBusVariant(childCount)));
         return true;
     } else if (function == "GetIndexInParent") {
         int childIndex = -1;
@@ -71,9 +62,8 @@ bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int
         sendReply(connection, message, childIndex);
         return true;
     } else if (function == "GetParent") {
-        QAccessibleInterface *parent = accessibleParent(interface, child);
-
         QString path;
+        QAccessibleInterface *parent = accessibleParent(interface, child);
         if (!parent || parent->role(0) == QAccessible::Application) {
             path = QSPI_OBJECT_PATH_ROOT;
         } else {
@@ -81,11 +71,8 @@ bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int
         }
         if (parent != interface)
             delete parent;
-
-        QVariant ref;
-        QSpiObjectReference v(connection, QDBusObjectPath(path));
-        ref.setValue(v);
-        sendReply(connection, message, ref);
+        sendReply(connection, message, QVariant::fromValue(
+                      QSpiObjectReference(connection, QDBusObjectPath(path))));
         return true;
     } else if (function == "GetChildAtIndex") {
         int index = message.arguments().first().toInt();
@@ -102,59 +89,40 @@ bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int
         } else {
             path = pathForInterface(interface, childIndex);
         }
-
-        QVariant ref;
-        QSpiObjectReference v(connection, QDBusObjectPath(path));
-        ref.setValue(v);
-        QDBusMessage reply = message.createReply(ref);
-        connection.send(reply);
+        sendReply(connection, message, QVariant::fromValue(
+                      QSpiObjectReference(connection, QDBusObjectPath(path))));
         return true;
     } else if (function == "GetInterfaces") {
         QStringList ifaces;
         // FIXME
         ifaces << QSPI_INTERFACE_ACCESSIBLE;
-        QVariant v;
-        v.setValue(ifaces);
-        QDBusMessage reply = message.createReply(v);
-        connection.send(reply);
+        sendReply(connection, message, ifaces);
         return true;
     } else if (function == "GetDescription") {
-        sendReply(connection, message, interface->text(QAccessible::Description, child));
+        sendReply(connection, message, QVariant::fromValue(QDBusVariant(interface->text(QAccessible::Description, child))));
         return true;
     } else if (function == "GetState") {
         quint64 spiState = spiStatesFromQState(interface->state(child));
         if (interface->table2Interface()) {
             setSpiStateBit(&spiState, ATSPI_STATE_MANAGES_DESCENDANTS);
         }
-        QVariant v;
-        QSpiUIntList l = spiStateSetFromSpiStates(spiState);
-        v.setValue(l);
-        QDBusMessage reply = message.createReply(v);
-        connection.send(reply);
+        sendReply(connection, message,
+                  QVariant::fromValue(spiStateSetFromSpiStates(spiState)));
         return true;
     } else if (function == "GetAttributes") {
-        QVariant attributes;
-        attributes.setValue(QSpiAttributeSet());
-        QDBusMessage reply = message.createReply(attributes);
-        connection.send(reply);
+        sendReply(connection, message, QVariant::fromValue(QSpiAttributeSet()));
         return true;
     } else if (function == "GetRelationSet") {
-        QVariant relations;
-        relations.setValue(relationSet(interface, child, connection));
-        QDBusMessage reply = message.createReply(relations);
-        connection.send(reply);
+        sendReply(connection, message, QVariant::fromValue(relationSet(interface, child, connection)));
         return true;
     } else if (function == "GetApplication") {
-        QVariant ref;
-        QSpiObjectReference v(connection, QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
-        ref.setValue(v);
-        QDBusMessage reply = message.createReply(ref);
-        connection.send(reply);
+        sendReply(connection, message, QVariant::fromValue(
+                      QSpiObjectReference(connection, QDBusObjectPath(QSPI_OBJECT_PATH_ROOT))));
         return true;
     } else if (function == "GetChildren") {
-        qDebug() << "IMPLEMENT GETCHILDREN";
+        qWarning() << "IMPLEMENT GETCHILDREN";
         //    QSpiObjectReferenceArray ();
-        return true;
+        return false;
     } else {
         qWarning() << "WARNING: QSpiAccessibleInterface::handleMessage does not implement " << function << message.path();
     }
@@ -195,14 +163,8 @@ QSpiRelationArray QSpiAccessibleInterface::relationSet(QAccessibleInterface *int
 
 void QSpiAccessibleInterface::sendReply(const QDBusConnection &connection, const QDBusMessage &message, const QVariant &argument)
 {
-    sendReply(connection, message, QDBusVariant(argument));
-}
-
-void QSpiAccessibleInterface::sendReply(const QDBusConnection &connection, const QDBusMessage &message, const QDBusVariant &argument)
-{
-    QDBusMessage reply = message.createReply(QVariant::fromValue(argument));
+    QDBusMessage reply = message.createReply(argument);
     connection.send(reply);
-//    qDebug() << "SIGNATURE " << message.member() << reply.signature() << message.signature();
 }
 
 QAccessibleInterface *QSpiAccessibleInterface::accessibleParent(QAccessibleInterface *iface, int child)
@@ -222,6 +184,15 @@ QString QSpiAccessibleInterface::pathForObject(QObject *object)
 
 QString QSpiAccessibleInterface::pathForInterface(QAccessibleInterface *interface, int childIndex)
 {
+    // Try to navigate to the child. If we get a proper interface, use it since it might have an object associated.
+    QAccessibleInterface* childInterface = 0;
+    if (childIndex) {
+        int ret = interface->navigate(QAccessible::Child, childIndex, &childInterface);
+        if (ret == 0 && childInterface) {
+            interface = childInterface;
+            childIndex = 0;
+        }
+    }
     QString path;
     QAccessibleInterface* interfaceWithObject = interface;
     while(!interfaceWithObject->object()) {
@@ -254,6 +225,7 @@ QString QSpiAccessibleInterface::pathForInterface(QAccessibleInterface *interfac
     if (childIndex > 0) {
         path.append('/' + QString::number(childIndex));
     }
+    delete childInterface;
     return path;
 }
 

@@ -39,7 +39,6 @@ public:
 
 private:
     void sendReply(const QDBusConnection &connection, const QDBusMessage &message, const QVariant &argument);
-    void sendReply(const QDBusConnection &connection, const QDBusMessage &message, const QDBusVariant &argument);
     QAccessibleInterface *accessibleParent(QAccessibleInterface *iface, int child);
 
 
