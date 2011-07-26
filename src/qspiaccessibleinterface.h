@@ -44,6 +44,7 @@ private:
     static QString pathForObject(QObject *object);
 
     QSpiRelationArray relationSet(QAccessibleInterface *interface, int child, const QDBusConnection &connection) const;
+    QStringList accessibleInterfaces(QAccessibleInterface *interface, int child) const;
 };
 
 #endif // QSPIACCESSIBLEINTERFACE_H

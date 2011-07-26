@@ -77,30 +77,13 @@ bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int
                       QSpiObjectReference(connection, QDBusObjectPath(path))));
         return true;
     } else if (function == "GetChildAtIndex") {
+        Q_ASSERT(child == 0); // Don't support child of virtual child
         int index = message.arguments().first().toInt() + 1;
-        Q_ASSERT(index > 0 && index <= interface->childCount());
-        QString path;
-        QAccessibleInterface *childInterface = 0;
-        int childIndex = interface->navigate(QAccessible::Child, index, &childInterface);
-        if (childIndex < 0) {
-            qWarning() << "GetChildAtIndex INVALID CHILD: " << interface->object() << index;
-            return false;
-        }
-        if (childIndex == 0) {
-            Q_ASSERT(childInterface);
-            path = pathForInterface(childInterface, childIndex);
-            delete childInterface;
-        } else {
-            path = pathForInterface(interface, childIndex);
-        }
         sendReply(connection, message, QVariant::fromValue(
-                      QSpiObjectReference(connection, QDBusObjectPath(path))));
+                      QSpiObjectReference(connection, QDBusObjectPath(pathForInterface(interface, index)))));
         return true;
     } else if (function == "GetInterfaces") {
-        QStringList ifaces;
-        // FIXME
-        ifaces << QSPI_INTERFACE_ACCESSIBLE;
-        sendReply(connection, message, ifaces);
+        sendReply(connection, message, accessibleInterfaces(interface, child));
         return true;
     } else if (function == "GetDescription") {
         sendReply(connection, message, QVariant::fromValue(QDBusVariant(interface->text(QAccessible::Description, child))));
@@ -131,6 +114,14 @@ bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int
         qWarning() << "WARNING: QSpiAccessibleInterface::handleMessage does not implement " << function << message.path();
     }
     return false;
+}
+
+QStringList QSpiAccessibleInterface::accessibleInterfaces(QAccessibleInterface */*interface*/, int /*child*/) const
+{
+    QStringList ifaces;
+    // FIXME
+    ifaces << QSPI_INTERFACE_ACCESSIBLE;
+    return ifaces;
 }
 
 QSpiRelationArray QSpiAccessibleInterface::relationSet(QAccessibleInterface *interface, int child, const QDBusConnection &connection) const
