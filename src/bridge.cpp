@@ -117,17 +117,41 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int /*reason*/, QAccessible
 //        }
 //        // FIXME: react to other changes properly
 //        break;
-
+//    switch (reason) {
+//    case QAccessible::ObjectCreated:
+//        qDebug() << "created" << interface->object();
+//        // make sure we don't duplicate this. seems to work for qml loaders.
+//        notifyAboutCreation(accessible);
+//        break;
+//    case QAccessible::ObjectShow:
+//        qDebug() << "show" << interface->object();
+//        break;
+//    case QAccessible::Focus: {
+//        static QSpiAccessible *lastFocused = 0;
+//        if (lastFocused) {
+//            QDBusVariant data;
+//            data.setVariant(QVariant::fromValue(lastFocused->getReference()));
+//            emit lastFocused->StateChanged("focused", 0, 0, data, getRootReference());
+//        }
+//        lastFocused = qobject_cast<QSpiAccessible*>(accessible);
+//        break;
+//    }
+//    case QAccessible::TableModelChanged:
+//        QAccessible2::TableModelChange change = interface->table2Interface()->modelChange();
+//        // assume we should reset if everything is 0
+//        if (change.firstColumn == 0 && change.firstRow == 0 && change.lastColumn == 0 && change.lastRow == 0) {
+//            notifyAboutDestruction(accessible);
+//            notifyAboutCreation(accessible);
+//        }
+//        break;
 //    if (!initialized)
 //        return;
-
 //    // this gets deleted, so create one if we don't have it yet
 //    QSpiAdaptor* accessible = interfaceToAccessible(interface, index, false);
 //    if (accessible->associatedInterface()->object() != interface->object()) {
 //        qWarning() << "WARNING: Creating accessible with different object than the original interface"
 //                   << accessible->associatedInterface()->object() << " new: " << interface->object();
 //    }
-
 //    switch (reason) {
 //    case QAccessible::ObjectCreated:
 //        qDebug() << "created" << interface->object();
