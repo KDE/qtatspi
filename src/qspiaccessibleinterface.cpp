@@ -99,6 +99,7 @@ bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int
         return true;
     } else if (function == "GetInterfaces") {
         QStringList ifaces;
+        // FIXME
         ifaces << QSPI_INTERFACE_ACCESSIBLE;
         QVariant v;
         v.setValue(ifaces);
@@ -120,10 +121,27 @@ bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int
         connection.send(reply);
         return true;
     } else if (function == "GetAttributes") {
-        qDebug() << "IMPLEMENT ATTRIBUTES";
+        QVariant attributes;
+        attributes.setValue(QSpiAttributeSet());
+        QDBusMessage reply = message.createReply(attributes);
+        connection.send(reply);
         return true;
     } else if (function == "GetRelationSet") {
-        qDebug() << "IMPLEMENT RELATIONS";
+        QVariant relations;
+        relations.setValue(relationSet(interface, child, connection));
+        QDBusMessage reply = message.createReply(relations);
+        connection.send(reply);
+        return true;
+    } else if (function == "GetApplication") {
+        QVariant ref;
+        QSpiObjectReference v(connection, QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
+        ref.setValue(v);
+        QDBusMessage reply = message.createReply(ref);
+        connection.send(reply);
+        return true;
+    } else if (function == "GetChildren") {
+        qDebug() << "IMPLEMENT GETCHILDREN";
+        //    QSpiObjectReferenceArray ();
         return true;
     } else {
         qWarning() << "WARNING: QSpiAccessibleInterface::handleMessage does not implement " << function << message.path();
@@ -131,6 +149,33 @@ bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int
     return false;
 }
 
+QSpiRelationArray QSpiAccessibleInterface::relationSet(QAccessibleInterface *interface, int child, const QDBusConnection &connection) const
+{
+    Q_ASSERT(child == 0);
+    const QAccessible::RelationFlag relationsToCheck[] = {QAccessible::Label, QAccessible::Labelled, QAccessible::Controller, QAccessible::Controlled, static_cast<QAccessible::RelationFlag>(-1)};
+    const AtspiRelationType relationTypes[] = {ATSPI_RELATION_LABELLED_BY, ATSPI_RELATION_LABEL_FOR, ATSPI_RELATION_CONTROLLED_BY, ATSPI_RELATION_CONTROLLER_FOR};
+
+    QSpiRelationArray relations;
+    QAccessibleInterface *target;
+
+    for (int i = 0; relationsToCheck[i] >= 0; i++) {
+        QList<QSpiObjectReference> related;
+        int navigateResult = 1;
+
+        for (int j = 1; navigateResult >= 0; j++) {
+            navigateResult = interface->navigate(relationsToCheck[i], j, &target);
+
+            if (navigateResult >= 0) {
+                QDBusObjectPath path = QDBusObjectPath(pathForInterface(target ? target : interface, navigateResult));
+                related.append(QSpiObjectReference(connection, path));
+                delete target;
+            }
+        }
+        if (!related.isEmpty())
+            relations.append(QSpiRelationArrayEntry(relationTypes[i], related));
+    }
+    return relations;
+}
 
 void QSpiAccessibleInterface::sendReply(const QDBusConnection &connection, const QDBusMessage &message, const QVariant &argument)
 {

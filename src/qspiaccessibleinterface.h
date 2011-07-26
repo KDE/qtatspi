@@ -1,6 +1,8 @@
 #ifndef QSPIACCESSIBLEINTERFACE_H
 #define QSPIACCESSIBLEINTERFACE_H
 
+#include "struct_marshallers.h"
+
 class QAccessibleInterface;
 class QDBusConnection;
 class QDBusMessage;
@@ -24,6 +26,8 @@ private:
 
     static QString pathForInterface(QAccessibleInterface *interface, int index);
     static QString pathForObject(QObject *object);
+
+    QSpiRelationArray relationSet(QAccessibleInterface *interface, int child, const QDBusConnection &connection) const;
 };
 
 #endif // QSPIACCESSIBLEINTERFACE_H
