@@ -204,8 +204,10 @@ bool QSpiAdaptorV2::accessibleInterface(QAccessibleInterface *interface, int chi
         }
         if (parent != interface)
             delete parent;
+
+        // Parent is a property, so it needs to be wrapped inside an extra variant.
         sendReply(connection, message, QVariant::fromValue(
-                      QSpiObjectReference(connection, QDBusObjectPath(path))));
+                      QDBusVariant(QVariant::fromValue(QSpiObjectReference(connection, QDBusObjectPath(path))))));
         return true;
     } else if (function == "GetChildAtIndex") {
         Q_ASSERT(child == 0); // Don't support child of virtual child
