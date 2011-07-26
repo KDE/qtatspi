@@ -163,18 +163,22 @@ bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int
 
 QSpiRelationArray QSpiAccessibleInterface::relationSet(QAccessibleInterface *interface, int child, const QDBusConnection &connection) const
 {
-    Q_ASSERT(child == 0);
+    QSpiRelationArray relations;
+    if (child == 0) {
+        qDebug() << "QSpiAccessibleInterface::relationSet currently has a problem with child ids.";
+        // FIXME for example trees need to express their child relations here.
+        return relations;
+    }
+
     const QAccessible::RelationFlag relationsToCheck[] = {QAccessible::Label, QAccessible::Labelled, QAccessible::Controller, QAccessible::Controlled, static_cast<QAccessible::RelationFlag>(-1)};
     const AtspiRelationType relationTypes[] = {ATSPI_RELATION_LABELLED_BY, ATSPI_RELATION_LABEL_FOR, ATSPI_RELATION_CONTROLLED_BY, ATSPI_RELATION_CONTROLLER_FOR};
-
-    QSpiRelationArray relations;
-    QAccessibleInterface *target;
 
     for (int i = 0; relationsToCheck[i] >= 0; i++) {
         QList<QSpiObjectReference> related;
         int navigateResult = 1;
 
         for (int j = 1; navigateResult >= 0; j++) {
+            QAccessibleInterface *target;
             navigateResult = interface->navigate(relationsToCheck[i], j, &target);
 
             if (navigateResult >= 0) {
