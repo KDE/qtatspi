@@ -33,6 +33,8 @@ QSpiAccessibleInterface::QSpiAccessibleInterface()
 
 bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
+    Q_ASSERT(child >= 0);
+
     if (function == "GetRole") {
         sendReply(connection, message, (uint) qSpiRoleMapping[interface->role(child)].spiRole());
         return true;
@@ -75,13 +77,15 @@ bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int
                       QSpiObjectReference(connection, QDBusObjectPath(path))));
         return true;
     } else if (function == "GetChildAtIndex") {
-        int index = message.arguments().first().toInt();
+        int index = message.arguments().first().toInt() + 1;
+        Q_ASSERT(index > 0 && index <= interface->childCount());
         QString path;
-        Q_ASSERT(child == 0);
         QAccessibleInterface *childInterface = 0;
-        int childIndex = interface->navigate(QAccessible::Child, index+1, &childInterface);
-        if (childIndex < 0)
+        int childIndex = interface->navigate(QAccessible::Child, index, &childInterface);
+        if (childIndex < 0) {
+            qWarning() << "GetChildAtIndex INVALID CHILD: " << interface->object() << index;
             return false;
+        }
         if (childIndex == 0) {
             Q_ASSERT(childInterface);
             path = pathForInterface(childInterface, childIndex);

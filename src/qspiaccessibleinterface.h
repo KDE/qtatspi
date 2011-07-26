@@ -34,13 +34,11 @@ class QSpiAccessibleInterface
 {
 public:
     QSpiAccessibleInterface();
-
     bool handleMessage(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
 
 private:
     void sendReply(const QDBusConnection &connection, const QDBusMessage &message, const QVariant &argument);
     QAccessibleInterface *accessibleParent(QAccessibleInterface *iface, int child);
-
 
     static QString pathForInterface(QAccessibleInterface *interface, int index);
     static QString pathForObject(QObject *object);
