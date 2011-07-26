@@ -26,10 +26,6 @@
 #include <QAccessibleInterface>
 #include <QQueue>
 
-#include "adaptor.h"
-
-class QSpiAccessible;
-
 /*
  * Used for the root object.
  *

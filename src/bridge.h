@@ -53,8 +53,6 @@ public:
 
         QSpiAdaptor* createSpiObject(QAccessibleInterface* interface, int index = 0);
 
-        QSpiAdaptor* objectToAccessible(QObject* object);
-        QSpiAdaptor* interfaceToAccessible(QAccessibleInterface *interface, int index, bool takeOwnershipOfInterface);
         void removeAdaptor(QSpiAdaptor* adaptor);
 
         QDBusConnection dBusConnection() const;

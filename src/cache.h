@@ -48,7 +48,7 @@ Q_SIGNALS:
     void RemoveAccessible(const QSpiObjectReference &nodeRemoved);
 
 public Q_SLOTS:
-    QSpiAccessibleCacheArray GetItems();
+//    QSpiAccessibleCacheArray GetItems();
 };
 
 #endif /* Q_SPI_CACHE_H */
