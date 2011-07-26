@@ -45,7 +45,6 @@ QString QSpiAdaptorV2::introspect(const QString &path) const
     return QString();
 }
 
-
 QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString& dbusPath)
 {
     QAccessibleInterface* inter = 0;
@@ -240,9 +239,13 @@ bool QSpiAdaptorV2::accessibleInterface(QAccessibleInterface *interface, int chi
                       QSpiObjectReference(connection, QDBusObjectPath(QSPI_OBJECT_PATH_ROOT))));
         return true;
     } else if (function == "GetChildren") {
-        qWarning() << "IMPLEMENT GETCHILDREN";
-        //    QSpiObjectReferenceArray ();
-        return false;
+        QSpiObjectReferenceArray children;
+        for (int i = 0; i < interface->childCount(); ++i) {
+            QSpiObjectReference ref(connection, QDBusObjectPath(pathForInterface(interface, i + 1)));
+            children << ref;
+        }
+        connection.send(message.createReply(QVariant::fromValue(children)));
+        return true;
     } else {
         qWarning() << "WARNING: QSpiAdaptorV2::handleMessage does not implement " << function << message.path();
     }
