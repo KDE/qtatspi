@@ -47,14 +47,21 @@ private:
     //bool handleMessageForRoot(const QDBusMessage &message, const QDBusConnection &connection);
 
     QPair<QAccessibleInterface*, int> interfaceFromPath(const QString& dbusPath);
-    bool handleApplicationMessage(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
+    bool applicationInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
+    bool accessibleInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
 
+    void sendReply(const QDBusConnection &connection, const QDBusMessage &message, const QVariant &argument);
+    QAccessibleInterface *accessibleParent(QAccessibleInterface *iface, int child);
+
+    static QString pathForInterface(QAccessibleInterface *interface, int index);
+    static QString pathForObject(QObject *object);
+
+    QSpiRelationArray relationSet(QAccessibleInterface *interface, int child, const QDBusConnection &connection) const;
+    QStringList accessibleInterfaces(QAccessibleInterface *interface, int child) const;
 
 
     QSpiObjectReference accessibilityRegistry;
     DBusConnection *m_dbus;
-
-    QSpiAccessibleInterface *m_accessibleInterface;
 
     /// Assigned from the accessibility registry.
     int m_applicationId;

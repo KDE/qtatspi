@@ -23,7 +23,6 @@
 #include <qaccessible.h>
 
 #include "generated/socket_proxy.h"
-#include "qspiaccessibleinterface.h"
 
 #include "constant_mappings.h"
 
@@ -31,12 +30,10 @@
 QSpiAdaptorV2::QSpiAdaptorV2(DBusConnection *connection, QObject *parent)
     :QDBusVirtualObject(parent), m_dbus(connection)
 {
-    m_accessibleInterface = new QSpiAccessibleInterface();
 }
 
 QSpiAdaptorV2::~QSpiAdaptorV2()
 {
-    delete m_accessibleInterface;
 }
 
 QString QSpiAdaptorV2::introspect(const QString &path) const
@@ -106,9 +103,9 @@ bool QSpiAdaptorV2::handleMessage(const QDBusMessage &message, const QDBusConnec
 
     // switch interface to call
     if (interface == QSPI_INTERFACE_ACCESSIBLE) {
-        return m_accessibleInterface->handleMessage(accessible.first, accessible.second, function, message, connection);
+        return accessibleInterface(accessible.first, accessible.second, function, message, connection);
     } else if (interface == QSPI_INTERFACE_APPLICATION) {
-        return handleApplicationMessage(accessible.first, accessible.second, function, message, connection);
+        return applicationInterface(accessible.first, accessible.second, function, message, connection);
     } else {
         qDebug() << "QSpiAdaptorV2::handleMessage " << message.path() << interface << function;
     }
@@ -116,7 +113,7 @@ bool QSpiAdaptorV2::handleMessage(const QDBusMessage &message, const QDBusConnec
 }
 
 
-bool QSpiAdaptorV2::handleApplicationMessage(QAccessibleInterface *, int, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+bool QSpiAdaptorV2::applicationInterface(QAccessibleInterface *, int, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
 
         if (function == "SetId") {
@@ -155,4 +152,246 @@ void QSpiAdaptorV2::registerApplication()
         qWarning() << reply.error().message();
     }
     delete registry;
+}
+
+
+
+
+
+
+
+
+bool QSpiAdaptorV2::accessibleInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+{
+    Q_ASSERT(child >= 0);
+
+    if (function == "GetRole") {
+        sendReply(connection, message, (uint) qSpiRoleMapping[interface->role(child)].spiRole());
+        return true;
+    } else if (function == "GetName") {
+        sendReply(connection, message, QVariant::fromValue(QDBusVariant(interface->text(QAccessible::Name, child))));
+        return true;
+    } else if (function == "GetRoleName") {
+        sendReply(connection, message, qSpiRoleMapping[interface->role(child)].name());
+        return true;
+    } else if (function == "GetLocalizedRoleName") {
+        sendReply(connection, message, QVariant::fromValue(qSpiRoleMapping[interface->role(child)].localizedName()));
+        return true;
+    } else if (function == "GetChildCount") {
+        int childCount = child ? 0 : interface->childCount();
+        sendReply(connection, message, QVariant::fromValue(QDBusVariant(childCount)));
+        return true;
+    } else if (function == "GetIndexInParent") {
+        int childIndex = -1;
+        if (child) {
+            childIndex = child;
+        } else {
+            QAccessibleInterface *parent = accessibleParent(interface, child);
+            if (parent)
+                childIndex = parent->indexOfChild(interface);
+            delete parent;
+        }
+        sendReply(connection, message, childIndex);
+        return true;
+    } else if (function == "GetParent") {
+        QString path;
+        QAccessibleInterface *parent = accessibleParent(interface, child);
+        if (!parent || parent->role(0) == QAccessible::Application) {
+            path = QSPI_OBJECT_PATH_ROOT;
+        } else {
+            path = pathForInterface(parent, 0);
+        }
+        if (parent != interface)
+            delete parent;
+        sendReply(connection, message, QVariant::fromValue(
+                      QSpiObjectReference(connection, QDBusObjectPath(path))));
+        return true;
+    } else if (function == "GetChildAtIndex") {
+        Q_ASSERT(child == 0); // Don't support child of virtual child
+        int index = message.arguments().first().toInt() + 1;
+        sendReply(connection, message, QVariant::fromValue(
+                      QSpiObjectReference(connection, QDBusObjectPath(pathForInterface(interface, index)))));
+        return true;
+    } else if (function == "GetInterfaces") {
+        sendReply(connection, message, accessibleInterfaces(interface, child));
+        return true;
+    } else if (function == "GetDescription") {
+        sendReply(connection, message, QVariant::fromValue(QDBusVariant(interface->text(QAccessible::Description, child))));
+        return true;
+    } else if (function == "GetState") {
+        quint64 spiState = spiStatesFromQState(interface->state(child));
+        if (interface->table2Interface()) {
+            setSpiStateBit(&spiState, ATSPI_STATE_MANAGES_DESCENDANTS);
+        }
+        sendReply(connection, message,
+                  QVariant::fromValue(spiStateSetFromSpiStates(spiState)));
+        return true;
+    } else if (function == "GetAttributes") {
+        sendReply(connection, message, QVariant::fromValue(QSpiAttributeSet()));
+        return true;
+    } else if (function == "GetRelationSet") {
+        sendReply(connection, message, QVariant::fromValue(relationSet(interface, child, connection)));
+        return true;
+    } else if (function == "GetApplication") {
+        sendReply(connection, message, QVariant::fromValue(
+                      QSpiObjectReference(connection, QDBusObjectPath(QSPI_OBJECT_PATH_ROOT))));
+        return true;
+    } else if (function == "GetChildren") {
+        qWarning() << "IMPLEMENT GETCHILDREN";
+        //    QSpiObjectReferenceArray ();
+        return false;
+    } else {
+        qWarning() << "WARNING: QSpiAdaptorV2::handleMessage does not implement " << function << message.path();
+    }
+    return false;
+}
+
+QStringList QSpiAdaptorV2::accessibleInterfaces(QAccessibleInterface *interface, int index) const
+{
+    QStringList ifaces;
+#ifdef ACCESSIBLE_CREATION_DEBUG
+    qDebug() << "ACCESSIBLE: " << interface->object();
+#endif
+    ifaces << QSPI_INTERFACE_ACCESSIBLE;
+
+    if (    (!interface->rect(index).isEmpty()) ||
+            (interface->object() && interface->object()->isWidgetType()) ||
+            (interface->role(index) == QAccessible::ListItem) ||
+            (interface->role(index) == QAccessible::Cell) ||
+            (interface->role(index) == QAccessible::TreeItem) ||
+            (interface->role(index) == QAccessible::Row) ||
+            (interface->object() && interface->object()->inherits("QSGItem"))
+            ) {
+        ifaces << QSPI_INTERFACE_COMPONENT;
+        }
+#ifdef ACCESSIBLE_CREATION_DEBUG
+    else {
+        qDebug() << " IS NOT a component";
+    }
+#endif
+
+    if (!index) {
+        if (interface->actionInterface())
+            ifaces << QSPI_INTERFACE_ACTION;
+
+        if (interface->textInterface()) {
+            ifaces << QSPI_INTERFACE_TEXT;
+            // Cache the last text?
+            // oldText = interface->textInterface()->text(0, interface->textInterface()->characterCount());
+        }
+
+        if (interface->editableTextInterface())
+            ifaces << QSPI_INTERFACE_EDITABLE_TEXT;
+
+        if (interface->valueInterface())
+            ifaces << QSPI_INTERFACE_VALUE;
+
+        if (interface->table2Interface())
+            ifaces << QSPI_INTERFACE_TABLE;
+    }
+
+    // Do we need to cache the state?
+    //    state = interface->state(childIndex());
+
+    return ifaces;
+}
+
+QSpiRelationArray QSpiAdaptorV2::relationSet(QAccessibleInterface *interface, int child, const QDBusConnection &connection) const
+{
+    QSpiRelationArray relations;
+    if (child == 0) {
+        qDebug() << "QSpiAdaptorV2::relationSet currently has a problem with child ids.";
+        // FIXME for example trees need to express their child relations here.
+        return relations;
+    }
+
+    const QAccessible::RelationFlag relationsToCheck[] = {QAccessible::Label, QAccessible::Labelled, QAccessible::Controller, QAccessible::Controlled, static_cast<QAccessible::RelationFlag>(-1)};
+    const AtspiRelationType relationTypes[] = {ATSPI_RELATION_LABELLED_BY, ATSPI_RELATION_LABEL_FOR, ATSPI_RELATION_CONTROLLED_BY, ATSPI_RELATION_CONTROLLER_FOR};
+
+    for (int i = 0; relationsToCheck[i] >= 0; i++) {
+        QList<QSpiObjectReference> related;
+        int navigateResult = 1;
+
+        for (int j = 1; navigateResult >= 0; j++) {
+            QAccessibleInterface *target;
+            navigateResult = interface->navigate(relationsToCheck[i], j, &target);
+
+            if (navigateResult >= 0) {
+                QDBusObjectPath path = QDBusObjectPath(pathForInterface(target ? target : interface, navigateResult));
+                related.append(QSpiObjectReference(connection, path));
+                delete target;
+            }
+        }
+        if (!related.isEmpty())
+            relations.append(QSpiRelationArrayEntry(relationTypes[i], related));
+    }
+    return relations;
+}
+
+void QSpiAdaptorV2::sendReply(const QDBusConnection &connection, const QDBusMessage &message, const QVariant &argument)
+{
+    QDBusMessage reply = message.createReply(argument);
+    connection.send(reply);
+}
+
+QAccessibleInterface *QSpiAdaptorV2::accessibleParent(QAccessibleInterface *iface, int child)
+{
+    if (child)
+        return iface;
+    QAccessibleInterface *parent = 0;
+    iface->navigate(QAccessible::Ancestor, 1, &parent);
+    return parent;
+}
+
+QString QSpiAdaptorV2::pathForObject(QObject *object)
+{
+    Q_ASSERT(object);
+    return QSPI_OBJECT_PATH_PREFIX + QString::number(reinterpret_cast<size_t>(object));
+}
+
+QString QSpiAdaptorV2::pathForInterface(QAccessibleInterface *interface, int childIndex)
+{
+    // Try to navigate to the child. If we get a proper interface, use it since it might have an object associated.
+    QAccessibleInterface* childInterface = 0;
+    if (childIndex) {
+        int ret = interface->navigate(QAccessible::Child, childIndex, &childInterface);
+        if (ret == 0 && childInterface) {
+            interface = childInterface;
+            childIndex = 0;
+        }
+    }
+    QString path;
+    QAccessibleInterface* interfaceWithObject = interface;
+    while(!interfaceWithObject->object()) {
+        QAccessibleInterface* parentInterface;
+        interfaceWithObject->navigate(QAccessible::Ancestor, 1, &parentInterface);
+        Q_ASSERT(parentInterface->isValid());
+        int index = parentInterface->indexOfChild(interfaceWithObject);
+        //Q_ASSERT(index >= 0);
+        // FIXME: This should never happen!
+        if (index < 0) {
+
+            index = 999;
+            path.prepend("/BROKEN_OBJECT_HIERARCHY");
+            qWarning() << "Object claims to have child that we cannot navigate to. FIX IT!" << parentInterface->object();
+
+            qDebug() << "Original interface: " << interface->object() << index;
+            qDebug() << "Parent interface: " << parentInterface->object() << " childcount:" << parentInterface->childCount();
+            QObject* p = parentInterface->object();
+            qDebug() << p->children();
+
+            QAccessibleInterface* tttt;
+            int id = parentInterface->navigate(QAccessible::Child, 1, &tttt);
+            qDebug() << "Nav child: " << id << tttt->object();
+        }
+        path.prepend('/' + QString::number(index));
+        interfaceWithObject = parentInterface;
+    }
+    path.prepend(QSPI_OBJECT_PATH_PREFIX + QString::number(reinterpret_cast<quintptr>(interfaceWithObject->object())));
+
+    if (childIndex > 0) {
+        path.append('/' + QString::number(childIndex));
+    }
+    delete childInterface;
+    return path;
 }

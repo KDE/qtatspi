@@ -9,8 +9,7 @@ HEADERS += \
            struct_marshallers.h \
            constant_mappings.h \
     dbusconnection.h \
-    qspiadaptorv2.h \
-    qspiaccessibleinterface.h
+    qspiadaptorv2.h
 
 SOURCES += \
            generated/dec_proxy.cpp \
@@ -22,8 +21,7 @@ SOURCES += \
            constant_mappings.cpp \
            main.cpp \
     dbusconnection.cpp \
-    qspiadaptorv2.cpp \
-    qspiaccessibleinterface.cpp
+    qspiadaptorv2.cpp
 
 QMAKE_CFLAGS+=-Werror
 QMAKE_CXXFLAGS+=-Werror
