@@ -116,11 +116,53 @@ bool QSpiAccessibleInterface::handleMessage(QAccessibleInterface *interface, int
     return false;
 }
 
-QStringList QSpiAccessibleInterface::accessibleInterfaces(QAccessibleInterface */*interface*/, int /*child*/) const
+QStringList QSpiAccessibleInterface::accessibleInterfaces(QAccessibleInterface *interface, int index) const
 {
     QStringList ifaces;
-    // FIXME
+#ifdef ACCESSIBLE_CREATION_DEBUG
+    qDebug() << "ACCESSIBLE: " << interface->object();
+#endif
     ifaces << QSPI_INTERFACE_ACCESSIBLE;
+
+    if (    (!interface->rect(index).isEmpty()) ||
+            (interface->object() && interface->object()->isWidgetType()) ||
+            (interface->role(index) == QAccessible::ListItem) ||
+            (interface->role(index) == QAccessible::Cell) ||
+            (interface->role(index) == QAccessible::TreeItem) ||
+            (interface->role(index) == QAccessible::Row) ||
+            (interface->object() && interface->object()->inherits("QSGItem"))
+            ) {
+        ifaces << QSPI_INTERFACE_COMPONENT;
+        }
+#ifdef ACCESSIBLE_CREATION_DEBUG
+    else {
+        qDebug() << " IS NOT a component";
+    }
+#endif
+
+    if (!index) {
+        if (interface->actionInterface())
+            ifaces << QSPI_INTERFACE_ACTION;
+
+        if (interface->textInterface()) {
+            ifaces << QSPI_INTERFACE_TEXT;
+            // Cache the last text?
+            // oldText = interface->textInterface()->text(0, interface->textInterface()->characterCount());
+        }
+
+        if (interface->editableTextInterface())
+            ifaces << QSPI_INTERFACE_EDITABLE_TEXT;
+
+        if (interface->valueInterface())
+            ifaces << QSPI_INTERFACE_VALUE;
+
+        if (interface->table2Interface())
+            ifaces << QSPI_INTERFACE_TABLE;
+    }
+
+    // Do we need to cache the state?
+    //    state = interface->state(childIndex());
+
     return ifaces;
 }
 
