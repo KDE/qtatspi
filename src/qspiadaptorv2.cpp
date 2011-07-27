@@ -147,30 +147,27 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
     //        qWarning() << "WARNING: Creating accessible with different object than the original interface"
     //                   << accessible->associatedInterface()->object() << " new: " << interface->object();
     //    }
-    //    switch (reason) {
-    //    case QAccessible::ObjectCreated:
-    //        qDebug() << "created" << interface->object();
-    //        // make sure we don't duplicate this. seems to work for qml loaders.
-    //        notifyAboutCreation(accessible);
-    //        break;
-    //    case QAccessible::ObjectShow:
-    //        qDebug() << "show" << interface->object();
-    //        break;
 
-//    case QAccessible::NameChanged: {
-//        QSpiObjectReference r = getReference();
-//        QDBusVariant data;
-//        data.setVariant(QVariant::fromValue(r));
-//        emit PropertyChange("accessible-name", 0, 0, data, spiBridge->getRootReference());
-//        break;
-//    }
-//    case QAccessible::DescriptionChanged: {
-//        QSpiObjectReference r = getReference();
-//        QDBusVariant data;
-//        data.setVariant(QVariant::fromValue(r));
-//        emit PropertyChange("accessible-description", 0, 0, data, spiBridge->getRootReference());
-//        break;
-//    }
+    case QAccessible::NameChanged: {
+        QString path = pathForInterface(interface, child);
+        QDBusVariant data;
+        data.setVariant(QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(path))));
+
+        QVariantList args = packDBusSignalArguments(QLatin1String("accessible-name"), 0, 0, QVariant::fromValue(data));
+        sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                       QLatin1String("PropertyChange"), args);
+        break;
+    }
+    case QAccessible::DescriptionChanged: {
+        QString path = pathForInterface(interface, child);
+        QDBusVariant data;
+        data.setVariant(QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(path))));
+
+        QVariantList args = packDBusSignalArguments(QLatin1String("accessible-description"), 0, 0, QVariant::fromValue(data));
+        sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                       QLatin1String("PropertyChange"), args);
+        break;
+    }
     case QAccessible::Focus: {
         static QString lastFocusPath;
         // "remove" old focus
@@ -230,13 +227,17 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
 //        break;
 //    }
 //#endif
-//    case QAccessible::ValueChanged: {
-//        Q_ASSERT(interface->valueInterface());
-//        QDBusVariant data;
-//        data.setVariant(QVariant::fromValue(getReference()));
-//        emit PropertyChange("accessible-value", 0, 0, data, spiBridge->getRootReference());
-//        break;
-//    }
+    case QAccessible::ValueChanged: {
+        Q_ASSERT(interface->valueInterface());
+        QString path = pathForInterface(interface, child);
+        QDBusVariant data;
+        data.setVariant(QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(path))));
+
+        QVariantList args = packDBusSignalArguments(QLatin1String("accessible-value"), 0, 0, QVariant::fromValue(data));
+        sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                       QLatin1String("PropertyChange"), args);
+        break;
+    }
     case QAccessible::ObjectShow:
         break;
     case QAccessible::ObjectHide:
