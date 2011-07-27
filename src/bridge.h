@@ -29,10 +29,11 @@
 class DBusConnection;
 class DeviceEventControllerProxy;
 class QSpiDBusCache;
-class QAccessibleInterface;
-class QSpiAdaptor;
-class QSpiObject;
-class QSpiObjectReference;
+//class QAccessibleInterface;
+//class QSpiAdaptor;
+//class QSpiObject;
+//class QSpiObjectReference;
+class QSpiAdaptorV2;
 
 #define spiBridge QSpiAccessibleBridge::instance()
 
@@ -49,29 +50,23 @@ public:
 
         virtual void notifyAccessibilityUpdate(int reason, QAccessibleInterface *obj, int child);
 
-        QSpiObjectReference getRootReference() const;
-
-        QSpiAdaptor* createSpiObject(QAccessibleInterface* interface, int index = 0);
-
-        void removeAdaptor(QSpiAdaptor* adaptor);
+//        QSpiAdaptor* createSpiObject(QAccessibleInterface* interface, int index = 0);
+//        void removeAdaptor(QSpiAdaptor* adaptor);
 
         QDBusConnection dBusConnection() const;
-
-        QList<QSpiAdaptor*> cacheObjects() const
-        { return adaptors.values(); }
 
 private Q_SLOTS:
         void windowActivated(QObject* window);
         void objectDestroyed(QObject*);
 
 private:
-        void notifyAboutCreation(QSpiAdaptor* accessible);
-        void notifyAboutDestruction(QSpiAdaptor* accessible);
+//        void notifyAboutCreation(QSpiAdaptor* accessible);
+//        void notifyAboutDestruction(QSpiAdaptor* accessible);
         static QSpiAccessibleBridge* self;
         QSpiDBusCache *cache;
         DeviceEventControllerProxy *dec;
 
-        QHash<QString, QSpiAdaptor*> adaptors;
+        QSpiAdaptorV2 *dbusAdaptor;
 
         DBusConnection* dbusConnection;
         bool initialized;

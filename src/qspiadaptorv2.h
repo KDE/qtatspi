@@ -29,6 +29,8 @@ class QSpiAccessibleInterface;
 
 class QSpiAdaptorV2 :public QDBusVirtualObject
 {
+    Q_OBJECT
+
 public:
     QSpiAdaptorV2();
 
@@ -43,6 +45,9 @@ public:
 
     virtual QString introspect(const QString &path) const;
     virtual bool handleMessage(const QDBusMessage &message, const QDBusConnection &connection);
+
+public Q_SLOTS:
+    void windowActivated(QObject* window);
 
 private:
 

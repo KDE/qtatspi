@@ -4,24 +4,26 @@ HEADERS += \
            generated/dec_proxy.h \
            generated/socket_proxy.h \
            generated/cache_adaptor.h \
+           application.h \
            bridge.h \
            cache.h  \
            struct_marshallers.h \
            constant_mappings.h \
-    dbusconnection.h \
-    qspiadaptorv2.h
+           dbusconnection.h \
+           qspiadaptorv2.h
 
 SOURCES += \
            generated/dec_proxy.cpp \
            generated/socket_proxy.cpp \
            generated/cache_adaptor.cpp \
+           application.cpp \
            bridge.cpp \
            cache.cpp  \
            struct_marshallers.cpp \
            constant_mappings.cpp \
            main.cpp \
-    dbusconnection.cpp \
-    qspiadaptorv2.cpp
+           dbusconnection.cpp \
+           qspiadaptorv2.cpp
 
 QMAKE_CFLAGS+=-Werror
 QMAKE_CXXFLAGS+=-Werror

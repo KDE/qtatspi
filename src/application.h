@@ -36,7 +36,7 @@ class QSpiApplicationAdaptor :public QObject
     Q_OBJECT
 
 public:
-    QSpiApplicationAdaptor();
+    QSpiApplicationAdaptor(const QDBusConnection &connection, QObject *parent);
     virtual ~QSpiApplicationAdaptor() {}
 
     // the Id property gets written and read by the accessibility framework
@@ -60,6 +60,8 @@ private:
 
     int applicationId;
     QQueue<QPair<QObject*, QKeyEvent*> > keyEvents;
+
+    QDBusConnection dbusConnection;
 };
 
 #endif

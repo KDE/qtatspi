@@ -17,22 +17,18 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "application.h"
 
+#include "qapplication.h"
 #include <QDBusPendingReply>
 #include <QDebug>
 
-#include "accessible.h"
-#include "application.h"
-#include "bridge.h"
-#include "cache.h"
-
-#include "generated/accessible_adaptor.h"
-#include "generated/application_adaptor.h"
-#include "generated/socket_proxy.h"
+#include "generated/dec_proxy.h"
 
 //#define KEYBOARD_DEBUG
 
-QSpiApplicationAdaptor::QSpiApplicationAdaptor()
+QSpiApplicationAdaptor::QSpiApplicationAdaptor(const QDBusConnection &connection, QObject *parent)
+    : QObject(parent), dbusConnection(connection)
 {
     qApp->installEventFilter(this);
 }
@@ -128,12 +124,9 @@ bool QSpiApplicationAdaptor::eventFilter(QObject *target, QEvent *event)
             m.setArguments(QVariantList() <<QVariant::fromValue(de));
 
             // FIXME: this is critical, the timeout should probably be pretty low to allow normal processing
-//            int timeout = 100;
-
-
-            // FIXME
-            bool sent =  false; // = dbusConnection.callWithCallback(m, this, SLOT(notifyKeyboardListenerCallback(QDBusMessage)),
-                                  //                      SLOT(notifyKeyboardListenerError(QDBusError, QDBusMessage)), timeout);
+            int timeout = 100;
+            bool sent = dbusConnection.callWithCallback(m, this, SLOT(notifyKeyboardListenerCallback(QDBusMessage)),
+                            SLOT(notifyKeyboardListenerError(QDBusError, QDBusMessage)), timeout);
             if (!sent)
                 return false;
 
@@ -178,14 +171,4 @@ void QSpiApplicationAdaptor::notifyKeyboardListenerError(const QDBusError& error
         QPair<QObject*, QKeyEvent*> event = keyEvents.dequeue();
         QApplication::postEvent(event.first, event.second);
     }
-}
-
-int QSpiApplicationAdaptor::id() const
-{
-    return applicationId;
-}
-
-void QSpiApplicationAdaptor::setId(int value)
-{
-    applicationId = value;
 }

@@ -22,6 +22,7 @@
 
 #include "qspiadaptorv2.h"
 
+#include "application.h"
 #include "cache.h"
 #include "constant_mappings.h"
 #include "dbusconnection.h"
@@ -60,22 +61,13 @@ QSpiAccessibleBridge::QSpiAccessibleBridge()
     bool reg = dBusConnection().registerObject(QSPI_DEC_OBJECT_PATH, this, QDBusConnection::ExportAdaptors);
     qDebug() << "Registered DEC: " << reg;
 
-    QSpiAdaptorV2 *dbusAdaptor = new QSpiAdaptorV2(dbusConnection, this);
+    dbusAdaptor = new QSpiAdaptorV2(dbusConnection, this);
     dBusConnection().registerVirtualObject(QSPI_OBJECT_PATH_ACCESSIBLE, dbusAdaptor, QDBusConnection::SubPath);
     dbusAdaptor->registerApplication();
 
-//    QAccessibleInterface* i = QAccessible::queryAccessibleInterface(qApp);
-//    QSpiAdaptor* applicationAccessible = new QSpiApplication(dbusConnection->connection(), i);
-//    adaptors.insert(QString(QSPI_OBJECT_PATH_ROOT), applicationAccessible);
-//    connect(applicationAccessible, SIGNAL(windowActivated(QObject*)), this, SLOT(windowActivated(QObject*)));
+    QSpiApplicationAdaptor *applicationAdaptor = new QSpiApplicationAdaptor(dbusConnection->connection(), this);
+    connect(applicationAdaptor, SIGNAL(windowActivated(QObject*)), dbusAdaptor, SLOT(windowActivated(QObject*)));
 }
-
-//void QSpiAccessibleBridge::windowActivated(QObject* window)
-//{
-//    QSpiAdaptor* a = spiBridge->objectToAccessible(window);
-//    QSpiAccessible* acc = static_cast<QSpiAccessible*>(a);
-//    acc->windowActivated();
-//}
 
 QSpiAccessibleBridge::~QSpiAccessibleBridge()
 {
@@ -94,11 +86,6 @@ void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *interface)
     // the interface we get will be for the QApplication object.
     // we already cache it in the constructor.
     Q_ASSERT(interface->object() == qApp);
-}
-
-QSpiObjectReference QSpiAccessibleBridge::getRootReference() const
-{
-    return QSpiObjectReference(dBusConnection(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
 }
 
 void QSpiAccessibleBridge::notifyAccessibilityUpdate(int /*reason*/, QAccessibleInterface */*interface*/, int /*index*/)
@@ -236,8 +223,8 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int /*reason*/, QAccessible
 //    return accessible;
 //}
 
-void QSpiAccessibleBridge::notifyAboutCreation(QSpiAdaptor* /*accessible*/)
-{
+//void QSpiAccessibleBridge::notifyAboutCreation(QSpiAdaptor* /*accessible*/)
+//{
 //    // say hello to d-bus
 //    cache->emitAddAccessible(accessible->getCacheItem());
 
@@ -262,10 +249,10 @@ void QSpiAccessibleBridge::notifyAboutCreation(QSpiAdaptor* /*accessible*/)
 //        data.setVariant(QVariant::fromValue(r));
 //        parentAdaptor->signalChildrenChanged("add", childCount, 0, data);
 //    }
-}
+//}
 
-void QSpiAccessibleBridge::notifyAboutDestruction(QSpiAdaptor* /*accessible*/)
-{
+//void QSpiAccessibleBridge::notifyAboutDestruction(QSpiAdaptor* /*accessible*/)
+//{
 //    int childCount = 0;
 //    QSpiAdaptor* parentAdaptor = 0;
 //    if (accessible->childIndex() == 0) {
@@ -288,15 +275,15 @@ void QSpiAccessibleBridge::notifyAboutDestruction(QSpiAdaptor* /*accessible*/)
 //    }
 
 //    cache->emitRemoveAccessible(accessible->getReference());
-}
+//}
 
-void QSpiAccessibleBridge::objectDestroyed(QObject*)
-{
+//void QSpiAccessibleBridge::objectDestroyed(QObject*)
+//{
 //    QString path = QSpiAccessible::pathForObject(o);
 //    adaptors.remove(path);
-}
+//}
 
-void QSpiAccessibleBridge::removeAdaptor(QSpiAdaptor *)
-{
+//void QSpiAccessibleBridge::removeAdaptor(QSpiAdaptor *)
+//{
 //    adaptors.remove(adaptor->getReference().path.path());
-}
+//}

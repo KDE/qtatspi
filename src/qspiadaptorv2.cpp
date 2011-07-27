@@ -46,6 +46,32 @@ QString QSpiAdaptorV2::introspect(const QString &path) const
     return QString();
 }
 
+void QSpiAdaptorV2::windowActivated(QObject* window)
+{
+    QAccessibleInterface *iface = QAccessible::queryAccessibleInterface(window);
+    QString windowTitle = iface->text(QAccessible::Name, 0);
+    delete iface;
+
+    QDBusVariant data;
+    data.setVariant(windowTitle);
+//    emit Create("", 0, 0, data, spiBridge->getRootReference());
+//    emit Restore("", 0, 0, data, spiBridge->getRootReference());
+//    emit Activate("", 0, 0, data, spiBridge->getRootReference());
+
+    QString path = pathForObject(window);
+    QString interface = "org.a11y.atspi.Event.Window";
+    QString name = "Activate";
+
+    QDBusMessage message = QDBusMessage::createSignal(path, interface, name);
+    QVariantList arguments;
+    arguments << QString() << 0 << 0 << QVariant::fromValue(data)
+              << QVariant::fromValue(QSpiObjectReference(m_dbus->connection().baseService(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT)));
+    message.setArguments(arguments);
+    bool ret = m_dbus->connection().send(message);
+
+    qDebug() << "window message sent: " << ret;
+}
+
 QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString& dbusPath) const
 {
     QAccessibleInterface* inter = 0;
@@ -1209,4 +1235,3 @@ bool QSpiAdaptorV2::tableInterface(QAccessibleInterface *interface, int child, c
     }
     return true;
 }
-
