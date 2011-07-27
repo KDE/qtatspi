@@ -56,10 +56,10 @@ private:
     bool valueInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
     bool tableInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
 
-    void sendReply(const QDBusConnection &connection, const QDBusMessage &message, const QVariant &argument);
-    QAccessibleInterface *accessibleParent(QAccessibleInterface *iface, int child);
+    void sendReply(const QDBusConnection &connection, const QDBusMessage &message, const QVariant &argument) const;
+    QAccessibleInterface *accessibleParent(QAccessibleInterface *iface, int child) const;
 
-    QPair<QAccessibleInterface*, int> interfaceFromPath(const QString& dbusPath);
+    QPair<QAccessibleInterface*, int> interfaceFromPath(const QString& dbusPath) const;
     static QString pathForInterface(QAccessibleInterface *interface, int index);
     static QString pathForObject(QObject *object);
 

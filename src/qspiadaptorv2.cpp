@@ -46,7 +46,7 @@ QString QSpiAdaptorV2::introspect(const QString &path) const
     return QString();
 }
 
-QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString& dbusPath)
+QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString& dbusPath) const
 {
     QAccessibleInterface* inter = 0;
     int index = 0;
@@ -331,13 +331,13 @@ QSpiRelationArray QSpiAdaptorV2::relationSet(QAccessibleInterface *interface, in
     return relations;
 }
 
-void QSpiAdaptorV2::sendReply(const QDBusConnection &connection, const QDBusMessage &message, const QVariant &argument)
+void QSpiAdaptorV2::sendReply(const QDBusConnection &connection, const QDBusMessage &message, const QVariant &argument) const
 {
     QDBusMessage reply = message.createReply(argument);
     connection.send(reply);
 }
 
-QAccessibleInterface *QSpiAdaptorV2::accessibleParent(QAccessibleInterface *iface, int child)
+QAccessibleInterface *QSpiAdaptorV2::accessibleParent(QAccessibleInterface *iface, int child) const
 {
     if (child)
         return iface;
