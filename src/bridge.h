@@ -29,10 +29,6 @@
 class DBusConnection;
 class DeviceEventControllerProxy;
 class QSpiDBusCache;
-//class QAccessibleInterface;
-//class QSpiAdaptor;
-//class QSpiObject;
-//class QSpiObjectReference;
 class QSpiAdaptorV2;
 
 #define spiBridge QSpiAccessibleBridge::instance()

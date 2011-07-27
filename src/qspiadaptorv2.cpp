@@ -30,7 +30,6 @@
 
 #include "constant_mappings.h"
 
-
 QSpiAdaptorV2::QSpiAdaptorV2(DBusConnection *connection, QObject *parent)
     :QDBusVirtualObject(parent), m_dbus(connection)
 {
@@ -54,24 +53,9 @@ void QSpiAdaptorV2::windowActivated(QObject* window)
 
     QDBusVariant data;
     data.setVariant(windowTitle);
-//    emit Create("", 0, 0, data, spiBridge->getRootReference());
-//    emit Restore("", 0, 0, data, spiBridge->getRootReference());
-//    emit Activate("", 0, 0, data, spiBridge->getRootReference());
-
-    QString path = pathForObject(window);
-    QString interface = "org.a11y.atspi.Event.Window";
-    QString signalName = "Activate";
-
-//    QDBusMessage message = QDBusMessage::createSignal(path, interface, signalName);
-//    QVariantList arguments;
-//    arguments << QString() << 0 << 0 << QVariant::fromValue(data)
-//              << QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT)));
-//    message.setArguments(arguments);
-//    m_dbus->connection().send(message);
-
 
     QVariantList args = packDBusSignalArguments(QString(), 0, 0, QVariant::fromValue(data));
-    sendDBusSignal(path, interface, signalName, args);
+    sendDBusSignal(pathForObject(window), ATSPI_DBUS_INTERFACE_EVENT_WINDOW, QLatin1String("Activate"), args);
 }
 
 QVariantList QSpiAdaptorV2::packDBusSignalArguments(const QString &type, int data1, int data2, const QVariant &variantData) const
@@ -188,27 +172,31 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
 //        break;
 //    }
     case QAccessible::Focus: {
-        //        static QSpiAccessible *lastFocused = 0;
-        //        if (lastFocused) {
-        //            QDBusVariant data;
-        //            data.setVariant(QVariant::fromValue(lastFocused->getReference()));
-        //            emit lastFocused->StateChanged("focused", 0, 0, data, getRootReference());
-        //        }
-        //        lastFocused = qobject_cast<QSpiAccessible*>(accessible);
-        //        break;
-        qDebug() << "Focus: " << interface->object() << interface->text(QAccessible::Name, 0);
+        static QString lastFocusPath;
+        // "remove" old focus
+        if (!lastFocusPath.isEmpty()) {
+            QDBusVariant data;
+            data.setVariant(QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(lastFocusPath))));
 
-        QString path = pathForInterface(interface, child);
-        QString interface = "org.a11y.atspi.Event.Focus";
-        QString signal = "Focus";
+            QVariantList stateArgs = packDBusSignalArguments(QLatin1String("focused"), 0, 0, QVariant::fromValue(data));
+            sendDBusSignal(lastFocusPath, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                           QLatin1String("StateChanged"), stateArgs);
+        }
+        // send new focus
+        {
+            QString path = pathForInterface(interface, child);
+            QDBusVariant data;
+            data.setVariant(QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(path))));
 
-        QDBusVariant data;
-        data.setVariant(QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(path))));
-        QVariantList args = packDBusSignalArguments(QString(), 0, 0, QVariant::fromValue(data));
-        sendDBusSignal(path, interface, signal, args);
+            QVariantList stateArgs = packDBusSignalArguments(QLatin1String("focused"), 1, 0, QVariant::fromValue(data));
+            sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                           QLatin1String("StateChanged"), stateArgs);
 
-//        emit StateChanged("focused", 1, 0, data, spiBridge->getRootReference());
-//        emit Focus("", 0, 0, data, spiBridge->getRootReference());
+            QVariantList focusArgs = packDBusSignalArguments(QString(), 0, 0, QVariant::fromValue(data));
+            sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_FOCUS),
+                           QLatin1String("Focus"), focusArgs);
+            lastFocusPath = path;
+        }
         break;
     }
 //#if (QT_VERSION >= QT_VERSION_CHECK(4, 8, 0))

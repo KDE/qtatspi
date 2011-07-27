@@ -20,6 +20,8 @@
 
 #include "bridge.h"
 
+#include <qaccessible2.h>
+
 #include "qspiadaptorv2.h"
 
 #include "application.h"
@@ -31,7 +33,6 @@
 #include "generated/dec_proxy.h"
 #include "generated/event_adaptor.h"
 
-#include <qaccessible2.h>
 
 #define QSPI_DEC_NAME        "/org/a11y/atspi/Registry"
 #define QSPI_DEC_OBJECT_PATH "/org/a11y/atspi/registry/deviceeventcontroller"
