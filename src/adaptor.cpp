@@ -364,7 +364,7 @@ QString QSpiAdaptor::GetKeyBinding(int index)
     if (keyBindings.length() > 0)
         return keyBindings[0];
     else
-        return "";
+        return QString();
 }
 
 QString QSpiAdaptor::GetName(int index)
@@ -567,7 +567,7 @@ bool QSpiAdaptor::GrabFocus()
 void QSpiAdaptor::CopyText(int startPos, int endPos)
 {
     if (!checkInterface()) return;
-    return interface->editableTextInterface()->copyText(startPos, endPos);
+    interface->editableTextInterface()->copyText(startPos, endPos);
 }
 
 bool QSpiAdaptor::CutText(int startPos, int endPos)
@@ -587,9 +587,7 @@ bool QSpiAdaptor::DeleteText(int startPos, int endPos)
 bool QSpiAdaptor::InsertText(int position, const QString &text, int length)
 {
     if (!checkInterface()) return false;
-    QString resized (text);
-    resized.resize(length);
-    interface->editableTextInterface()->insertText(position, resized);
+    ;
     return TRUE;
 }
 
@@ -898,7 +896,7 @@ QSpiAttributeSet QSpiAdaptor::GetAttributes(int offset, int &startOffset, int &e
     return set;
 }
 
-QSpiRangeList QSpiAdaptor::GetBoundedRanges(int x,
+QSpiTextRangeList QSpiAdaptor::GetBoundedRanges(int x,
 					        int y,
 					        int width,
 					        int height,
@@ -906,12 +904,12 @@ QSpiRangeList QSpiAdaptor::GetBoundedRanges(int x,
 					        uint xClipType,
 					        uint yClipType)
 {
-    if (!checkInterface()) return QSpiRangeList();
+    if (!checkInterface()) return QSpiTextRangeList();
     qWarning("Not implemented: QSpiAdaptor::GetBoundedRanges");
     Q_UNUSED(x) Q_UNUSED (y) Q_UNUSED(width)
     Q_UNUSED(height) Q_UNUSED(coordType)
     Q_UNUSED(xClipType) Q_UNUSED(yClipType)
-    QSpiRangeList out0;
+    QSpiTextRangeList out0;
     return out0;
 }
 

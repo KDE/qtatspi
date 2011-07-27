@@ -19,6 +19,7 @@
 #include "qspiadaptorv2.h"
 
 #include <qaccessible.h>
+#include <qaccessible2.h>
 #include <qapplication.h>
 #include <qdbusmessage.h>
 #include <qwidget.h>
@@ -110,6 +111,16 @@ bool QSpiAdaptorV2::handleMessage(const QDBusMessage &message, const QDBusConnec
         return applicationInterface(accessible.first, accessible.second, function, message, connection);
     } else if (interface == QSPI_INTERFACE_COMPONENT) {
         return componentInterface(accessible.first, accessible.second, function, message, connection);
+    } else if (interface == QSPI_INTERFACE_ACTION) {
+        return actionInterface(accessible.first, accessible.second, function, message, connection);
+    } else if (interface == QSPI_INTERFACE_TEXT) {
+        return textInterface(accessible.first, accessible.second, function, message, connection);
+    } else if (interface == QSPI_INTERFACE_EDITABLE_TEXT) {
+        return editableTextInterface(accessible.first, accessible.second, function, message, connection);
+    } else if (interface == QSPI_INTERFACE_VALUE) {
+        return valueInterface(accessible.first, accessible.second, function, message, connection);
+    } else if (interface == QSPI_INTERFACE_TABLE) {
+        return tableInterface(accessible.first, accessible.second, function, message, connection);
     } else {
         qDebug() << "QSpiAdaptorV2::handleMessage " << message.path() << interface << function;
     }
@@ -167,20 +178,15 @@ bool QSpiAdaptorV2::accessibleInterface(QAccessibleInterface *interface, int chi
 
     if (function == "GetRole") {
         sendReply(connection, message, (uint) qSpiRoleMapping[interface->role(child)].spiRole());
-        return true;
     } else if (function == "GetName") {
         sendReply(connection, message, QVariant::fromValue(QDBusVariant(interface->text(QAccessible::Name, child))));
-        return true;
     } else if (function == "GetRoleName") {
         sendReply(connection, message, qSpiRoleMapping[interface->role(child)].name());
-        return true;
     } else if (function == "GetLocalizedRoleName") {
         sendReply(connection, message, QVariant::fromValue(qSpiRoleMapping[interface->role(child)].localizedName()));
-        return true;
     } else if (function == "GetChildCount") {
         int childCount = child ? 0 : interface->childCount();
         sendReply(connection, message, QVariant::fromValue(QDBusVariant(childCount)));
-        return true;
     } else if (function == "GetIndexInParent") {
         int childIndex = -1;
         if (child) {
@@ -192,7 +198,6 @@ bool QSpiAdaptorV2::accessibleInterface(QAccessibleInterface *interface, int chi
             delete parent;
         }
         sendReply(connection, message, childIndex);
-        return true;
     } else if (function == "GetParent") {
         QString path;
         QAccessibleInterface *parent = accessibleParent(interface, child);
@@ -207,19 +212,15 @@ bool QSpiAdaptorV2::accessibleInterface(QAccessibleInterface *interface, int chi
         // Parent is a property, so it needs to be wrapped inside an extra variant.
         sendReply(connection, message, QVariant::fromValue(
                       QDBusVariant(QVariant::fromValue(QSpiObjectReference(connection, QDBusObjectPath(path))))));
-        return true;
     } else if (function == "GetChildAtIndex") {
         Q_ASSERT(child == 0); // Don't support child of virtual child
         int index = message.arguments().first().toInt() + 1;
         sendReply(connection, message, QVariant::fromValue(
                       QSpiObjectReference(connection, QDBusObjectPath(pathForInterface(interface, index)))));
-        return true;
     } else if (function == "GetInterfaces") {
         sendReply(connection, message, accessibleInterfaces(interface, child));
-        return true;
     } else if (function == "GetDescription") {
         sendReply(connection, message, QVariant::fromValue(QDBusVariant(interface->text(QAccessible::Description, child))));
-        return true;
     } else if (function == "GetState") {
         quint64 spiState = spiStatesFromQState(interface->state(child));
         if (interface->table2Interface()) {
@@ -227,17 +228,13 @@ bool QSpiAdaptorV2::accessibleInterface(QAccessibleInterface *interface, int chi
         }
         sendReply(connection, message,
                   QVariant::fromValue(spiStateSetFromSpiStates(spiState)));
-        return true;
     } else if (function == "GetAttributes") {
         sendReply(connection, message, QVariant::fromValue(QSpiAttributeSet()));
-        return true;
     } else if (function == "GetRelationSet") {
         sendReply(connection, message, QVariant::fromValue(relationSet(interface, child, connection)));
-        return true;
     } else if (function == "GetApplication") {
         sendReply(connection, message, QVariant::fromValue(
                       QSpiObjectReference(connection, QDBusObjectPath(QSPI_OBJECT_PATH_ROOT))));
-        return true;
     } else if (function == "GetChildren") {
         QSpiObjectReferenceArray children;
         for (int i = 0; i < interface->childCount(); ++i) {
@@ -245,11 +242,11 @@ bool QSpiAdaptorV2::accessibleInterface(QAccessibleInterface *interface, int chi
             children << ref;
         }
         connection.send(message.createReply(QVariant::fromValue(children)));
-        return true;
     } else {
         qWarning() << "WARNING: QSpiAdaptorV2::handleMessage does not implement " << function << message.path();
+        return false;
     }
-    return false;
+    return true;
 }
 
 QStringList QSpiAdaptorV2::accessibleInterfaces(QAccessibleInterface *interface, int index) const
@@ -446,8 +443,6 @@ static QRect getRelativeRect(QAccessibleInterface* interface, int child)
 
 bool QSpiAdaptorV2::componentInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
-    Q_ASSERT(child >= 0);
-
     if (function == "Contains") {
         bool ret = false;
         int x = message.arguments().at(0).toInt();
@@ -552,3 +547,514 @@ QSpiRect QSpiAdaptorV2::getExtents(QAccessibleInterface *interface, int child, u
     val.height = rect.height();
     return val;
 }
+
+// Action interface
+bool QSpiAdaptorV2::actionInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+{
+    if (function == "GetNActions") {
+        sendReply(connection, message, QVariant::fromValue(QDBusVariant(QVariant::fromValue(interface->actionInterface()->actionCount()))));
+    } else if (function == "DoAction") {
+        int index = message.arguments().at(0).toInt();
+        interface->actionInterface()->doAction(index);
+        sendReply(connection, message, true);
+    } else if (function == "GetActions") {
+        if (child) {
+            qWarning() << "QSpiAdaptorV2::actionInterface: Requesting action interface for child";
+            return false;
+        }
+        sendReply(connection, message, QVariant::fromValue(getActions(interface)));
+    } else if (function == "GetName") {
+        int index = message.arguments().at(0).toInt();
+        sendReply(connection, message, interface->actionInterface()->name(index));
+    } else if (function == "GetDescription") {
+        int index = message.arguments().at(0).toInt();
+        sendReply(connection, message, interface->actionInterface()->description(index));
+    } else if (function == "GetKeyBinding") {
+        int index = message.arguments().at(0).toInt();
+        QStringList keyBindings;
+        keyBindings = interface->actionInterface()->keyBindings(index);
+        /* Might as well return the first key binding, what are the other options? */
+        if (keyBindings.length() > 0)
+            sendReply(connection, message, keyBindings.at(0));
+        else
+            sendReply(connection, message, QString());
+    } else {
+        qWarning() << "WARNING: QSpiAdaptorV2::handleMessage does not implement " << function << message.path();
+        return false;
+    }
+    return true;
+}
+
+QSpiActionArray QSpiAdaptorV2::getActions(QAccessibleInterface *interface) const
+{
+    QSpiActionArray actions;
+    for (int i = 0; i < interface->actionInterface()->actionCount(); i++)
+    {
+        QSpiAction action;
+        QStringList keyBindings;
+
+        action.name = interface->actionInterface()->name(i);
+        action.description = interface->actionInterface()->description(i);
+
+        keyBindings = interface->actionInterface()->keyBindings(i);
+
+        if (keyBindings.length() > 0)
+                action.keyBinding = keyBindings[0];
+        else
+                action.keyBinding = "";
+
+        actions << action;
+    }
+    return actions;
+}
+
+// Text interface
+bool QSpiAdaptorV2::textInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+{
+    Q_ASSERT(child == 0); // We should never claim to have a text interface on a virtual child
+    // properties
+    if (function == "GetCaretOffset") {
+        sendReply(connection, message, QVariant::fromValue(QDBusVariant(QVariant::fromValue(interface->textInterface()->cursorPosition()))));
+    } else if (function == "GetCharacterCount") {
+        sendReply(connection, message, QVariant::fromValue(QDBusVariant(QVariant::fromValue(interface->textInterface()->characterCount()))));
+
+    // functions
+    } else if (function == "AddSelection") {
+        int startOffset = message.arguments().at(0).toInt();
+        int endOffset = message.arguments().at(1).toInt();
+        int lastSelection = interface->textInterface()->selectionCount();
+        interface->textInterface()->setSelection(lastSelection, startOffset, endOffset);
+        sendReply(connection, message, (interface->textInterface()->selectionCount() > lastSelection));
+    } else if (function == "GetAttributeRun") {
+        int offset = message.arguments().at(0).toInt();
+        bool includeDefaults = message.arguments().at(1).toBool();
+        Q_UNUSED(includeDefaults)
+        connection.send(message.createReply(getAttributes(interface, offset, includeDefaults)));
+    } else if (function == "GetAttributeValue") {
+        int offset = message.arguments().at(0).toInt();
+        QString attributeName = message.arguments().at(1).toString();
+        connection.send(message.createReply(getAttributeValue(interface, offset, attributeName)));
+    } else if (function == "GetAttributes") {
+        int offset = message.arguments().at(0).toInt();
+        connection.send(message.createReply(getAttributes(interface, offset, true)));
+    } else if (function == "GetBoundedRanges") {
+        int x = message.arguments().at(0).toInt();
+        int y = message.arguments().at(1).toInt();
+        int width = message.arguments().at(2).toInt();
+        int height = message.arguments().at(3).toInt();
+        uint coordType = message.arguments().at(4).toUInt();
+        uint xClipType = message.arguments().at(5).toUInt();
+        uint yClipType = message.arguments().at(6).toUInt();
+        Q_UNUSED(x) Q_UNUSED (y) Q_UNUSED(width)
+        Q_UNUSED(height) Q_UNUSED(coordType)
+        Q_UNUSED(xClipType) Q_UNUSED(yClipType)
+        qWarning("Not implemented: QSpiAdaptor::GetBoundedRanges");
+        sendReply(connection, message, QVariant::fromValue(QSpiTextRangeList()));
+    } else if (function == "GetCharacterAtOffset") {
+        int offset = message.arguments().at(0).toInt();
+        int start;
+        int end;
+        QString result = interface->textInterface()->textAtOffset(offset, QAccessible2::CharBoundary, &start, &end);
+        sendReply(connection, message, (int) *(qPrintable (result)));
+        Q_ASSERT(0); // FIXME wtf is this!!!???!!! at least test if it produces the desired result bah
+
+    } else if (function == "GetCharacterExtents") {
+        int offset = message.arguments().at(0).toInt();
+        int coordType = message.arguments().at(1).toUInt();
+        connection.send(message.createReply(getCharacterExtents(interface, offset, coordType)));
+    } else if (function == "GetDefaultAttributeSet" || function == "GetDefaultAttributes") {
+        // GetDefaultAttributes is deprecated in favour of GetDefaultAttributeSet.
+        // Empty set seems reasonable. There is no default attribute set.
+        sendReply(connection, message, QVariant::fromValue(QSpiAttributeSet()));
+    } else if (function == "GetNSelections") {
+        sendReply(connection, message, interface->textInterface()->selectionCount());
+    } else if (function == "GetOffsetAtPoint") {
+        int x = message.arguments().at(0).toInt();
+        int y = message.arguments().at(1).toInt();
+        uint coordType = message.arguments().at(2).toUInt();
+        //            int (int x, int y, uint coordType);
+        // FIXME: relative to screen and relative to parent is not the same
+        int offset = interface->textInterface()->offsetAtPoint(QPoint (x, y), static_cast <QAccessible2::CoordinateType> (coordType));
+        sendReply(connection, message, offset);
+    } else if (function == "GetRangeExtents") {
+        int startOffset = message.arguments().at(0).toInt();
+        int endOffset = message.arguments().at(1).toInt();
+        uint coordType = message.arguments().at(2).toUInt();
+        connection.send(message.createReply(getRangeExtents(interface, startOffset, endOffset, coordType)));
+    } else if (function == "GetSelection") {
+        int selectionNum = message.arguments().at(0).toInt();
+        int start, end;
+        interface->textInterface()->selection(selectionNum, &start, &end);
+            if (start < 0) {
+            // FIXME: what is this for?
+            end = interface->textInterface()->cursorPosition();
+        }
+        QVariantList sel;
+        sel << start << end;
+        connection.send(message.createReply(sel));
+    } else if (function == "GetText") {
+        int startOffset = message.arguments().at(0).toInt();
+        int endOffset = message.arguments().at(1).toInt();
+        if (endOffset == -1) // AT-SPI uses -1 to signal all characters
+            endOffset = interface->textInterface()->characterCount();
+        sendReply(connection, message, interface->textInterface()->text(startOffset, endOffset));
+    } else if (function == "GetTextAfterOffset") {
+        int offset = message.arguments().at(0).toInt();
+        int type = message.arguments().at(1).toUInt();
+        int startOffset, endOffset;
+        QString text = interface->textInterface()->textAfterOffset(offset, qAccessibleBoundaryType(type), &startOffset, &endOffset);
+        QVariantList ret;
+        ret << text << startOffset << endOffset;
+        connection.send(message.createReply(ret));
+    } else if (function == "GetTextAtOffset") {
+        int offset = message.arguments().at(0).toInt();
+        int type = message.arguments().at(1).toUInt();
+        int startOffset, endOffset;
+        QString text = interface->textInterface()->textAtOffset(offset, qAccessibleBoundaryType(type), &startOffset, &endOffset);
+        QVariantList ret;
+        ret << text << startOffset << endOffset;
+        connection.send(message.createReply(ret));
+    } else if (function == "GetTextBeforeOffset") {
+        int offset = message.arguments().at(0).toInt();
+        int type = message.arguments().at(1).toUInt();
+        int startOffset, endOffset;
+        QString text = interface->textInterface()->textBeforeOffset(offset, qAccessibleBoundaryType(type), &startOffset, &endOffset);
+        QVariantList ret;
+        ret << text << startOffset << endOffset;
+        connection.send(message.createReply(ret));
+    } else if (function == "RemoveSelection") {
+        int selectionNum = message.arguments().at(0).toInt();
+        interface->textInterface()->removeSelection(selectionNum);
+        sendReply(connection, message, true);
+    } else if (function == "SetCaretOffset") {
+        int offset = message.arguments().at(0).toInt();
+        interface->textInterface()->setCursorPosition(offset);
+        sendReply(connection, message, true);
+    } else if (function == "SetSelection") {
+        int selectionNum = message.arguments().at(0).toInt();
+        int startOffset = message.arguments().at(1).toInt();
+        int endOffset = message.arguments().at(2).toInt();
+        interface->textInterface()->setSelection(selectionNum, startOffset, endOffset);
+        sendReply(connection, message, true);
+    } else {
+        qWarning() << "WARNING: QSpiAdaptorV2::handleMessage does not implement " << function << message.path();
+        return false;
+    }
+    return true;
+}
+
+QAccessible2::BoundaryType QSpiAdaptorV2::qAccessibleBoundaryType(int atspiTextBoundaryType) const
+{
+    switch (atspiTextBoundaryType) {
+    case ATSPI_TEXT_BOUNDARY_CHAR:
+        return QAccessible2::CharBoundary;
+    case ATSPI_TEXT_BOUNDARY_WORD_START:
+    case ATSPI_TEXT_BOUNDARY_WORD_END:
+        return QAccessible2::WordBoundary;
+    case ATSPI_TEXT_BOUNDARY_SENTENCE_START:
+    case ATSPI_TEXT_BOUNDARY_SENTENCE_END:
+        return QAccessible2::SentenceBoundary;
+    case ATSPI_TEXT_BOUNDARY_LINE_START:
+    case ATSPI_TEXT_BOUNDARY_LINE_END:
+        return QAccessible2::LineBoundary;
+    }
+    Q_ASSERT_X(0, "", "Requested invalid boundary type.");
+    return QAccessible2::CharBoundary;
+}
+
+// FIXME all attribute methods below should share code
+QVariantList QSpiAdaptorV2::getAttributes(QAccessibleInterface *interface, int offset, bool includeDefaults) const
+{
+    Q_UNUSED(includeDefaults);
+
+    QSpiAttributeSet set;
+    int startOffset;
+    int endOffset;
+
+    QString joined = interface->textInterface()->attributes(offset, &startOffset, &endOffset);
+    QStringList attributes = joined.split (';', QString::SkipEmptyParts, Qt::CaseSensitive);
+    foreach (const QString &attr, attributes) {
+        QStringList items;
+        items = attr.split(':', QString::SkipEmptyParts, Qt::CaseSensitive);
+        set[items[0]] = items[1];
+    }
+
+    QVariantList list;
+    list << QVariant::fromValue(set) << startOffset << endOffset;
+
+    return list;
+}
+
+QVariantList QSpiAdaptorV2::getAttributeValue(QAccessibleInterface *interface, int offset, const QString &attributeName) const
+{
+    QString     mapped;
+    QString     joined;
+    QStringList attributes;
+    QSpiAttributeSet map;
+    int startOffset;
+    int endOffset;
+    bool defined;
+
+    joined = interface->textInterface()->attributes(offset, &startOffset, &endOffset);
+    attributes = joined.split (';', QString::SkipEmptyParts, Qt::CaseSensitive);
+    foreach (const QString& attr, attributes) {
+        QStringList items;
+        items = attr.split(':', QString::SkipEmptyParts, Qt::CaseSensitive);
+        map[items[0]] = items[1];
+    }
+    mapped = map[attributeName];
+    if (mapped == QString())
+       defined = true;
+    else
+       defined = false;
+    QVariantList list;
+    list << mapped << startOffset << endOffset << defined;
+    return list;
+}
+
+QVariantList QSpiAdaptorV2::getCharacterExtents(QAccessibleInterface *interface, int offset, uint coordType) const
+{
+    int x;
+    int y;
+    int width;
+    int height;
+
+    // QAccessible2 has RelativeToParent as a coordinate type instead of relative
+    // to top-level window, which is an AT-SPI coordinate type.
+    if (static_cast<QAccessible2::CoordinateType>(coordType) != QAccessible2::RelativeToScreen) {
+        const QWidget *widget = qobject_cast<const QWidget*>(interface->object());
+        if (!widget) {
+            return QVariantList() << 0 << 0 << 0 << 0;
+        }
+        const QWidget *parent = widget->parentWidget();
+        while (parent) {
+            widget = parent;
+            parent = widget->parentWidget();
+        }
+        x = -widget->x();
+        y = -widget->y();
+    } else {
+        x = 0;
+        y = 0;
+    }
+
+    QRect rect = interface->textInterface()->characterRect(offset, QAccessible2::RelativeToScreen);
+    width = rect.width();
+    height = rect.height();
+    x += rect.x();
+    y += rect.y();
+
+    QVariantList list;
+    list << x << y << width << height;
+    return list;
+}
+
+QVariantList QSpiAdaptorV2::getRangeExtents(QAccessibleInterface *interface,
+                                            int startOffset, int endOffset, uint coordType) const
+{
+    int x;
+    int y;
+    int width;
+    int height;
+
+    if (endOffset == -1)
+        endOffset = interface->textInterface()->characterCount();
+
+    if (endOffset <= startOffset) {
+        return QVariantList() << 0 << 0 << 0 << 0;
+    }
+
+    int xOffset = 0, yOffset = 0;
+    QAccessibleTextInterface *textInterface = interface->textInterface();
+
+    // QAccessible2 has RelativeToParent as a coordinate type instead of relative
+    // to top-level window, which is an AT-SPI coordinate type.
+    if (static_cast<QAccessible2::CoordinateType>(coordType) != QAccessible2::RelativeToScreen) {
+        const QWidget *widget = qobject_cast<const QWidget*>(interface->object());
+        if (!widget) {
+            return QVariantList() << 0 << 0 << 0 << 0;
+        }
+        const QWidget *parent = widget->parentWidget();
+        while (parent) {
+            widget = parent;
+            parent = widget->parentWidget();
+        }
+        xOffset = -widget->x();
+        yOffset = -widget->y();
+    }
+
+    int minX=INT_MAX, minY=INT_MAX, maxX=0, maxY=0;
+
+    for (int i=startOffset; i<endOffset; i++) {
+        QRect rect = textInterface->characterRect(i, QAccessible2::RelativeToScreen);
+        if (rect.x() < minX) {
+            minX = rect.x();
+        }
+        if (rect.y() < minY) {
+            minY = rect.y();
+        }
+        if ((rect.x() + rect.width()) > maxX) {
+            maxX = (rect.x() + rect.width());
+        }
+        if ((rect.y() + rect.height()) > maxY) {
+            maxY = (rect.y() + rect.height());
+        }
+    }
+
+    width = maxX - minX;
+    height = maxY - minY;
+    y = minY + yOffset;
+    x = minX + xOffset;
+    QVariantList list;
+    list << x << y << width << height;
+    return list;
+}
+
+
+
+// Editable Text interface
+bool QSpiAdaptorV2::editableTextInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+{
+    Q_ASSERT(child == 0); // We should never claim to have a text interface on a virtual child
+    if (function == "CopyText") {
+        int startPos = message.arguments().at(0).toInt();
+        int endPos = message.arguments().at(1).toInt();
+        interface->editableTextInterface()->copyText(startPos, endPos);
+        connection.send(message.createReply(true));
+    } else if (function == "CutText") {
+        int startPos = message.arguments().at(0).toInt();
+        int endPos = message.arguments().at(1).toInt();
+        interface->editableTextInterface()->cutText(startPos, endPos);
+        connection.send(message.createReply(true));
+    } else if (function == "DeleteText") {
+        int startPos = message.arguments().at(0).toInt();
+        int endPos = message.arguments().at(1).toInt();
+        interface->editableTextInterface()->deleteText(startPos, endPos);
+        connection.send(message.createReply(true));
+    } else if (function == "InsertText") {
+        int position = message.arguments().at(0).toInt();
+        QString text = message.arguments().at(1).toString();
+        int length = message.arguments().at(2).toInt();
+        QString resized (text);
+        resized.resize(length);
+        interface->editableTextInterface()->insertText(position, resized);
+        connection.send(message.createReply(true));
+    } else if (function == "PasteText") {
+        int position = message.arguments().at(0).toInt();
+        interface->editableTextInterface()->pasteText(position);
+        connection.send(message.createReply(true));
+    } else if (function == "SetTextContents") {
+        QString newContents = message.arguments().at(0).toString();
+        interface->editableTextInterface()->replaceText(0, interface->textInterface()->characterCount(), newContents);
+        connection.send(message.createReply(true));
+    } else if (function == "") {
+        connection.send(message.createReply());
+    } else {
+        qWarning() << "WARNING: QSpiAdaptorV2::handleMessage does not implement " << function << message.path();
+        return false;
+    }
+    return true;
+}
+
+// Value interface
+bool QSpiAdaptorV2::valueInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+{
+    Q_ASSERT(child == 0);
+    if (0) {
+    } else if (function == "SetCurrentValue") {
+        double value = message.arguments().at(0).toInt();
+        //Temporal fix
+        //See https://bugzilla.gnome.org/show_bug.cgi?id=652596
+        interface->valueInterface()->setCurrentValue(value);
+        connection.send(message.createReply()); // FIXME is the reply needed?
+    } else if (function == "GetCurrentValue") {
+        bool success;
+        double val = interface->valueInterface()->currentValue().toDouble(&success);
+        if (!success) {
+            qWarning ("QSpiAdaptorV2::valueInterface: Could not convert current value to double.");
+        }
+        connection.send(message.createReply(
+                            QVariant::fromValue(QDBusVariant(QVariant::fromValue(val)))));
+    } else if (function == "GetMaximumValue") {
+        bool success;
+        double val = interface->valueInterface()->maximumValue().toDouble(&success);
+        if (!success) {
+            qWarning ("QSpiAdaptorV2::valueInterface: Could not convert current value to double.");
+        }
+        connection.send(message.createReply(
+                            QVariant::fromValue(QDBusVariant(QVariant::fromValue(val)))));
+    } else if (function == "GetMinimumIncrement") {
+        connection.send(message.createReply(
+                            QVariant::fromValue(QDBusVariant(QVariant::fromValue(0.0)))));
+    } else if (function == "GetMinimumValue") {
+        bool success;
+        double val = interface->valueInterface()->minimumValue().toDouble(&success);
+        if (!success) {
+            qWarning ("QSpiAdaptorV2::valueInterface: Could not convert current value to double.");
+        }
+        connection.send(message.createReply(
+                            QVariant::fromValue(QDBusVariant(QVariant::fromValue(val)))));
+    } else {
+        qWarning() << "WARNING: QSpiAdaptorV2::handleMessage does not implement " << function << message.path();
+        return false;
+    }
+    return true;
+}
+
+// Table interface
+bool QSpiAdaptorV2::tableInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+{
+    Q_ASSERT(child == 0);
+    if (function == "") {
+
+        Q_UNUSED(interface) Q_UNUSED(message) Q_UNUSED(connection)
+
+        //public: // PROPERTIES
+        //    Q_PROPERTY(QSpiObjectReference Caption READ caption)
+        //    QSpiObjectReference caption() const;
+
+        //    Q_PROPERTY(int NColumns READ nColumns)
+        //    int nColumns() const;
+
+        //    Q_PROPERTY(int NRows READ nRows)
+        //    int nRows() const;
+
+        //    Q_PROPERTY(int NSelectedColumns READ nSelectedColumns)
+        //    int nSelectedColumns() const;
+
+        //    Q_PROPERTY(int NSelectedRows READ nSelectedRows)
+        //    int nSelectedRows() const;
+
+        //    Q_PROPERTY(QSpiObjectReference Summary READ summary)
+        //    QSpiObjectReference summary() const;
+
+        //public Q_SLOTS: // METHODS
+        //    bool AddColumnSelection(int column);
+        //    bool AddRowSelection(int row);
+        //    QSpiObjectReference GetAccessibleAt(int row, int column);
+        //    int GetColumnAtIndex(int index);
+        //    QString GetColumnDescription(int column);
+        //    int GetColumnExtentAt(int row, int column);
+        //    QSpiObjectReference GetColumnHeader(int column);
+        //    int GetIndexAt(int row, int column);
+        //    int GetRowAtIndex(int index);
+        //    bool GetRowColumnExtentsAtIndex(int index, int &row, int &col, int &row_extents, int &col_extents, bool &is_selected);
+        //    QString GetRowDescription(int row);
+        //    int GetRowExtentAt(int row, int column);
+        //    QSpiObjectReference GetRowHeader(int row);
+        //    QSpiIntList GetSelectedColumns();
+        //    QSpiIntList GetSelectedRows();
+        //    bool IsColumnSelected(int column);
+        //    bool IsRowSelected(int row);
+        //    bool IsSelected(int row, int column);
+        //    bool RemoveColumnSelection(int column);
+        //    bool RemoveRowSelection(int row);
+    } else if (function == "") {
+
+    } else {
+        qWarning() << "WARNING: QSpiAdaptorV2::handleMessage does not implement " << function << message.path();
+        return false;
+    }
+    return true;
+}
+

@@ -69,7 +69,7 @@ QSpiAttributeSet TextAdaptor::GetAttributes(int offset, int &startOffset, int &e
     return parent()->GetAttributes(offset, startOffset, endOffset);
 }
 
-QSpiRangeList TextAdaptor::GetBoundedRanges(int x, int y, int width, int height, uint coordType, uint xClipType, uint yClipType)
+QSpiTextRangeList TextAdaptor::GetBoundedRanges(int x, int y, int width, int height, uint coordType, uint xClipType, uint yClipType)
 {
     // handle method call org.a11y.atspi.Text.GetBoundedRanges
     return parent()->GetBoundedRanges(x, y, width, height, coordType, xClipType, yClipType);

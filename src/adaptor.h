@@ -204,7 +204,7 @@ public Q_SLOTS:
     QSpiAttributeSet GetAttributeRun(int offset, bool includeDefaults, int &startOffset, int &endOffset);
     QString GetAttributeValue(int offset, const QString &attributeName, int &startOffset, int &endOffset, bool &defined);
     QSpiAttributeSet GetAttributes(int offset, int &startOffset, int &endOffset);
-    QSpiRangeList GetBoundedRanges(int x, int y, int width, int height, uint coordType, uint xClipType, uint yClipType);
+    QSpiTextRangeList GetBoundedRanges(int x, int y, int width, int height, uint coordType, uint xClipType, uint yClipType);
     int GetCharacterAtOffset(int offset);
     int GetCharacterExtents(int offset, uint coordType, int &y, int &width, int &height);
     QSpiAttributeSet GetDefaultAttributeSet();

@@ -143,46 +143,46 @@ public:
     inline QSpiAdaptor *parent() const
     { return static_cast<QSpiAdaptor *>(QObject::parent()); }
 
-public: // PROPERTIES
-    Q_PROPERTY(QSpiObjectReference Caption READ caption)
-    QSpiObjectReference caption() const;
+//public: // PROPERTIES
+//    Q_PROPERTY(QSpiObjectReference Caption READ caption)
+//    QSpiObjectReference caption() const;
 
-    Q_PROPERTY(int NColumns READ nColumns)
-    int nColumns() const;
+//    Q_PROPERTY(int NColumns READ nColumns)
+//    int nColumns() const;
 
-    Q_PROPERTY(int NRows READ nRows)
-    int nRows() const;
+//    Q_PROPERTY(int NRows READ nRows)
+//    int nRows() const;
 
-    Q_PROPERTY(int NSelectedColumns READ nSelectedColumns)
-    int nSelectedColumns() const;
+//    Q_PROPERTY(int NSelectedColumns READ nSelectedColumns)
+//    int nSelectedColumns() const;
 
-    Q_PROPERTY(int NSelectedRows READ nSelectedRows)
-    int nSelectedRows() const;
+//    Q_PROPERTY(int NSelectedRows READ nSelectedRows)
+//    int nSelectedRows() const;
 
-    Q_PROPERTY(QSpiObjectReference Summary READ summary)
-    QSpiObjectReference summary() const;
+//    Q_PROPERTY(QSpiObjectReference Summary READ summary)
+//    QSpiObjectReference summary() const;
 
-public Q_SLOTS: // METHODS
-    bool AddColumnSelection(int column);
-    bool AddRowSelection(int row);
-    QSpiObjectReference GetAccessibleAt(int row, int column);
-    int GetColumnAtIndex(int index);
-    QString GetColumnDescription(int column);
-    int GetColumnExtentAt(int row, int column);
-    QSpiObjectReference GetColumnHeader(int column);
-    int GetIndexAt(int row, int column);
-    int GetRowAtIndex(int index);
-    bool GetRowColumnExtentsAtIndex(int index, int &row, int &col, int &row_extents, int &col_extents, bool &is_selected);
-    QString GetRowDescription(int row);
-    int GetRowExtentAt(int row, int column);
-    QSpiObjectReference GetRowHeader(int row);
-    QSpiIntList GetSelectedColumns();
-    QSpiIntList GetSelectedRows();
-    bool IsColumnSelected(int column);
-    bool IsRowSelected(int row);
-    bool IsSelected(int row, int column);
-    bool RemoveColumnSelection(int column);
-    bool RemoveRowSelection(int row);
+//public Q_SLOTS: // METHODS
+//    bool AddColumnSelection(int column);
+//    bool AddRowSelection(int row);
+//    QSpiObjectReference GetAccessibleAt(int row, int column);
+//    int GetColumnAtIndex(int index);
+//    QString GetColumnDescription(int column);
+//    int GetColumnExtentAt(int row, int column);
+//    QSpiObjectReference GetColumnHeader(int column);
+//    int GetIndexAt(int row, int column);
+//    int GetRowAtIndex(int index);
+//    bool GetRowColumnExtentsAtIndex(int index, int &row, int &col, int &row_extents, int &col_extents, bool &is_selected);
+//    QString GetRowDescription(int row);
+//    int GetRowExtentAt(int row, int column);
+//    QSpiObjectReference GetRowHeader(int row);
+//    QSpiIntList GetSelectedColumns();
+//    QSpiIntList GetSelectedRows();
+//    bool IsColumnSelected(int column);
+//    bool IsRowSelected(int row);
+//    bool IsSelected(int row, int column);
+//    bool RemoveColumnSelection(int column);
+//    bool RemoveRowSelection(int row);
 Q_SIGNALS: // SIGNALS
 };
 

@@ -18,6 +18,7 @@
 #ifndef QSPIADAPTORV2_H
 #define QSPIADAPTORV2_H
 
+#include <qaccessible2.h>
 #include <qdbusvirtualobject.h>
 
 #include "dbusconnection.h"
@@ -49,6 +50,11 @@ private:
     bool applicationInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
     bool accessibleInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
     bool componentInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
+    bool actionInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
+    bool textInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
+    bool editableTextInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
+    bool valueInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
+    bool tableInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);
 
     void sendReply(const QDBusConnection &connection, const QDBusMessage &message, const QVariant &argument);
     QAccessibleInterface *accessibleParent(QAccessibleInterface *iface, int child);
@@ -64,6 +70,15 @@ private:
     // component helper functions
     static QSpiRect getExtents(QAccessibleInterface *interface, int child, uint coordType);
 
+    // action helper functions
+    QSpiActionArray getActions(QAccessibleInterface *interface) const;
+
+    // text helper functions
+    QVariantList getAttributes(QAccessibleInterface *interface, int offset, bool includeDefaults) const;
+    QVariantList getAttributeValue(QAccessibleInterface *interface, int offset, const QString &attributeName) const;
+    QVariantList getCharacterExtents(QAccessibleInterface *interface, int offset, uint coordType) const;
+    QVariantList getRangeExtents(QAccessibleInterface *interface, int startOffset, int endOffset, uint coordType) const;
+    QAccessible2::BoundaryType qAccessibleBoundaryType(int atspiTextBoundaryType) const;
 
     // private vars
     QSpiObjectReference accessibilityRegistry;
