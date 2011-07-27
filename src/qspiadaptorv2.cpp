@@ -60,16 +60,33 @@ void QSpiAdaptorV2::windowActivated(QObject* window)
 
     QString path = pathForObject(window);
     QString interface = "org.a11y.atspi.Event.Window";
-    QString name = "Activate";
+    QString signalName = "Activate";
 
-    QDBusMessage message = QDBusMessage::createSignal(path, interface, name);
+//    QDBusMessage message = QDBusMessage::createSignal(path, interface, signalName);
+//    QVariantList arguments;
+//    arguments << QString() << 0 << 0 << QVariant::fromValue(data)
+//              << QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT)));
+//    message.setArguments(arguments);
+//    m_dbus->connection().send(message);
+
+
+    QVariantList args = packDBusSignalArguments(QString(), 0, 0, QVariant::fromValue(data));
+    sendDBusSignal(path, interface, signalName, args);
+}
+
+QVariantList QSpiAdaptorV2::packDBusSignalArguments(const QString &type, int data1, int data2, const QVariant &variantData) const
+{
     QVariantList arguments;
-    arguments << QString() << 0 << 0 << QVariant::fromValue(data)
-              << QVariant::fromValue(QSpiObjectReference(m_dbus->connection().baseService(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT)));
-    message.setArguments(arguments);
-    bool ret = m_dbus->connection().send(message);
+    arguments << type << data1 << data2 << variantData
+              << QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT)));
+    return arguments;
+}
 
-    qDebug() << "window message sent: " << ret;
+bool QSpiAdaptorV2::sendDBusSignal(const QString &path, const QString &interface, const QString &signalName, const QVariantList &arguments) const
+{
+    QDBusMessage message = QDBusMessage::createSignal(path, interface, signalName);
+    message.setArguments(arguments);
+    return m_dbus->connection().send(message);
 }
 
 QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString& dbusPath) const
@@ -106,6 +123,170 @@ QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString
     }
 
     return QPair<QAccessibleInterface*, int>(inter, index);
+}
+
+void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int child) const
+{
+    Q_UNUSED(child)
+
+    Q_ASSERT(interface);
+    if (!interface->isValid()) {
+        //spiBridge->removeAdaptor(this);
+        // FIXME announce that this thing is dead? will it ever happen?
+        Q_ASSERT_X(0, "", "Got an update for an invalid inteface. Investigate this.");
+        return;
+    }
+
+    switch (reason) {
+    //    case QAccessible::ObjectCreated:
+    //        qDebug() << "created" << interface->object();
+    //        // make sure we don't duplicate this. seems to work for qml loaders.
+    //        notifyAboutCreation(accessible);
+    //        break;
+    //    case QAccessible::ObjectShow:
+    //        qDebug() << "show" << interface->object();
+    //        break;
+
+    //    case QAccessible::TableModelChanged:
+    //        QAccessible2::TableModelChange change = interface->table2Interface()->modelChange();
+    //        // assume we should reset if everything is 0
+    //        if (change.firstColumn == 0 && change.firstRow == 0 && change.lastColumn == 0 && change.lastRow == 0) {
+    //            notifyAboutDestruction(accessible);
+    //            notifyAboutCreation(accessible);
+    //        }
+    //        break;
+    //    if (!initialized)
+    //        return;
+    //    // this gets deleted, so create one if we don't have it yet
+    //    QSpiAdaptor* accessible = interfaceToAccessible(interface, index, false);
+    //    if (accessible->associatedInterface()->object() != interface->object()) {
+    //        qWarning() << "WARNING: Creating accessible with different object than the original interface"
+    //                   << accessible->associatedInterface()->object() << " new: " << interface->object();
+    //    }
+    //    switch (reason) {
+    //    case QAccessible::ObjectCreated:
+    //        qDebug() << "created" << interface->object();
+    //        // make sure we don't duplicate this. seems to work for qml loaders.
+    //        notifyAboutCreation(accessible);
+    //        break;
+    //    case QAccessible::ObjectShow:
+    //        qDebug() << "show" << interface->object();
+    //        break;
+
+//    case QAccessible::NameChanged: {
+//        QSpiObjectReference r = getReference();
+//        QDBusVariant data;
+//        data.setVariant(QVariant::fromValue(r));
+//        emit PropertyChange("accessible-name", 0, 0, data, spiBridge->getRootReference());
+//        break;
+//    }
+//    case QAccessible::DescriptionChanged: {
+//        QSpiObjectReference r = getReference();
+//        QDBusVariant data;
+//        data.setVariant(QVariant::fromValue(r));
+//        emit PropertyChange("accessible-description", 0, 0, data, spiBridge->getRootReference());
+//        break;
+//    }
+    case QAccessible::Focus: {
+        //        static QSpiAccessible *lastFocused = 0;
+        //        if (lastFocused) {
+        //            QDBusVariant data;
+        //            data.setVariant(QVariant::fromValue(lastFocused->getReference()));
+        //            emit lastFocused->StateChanged("focused", 0, 0, data, getRootReference());
+        //        }
+        //        lastFocused = qobject_cast<QSpiAccessible*>(accessible);
+        //        break;
+        qDebug() << "Focus: " << interface->object() << interface->text(QAccessible::Name, 0);
+
+        QString path = pathForInterface(interface, child);
+        QString interface = "org.a11y.atspi.Event.Focus";
+        QString signal = "Focus";
+
+        QDBusVariant data;
+        data.setVariant(QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(path))));
+        QVariantList args = packDBusSignalArguments(QString(), 0, 0, QVariant::fromValue(data));
+        sendDBusSignal(path, interface, signal, args);
+
+//        emit StateChanged("focused", 1, 0, data, spiBridge->getRootReference());
+//        emit Focus("", 0, 0, data, spiBridge->getRootReference());
+        break;
+    }
+//#if (QT_VERSION >= QT_VERSION_CHECK(4, 8, 0))
+//    case QAccessible::TextUpdated: {
+//        Q_ASSERT(interface->textInterface());
+
+//        // at-spi doesn't have a proper text updated/changed, so remove all and re-add the new text
+//        qDebug() << "Text changed: " << interface->object();
+//        QDBusVariant data;
+//        data.setVariant(QVariant::fromValue(oldText));
+//        emit TextChanged("delete", 0, oldText.length(), data, spiBridge->getRootReference());
+
+//        QString text = interface->textInterface()->text(0, interface->textInterface()->characterCount());
+//        data.setVariant(QVariant::fromValue(text));
+//        emit TextChanged("insert", 0, text.length(), data, spiBridge->getRootReference());
+//        oldText = text;
+
+//        QDBusVariant cursorData;
+//        int pos = interface->textInterface()->cursorPosition();
+//        cursorData.setVariant(QVariant::fromValue(pos));
+//        emit TextCaretMoved(QString(), pos ,0, cursorData, spiBridge->getRootReference());
+//        break;
+//    }
+//    case QAccessible::TextCaretMoved: {
+//        Q_ASSERT(interface->textInterface());
+//        qDebug() << "Text caret moved: " << interface->object();
+//        QDBusVariant data;
+//        int pos = interface->textInterface()->cursorPosition();
+//        data.setVariant(QVariant::fromValue(pos));
+//        emit TextCaretMoved(QString(), pos ,0, data, spiBridge->getRootReference());
+//        break;
+//    }
+//#endif
+//    case QAccessible::ValueChanged: {
+//        Q_ASSERT(interface->valueInterface());
+//        QDBusVariant data;
+//        data.setVariant(QVariant::fromValue(getReference()));
+//        emit PropertyChange("accessible-value", 0, 0, data, spiBridge->getRootReference());
+//        break;
+//    }
+    case QAccessible::ObjectShow:
+        break;
+    case QAccessible::ObjectHide:
+        // TODO - send status changed
+//        qWarning() << "Object hide";
+        break;
+//    case QAccessible::ObjectDestroyed:
+//        // TODO - maybe send children-changed and cache Removed
+////        qWarning() << "Object destroyed";
+//        break;
+//    case QAccessible::StateChanged: {
+//        QAccessible::State newState = interface->state(childIndex());
+////        qDebug() << "StateChanged: old: " << state << " new: " << newState << " xor: " << (state^newState);
+//        if ((state^newState) & QAccessible::Checked) {
+//            int checked = (newState & QAccessible::Checked) ? 1 : 0;
+//            QDBusVariant data;
+//            data.setVariant(QVariant::fromValue(getReference()));
+//            emit StateChanged("checked", checked, 0, data, spiBridge->getRootReference());
+//        }
+//        state = newState;
+//        break;
+//    }
+//    case QAccessible::TableModelChanged: {
+//        // This is rather evil. We don't send data and hope that at-spi fetches the right child.
+//        // This hack fails when a row gets removed and a different one added in its place.
+//        QDBusVariant data;
+//        emit ChildrenChanged("add", 0, 0, data, spiBridge->getRootReference());
+//        break;
+//    }
+    case QAccessible::ParentChanged:
+        // FIXME send parent changed
+        break;
+    default:
+        qWarning() << "QSpiAccessible::accessibleEvent not handled: " << QString::number(reason, 16)
+                   << " obj: " << interface->object()
+                   << (interface->isValid() ? interface->object()->objectName() : " invalid interface!");
+        break;
+    }
 }
 
 bool QSpiAdaptorV2::handleMessage(const QDBusMessage &message, const QDBusConnection &connection)

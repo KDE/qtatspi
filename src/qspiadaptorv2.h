@@ -46,10 +46,15 @@ public:
     virtual QString introspect(const QString &path) const;
     virtual bool handleMessage(const QDBusMessage &message, const QDBusConnection &connection);
 
+    void notify(int reason, QAccessibleInterface *interface, int child) const;
+
 public Q_SLOTS:
     void windowActivated(QObject* window);
 
 private:
+    // sending messages
+    QVariantList packDBusSignalArguments(const QString &type, int data1, int data2, const QVariant &variantData) const;
+    bool sendDBusSignal(const QString &path, const QString &interface, const QString &name, const QVariantList &arguments) const;
 
     // handlers for the different accessible interfaces
     bool applicationInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection);

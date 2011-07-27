@@ -88,22 +88,10 @@ void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *interface)
     Q_ASSERT(interface->object() == qApp);
 }
 
-void QSpiAccessibleBridge::notifyAccessibilityUpdate(int /*reason*/, QAccessibleInterface */*interface*/, int /*index*/)
+void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface, int index)
 {
-//    Q_ASSERT(interface && interface->isValid());
+    dbusAdaptor->notify(reason, interface, index);
 
-//    return;
-//        break;
-//    }
-//    case QAccessible::TableModelChanged:
-//        QAccessible2::TableModelChange change = interface->table2Interface()->modelChange();
-//        // assume we should reset if everything is 0
-//        if (change.firstColumn == 0 && change.firstRow == 0 && change.lastColumn == 0 && change.lastRow == 0) {
-//            notifyAboutDestruction(accessible);
-//            notifyAboutCreation(accessible);
-//        }
-//        // FIXME: react to other changes properly
-//        break;
 //    switch (reason) {
 //    case QAccessible::ObjectCreated:
 //        qDebug() << "created" << interface->object();
