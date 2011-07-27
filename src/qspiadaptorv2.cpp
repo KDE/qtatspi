@@ -83,16 +83,13 @@ QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString
     }
 
     QStringList parts = dbusPath.split('/');
-
     if (parts.size() <= 5) {
         qWarning() << "invalid path: " << dbusPath;
         return QPair<QAccessibleInterface*, int>(0, 0);
     }
 
     QString objectString = parts.at(5);
-
     quintptr uintptr = objectString.toULongLong();
-
     if (!uintptr)
         return QPair<QAccessibleInterface*, int>(0, 0);
 
@@ -154,7 +151,6 @@ bool QSpiAdaptorV2::handleMessage(const QDBusMessage &message, const QDBusConnec
 }
 
 // Application
-
 bool QSpiAdaptorV2::applicationInterface(QAccessibleInterface *, int, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
 
@@ -173,7 +169,6 @@ bool QSpiAdaptorV2::applicationInterface(QAccessibleInterface *, int, const QStr
 
         return false;
 }
-
 
 void QSpiAdaptorV2::registerApplication()
 {
@@ -197,7 +192,6 @@ void QSpiAdaptorV2::registerApplication()
 }
 
 // Accessible
-
 bool QSpiAdaptorV2::accessibleInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
     Q_ASSERT(child >= 0);
@@ -426,7 +420,6 @@ QString QSpiAdaptorV2::pathForInterface(QAccessibleInterface *interface, int chi
 }
 
 // Component
-
 static QAccessibleInterface *getWindow(QAccessibleInterface* interface)
 {
     QAccessibleInterface *current=NULL, *tmp=NULL;
