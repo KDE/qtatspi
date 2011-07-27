@@ -264,30 +264,30 @@ void QSpiAccessibleBridge::notifyAboutCreation(QSpiAdaptor* /*accessible*/)
 //    }
 }
 
-void QSpiAccessibleBridge::notifyAboutDestruction(QSpiAdaptor* accessible)
+void QSpiAccessibleBridge::notifyAboutDestruction(QSpiAdaptor* /*accessible*/)
 {
-    int childCount = 0;
-    QSpiAdaptor* parentAdaptor = 0;
-    if (accessible->childIndex() == 0) {
-        QAccessibleInterface *parent = 0;
-        accessible->associatedInterface()->navigate(QAccessible::Ancestor, 1, &parent);
-        if (parent) {
-            parentAdaptor = interfaceToAccessible(parent, 0, true);
-            childCount = parent->childCount();
-        }
-    } else {
-        parentAdaptor = interfaceToAccessible(accessible->associatedInterface(), 0, true);
-        childCount = accessible->associatedInterface()->childCount();
-    }
+//    int childCount = 0;
+//    QSpiAdaptor* parentAdaptor = 0;
+//    if (accessible->childIndex() == 0) {
+//        QAccessibleInterface *parent = 0;
+//        accessible->associatedInterface()->navigate(QAccessible::Ancestor, 1, &parent);
+//        if (parent) {
+//            parentAdaptor = interfaceToAccessible(parent, 0, true);
+//            childCount = parent->childCount();
+//        }
+//    } else {
+//        parentAdaptor = interfaceToAccessible(accessible->associatedInterface(), 0, true);
+//        childCount = accessible->associatedInterface()->childCount();
+//    }
 
-    if (parentAdaptor) {
-        QSpiObjectReference r = accessible->getReference();
-        QDBusVariant data;
-        data.setVariant(QVariant::fromValue(r));
-        parentAdaptor->signalChildrenChanged("remove", 1, 0, data);
-    }
+//    if (parentAdaptor) {
+//        QSpiObjectReference r = accessible->getReference();
+//        QDBusVariant data;
+//        data.setVariant(QVariant::fromValue(r));
+//        parentAdaptor->signalChildrenChanged("remove", 1, 0, data);
+//    }
 
-    cache->emitRemoveAccessible(accessible->getReference());
+//    cache->emitRemoveAccessible(accessible->getReference());
 }
 
 void QSpiAccessibleBridge::objectDestroyed(QObject*)

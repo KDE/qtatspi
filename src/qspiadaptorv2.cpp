@@ -1005,52 +1005,202 @@ bool QSpiAdaptorV2::valueInterface(QAccessibleInterface *interface, int child, c
 bool QSpiAdaptorV2::tableInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
     Q_ASSERT(child == 0);
-    if (function == "") {
+    if (0) {
+    // properties
+    } else if (function == "GetCaption") {
+        // fixme: leak of QAI
+        QObject *object = interface->tableInterface()->caption()->object();
+        if (!object) {
+            connection.send(message.createReply(QVariant::fromValue(QDBusVariant(QVariant::fromValue(QSpiObjectReference())))));
+        } else {
+            QDBusObjectPath path(pathForObject(object));
+            QSpiObjectReference ref(connection, path);
+            connection.send(message.createReply(QVariant::fromValue(QDBusVariant(QVariant::fromValue(ref)))));
+        }
+    } else if (function == "GetNColumns") {
+        connection.send(message.createReply(QVariant::fromValue(QDBusVariant(
+            QVariant::fromValue(interface->table2Interface()->columnCount())))));
+    } else if (function == "GetNRows") {
+        connection.send(message.createReply(QVariant::fromValue(QDBusVariant(
+            QVariant::fromValue(interface->table2Interface()->rowCount())))));
+    } else if (function == "GetNSelectedColumns") {
+        connection.send(message.createReply(QVariant::fromValue(QDBusVariant(
+            QVariant::fromValue(interface->table2Interface()->selectedColumnCount())))));
+    } else if (function == "GetNSelectedRows") {
+        connection.send(message.createReply(QVariant::fromValue(QDBusVariant(
+            QVariant::fromValue(interface->table2Interface()->selectedRowCount())))));
+    } else if (function == "GetSummary") {
+        // fixme: leak of QAI
+        QObject *object = interface->tableInterface()->summary()->object();
+        if (!object) {
+            connection.send(message.createReply(QVariant::fromValue(QDBusVariant(QVariant::fromValue(QSpiObjectReference())))));
+        } else {
+            QDBusObjectPath path(pathForObject(object));
+            QSpiObjectReference ref(connection, path);
+            connection.send(message.createReply(QVariant::fromValue(QDBusVariant(QVariant::fromValue(ref)))));
+        }
 
-        Q_UNUSED(interface) Q_UNUSED(message) Q_UNUSED(connection)
+    // methods
+    } else if (function == "GetAccessibleAt") {
+        int row = message.arguments().at(0).toInt();
+        int column = message.arguments().at(1).toInt();
+        Q_ASSERT(interface->table2Interface());
+        Q_ASSERT(row >= 0);
+        Q_ASSERT(column >= 0);
+        Q_ASSERT(row < interface->table2Interface()->rowCount());
+        Q_ASSERT(column < interface->table2Interface()->columnCount());
 
-        //public: // PROPERTIES
-        //    Q_PROPERTY(QSpiObjectReference Caption READ caption)
-        //    QSpiObjectReference caption() const;
+        QSpiObjectReference ref;
+        QAccessibleInterface* cell = interface->table2Interface()->cellAt(row, column);
+        if (cell) {
+            ref = QSpiObjectReference(connection, QDBusObjectPath(pathForInterface(cell, 0)));
+            delete cell;
+        } else {
+            qWarning() << "WARNING: no cell interface returned for " << interface->object() << row << column;
+            ref = QSpiObjectReference();
+        }
+        connection.send(message.createReply(QVariant::fromValue(ref)));
 
-        //    Q_PROPERTY(int NColumns READ nColumns)
-        //    int nColumns() const;
+    } else if (function == "GetIndexAt") {
+        int row = message.arguments().at(0).toInt();
+        int column = message.arguments().at(1).toInt();
+        QAccessibleInterface *cell = interface->table2Interface()->cellAt(row, column);
+        int index = interface->indexOfChild(cell);
+        qDebug() << "QSpiAdaptor::GetIndexAt" << row << column << index;
+        Q_ASSERT(index > 0);
+        delete cell;
+        connection.send(message.createReply(index));
 
-        //    Q_PROPERTY(int NRows READ nRows)
-        //    int nRows() const;
+    } else if (function == "GetColumnAtIndex") {
+        int index = message.arguments().at(0).toInt();
+        int ret = 0;
+        if (index > 1) {
+            QAccessibleInterface *iface;
+            interface->navigate(QAccessible::Child, index, &iface);
+            if (iface) {
+                qDebug() << "iface: " << iface->text(QAccessible::Name, 0);
 
-        //    Q_PROPERTY(int NSelectedColumns READ nSelectedColumns)
-        //    int nSelectedColumns() const;
+                QAccessibleTable2CellInterface *cell = static_cast<QAccessibleTable2CellInterface*>(iface);
+                ret = cell->columnIndex();
+                delete cell;
+            }
+        }
+        connection.send(message.createReply(ret));
+    } else if (function == "GetRowAtIndex") {
+        // FIXME merge with GetColumnAtIndex
+        int index = message.arguments().at(0).toInt();
+        int ret = 0;
+        qDebug() << "QSpiAdaptor::GetRowAtIndex" << index;
+        if (index > 1) {
+            QAccessibleInterface *iface;
+            interface->navigate(QAccessible::Child, index, &iface);
+            if (iface) {
+                qDebug() << "iface: " << iface->text(QAccessible::Name, 0);
 
-        //    Q_PROPERTY(int NSelectedRows READ nSelectedRows)
-        //    int nSelectedRows() const;
+                QAccessibleTable2CellInterface *cell = static_cast<QAccessibleTable2CellInterface*>(iface);
+                ret = cell->rowIndex();
+                delete cell;
+            }
+        }
+        connection.send(message.createReply(ret));
 
-        //    Q_PROPERTY(QSpiObjectReference Summary READ summary)
-        //    QSpiObjectReference summary() const;
+    } else if (function == "GetColumnDescription") {
+        int column = message.arguments().at(0).toInt();
+        connection.send(message.createReply(interface->table2Interface()->columnDescription(column)));
+    } else if (function == "GetRowDescription") {
+        int row = message.arguments().at(0).toInt();
+        connection.send(message.createReply(interface->table2Interface()->rowDescription(row)));
 
-        //public Q_SLOTS: // METHODS
-        //    bool AddColumnSelection(int column);
-        //    bool AddRowSelection(int row);
-        //    QSpiObjectReference GetAccessibleAt(int row, int column);
-        //    int GetColumnAtIndex(int index);
-        //    QString GetColumnDescription(int column);
-        //    int GetColumnExtentAt(int row, int column);
-        //    QSpiObjectReference GetColumnHeader(int column);
-        //    int GetIndexAt(int row, int column);
-        //    int GetRowAtIndex(int index);
-        //    bool GetRowColumnExtentsAtIndex(int index, int &row, int &col, int &row_extents, int &col_extents, bool &is_selected);
-        //    QString GetRowDescription(int row);
-        //    int GetRowExtentAt(int row, int column);
-        //    QSpiObjectReference GetRowHeader(int row);
-        //    QSpiIntList GetSelectedColumns();
-        //    QSpiIntList GetSelectedRows();
-        //    bool IsColumnSelected(int column);
-        //    bool IsRowSelected(int row);
-        //    bool IsSelected(int row, int column);
-        //    bool RemoveColumnSelection(int column);
-        //    bool RemoveRowSelection(int row);
-    } else if (function == "") {
 
+
+    } else if (function == "GetRowColumnExtentsAtIndex") {
+        int index = message.arguments().at(0).toInt();
+        bool success = false;
+
+        int row, col, rowExtents, colExtents;
+        bool isSelected;
+
+        int cols = interface->table2Interface()->columnCount();
+        row = index/cols;
+        col = index%cols;
+        QAccessibleTable2CellInterface *cell = interface->table2Interface()->cellAt(row, col);
+        if (cell) {
+            cell->rowColumnExtents(&row, &col, &rowExtents, &colExtents, &isSelected);
+            success = true;
+            delete cell;
+        }
+
+        QVariantList list;
+        list << success << row << col << rowExtents << colExtents << isSelected;
+        connection.send(message.createReply(list));
+
+    } else if (function == "GetColumnExtentAt") {
+        int row = message.arguments().at(0).toInt();
+        int column = message.arguments().at(1).toInt();
+        connection.send(message.createReply(interface->table2Interface()->cellAt(row, column)->columnExtent()));
+
+    } else if (function == "GetRowExtentAt") {
+        int row = message.arguments().at(0).toInt();
+        int column = message.arguments().at(1).toInt();
+        connection.send(message.createReply(interface->table2Interface()->cellAt(row, column)->rowExtent()));
+
+    } else if (function == "GetColumnHeader") {
+        int column = message.arguments().at(0).toInt();
+        QSpiObjectReference ref;
+
+        QAccessibleTable2CellInterface *cell = interface->table2Interface()->cellAt(0, column);
+        if (cell) {
+            QList<QAccessibleInterface*> header = cell->columnHeaderCells();
+            delete cell;
+            if (header.size() > 0) {
+                ref = QSpiObjectReference(connection, QDBusObjectPath(pathForInterface(header.at(0), 0)));
+                qDeleteAll(header);
+            }
+        }
+        connection.send(message.createReply(QVariant::fromValue(ref)));
+
+    } else if (function == "GetRowHeader") {
+        int row = message.arguments().at(0).toInt();
+        QSpiObjectReference ref;
+        QAccessibleTable2CellInterface *cell = interface->table2Interface()->cellAt(row, 0);
+        if (cell) {
+            QList<QAccessibleInterface*> header = cell->rowHeaderCells();
+            delete cell;
+            if (header.size() > 0) {
+                ref = QSpiObjectReference(connection, QDBusObjectPath(pathForInterface(header.at(0), 0)));
+                qDeleteAll(header);
+            }
+        }
+        connection.send(message.createReply(QVariant::fromValue(ref)));
+
+    } else if (function == "GetSelectedColumns") {
+        connection.send(message.createReply(QVariant::fromValue(interface->table2Interface()->selectedColumns())));
+    } else if (function == "GetSelectedRows") {
+        connection.send(message.createReply(QVariant::fromValue(interface->table2Interface()->selectedRows())));
+    } else if (function == "IsColumnSelected") {
+        int column = message.arguments().at(0).toInt();
+        connection.send(message.createReply(interface->table2Interface()->isColumnSelected(column)));
+    } else if (function == "IsRowSelected") {
+        int row = message.arguments().at(0).toInt();
+        connection.send(message.createReply(interface->table2Interface()->isRowSelected(row)));
+    } else if (function == "IsSelected") {
+        int row = message.arguments().at(0).toInt();
+        int column = message.arguments().at(1).toInt();
+        QAccessibleTable2CellInterface* cell = interface->table2Interface()->cellAt(row, column);
+        connection.send(message.createReply(cell->isSelected()));
+        delete cell;
+    } else if (function == "AddColumnSelection") {
+        int column = message.arguments().at(0).toInt();
+        connection.send(message.createReply(interface->table2Interface()->selectColumn(column)));
+    } else if (function == "AddRowSelection") {
+        int row = message.arguments().at(0).toInt();
+        connection.send(message.createReply(interface->table2Interface()->selectRow(row)));
+    } else if (function == "RemoveColumnSelection") {
+        int column = message.arguments().at(0).toInt();
+        connection.send(message.createReply(interface->table2Interface()->unselectColumn(column)));
+    } else if (function == "RemoveRowSelection") {
+        int row = message.arguments().at(0).toInt();
+        connection.send(message.createReply(interface->table2Interface()->unselectRow(row)));
     } else {
         qWarning() << "WARNING: QSpiAdaptorV2::handleMessage does not implement " << function << message.path();
         return false;
