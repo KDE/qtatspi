@@ -468,6 +468,8 @@ bool QSpiAdaptorV2::componentInterface(QAccessibleInterface *interface, int chil
                 return false;
             }
             int childIndex = iface->childAt(x, y);
+            if (childIndex < 0)
+                childIndex = 0;
             QString path = pathForInterface(iface, childIndex);
             sendReply(connection, message, QVariant::fromValue(
                           QSpiObjectReference(connection, QDBusObjectPath(path))));
