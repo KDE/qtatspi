@@ -66,6 +66,13 @@ QVariantList QSpiAdaptorV2::packDBusSignalArguments(const QString &type, int dat
     return arguments;
 }
 
+QVariant QSpiAdaptorV2::variantForPath(const QString &path) const
+{
+    QDBusVariant data;
+    data.setVariant(QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(path))));
+    return QVariant::fromValue(data);
+}
+
 bool QSpiAdaptorV2::sendDBusSignal(const QString &path, const QString &interface, const QString &signalName, const QVariantList &arguments) const
 {
     QDBusMessage message = QDBusMessage::createSignal(path, interface, signalName);
@@ -150,20 +157,14 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
 
     case QAccessible::NameChanged: {
         QString path = pathForInterface(interface, child);
-        QDBusVariant data;
-        data.setVariant(QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(path))));
-
-        QVariantList args = packDBusSignalArguments(QLatin1String("accessible-name"), 0, 0, QVariant::fromValue(data));
+        QVariantList args = packDBusSignalArguments(QLatin1String("accessible-name"), 0, 0, variantForPath(path));
         sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
                        QLatin1String("PropertyChange"), args);
         break;
     }
     case QAccessible::DescriptionChanged: {
         QString path = pathForInterface(interface, child);
-        QDBusVariant data;
-        data.setVariant(QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(path))));
-
-        QVariantList args = packDBusSignalArguments(QLatin1String("accessible-description"), 0, 0, QVariant::fromValue(data));
+        QVariantList args = packDBusSignalArguments(QLatin1String("accessible-description"), 0, 0, variantForPath(path));
         sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
                        QLatin1String("PropertyChange"), args);
         break;
@@ -172,24 +173,19 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
         static QString lastFocusPath;
         // "remove" old focus
         if (!lastFocusPath.isEmpty()) {
-            QDBusVariant data;
-            data.setVariant(QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(lastFocusPath))));
-
-            QVariantList stateArgs = packDBusSignalArguments(QLatin1String("focused"), 0, 0, QVariant::fromValue(data));
+            QVariantList stateArgs = packDBusSignalArguments(QLatin1String("focused"), 0, 0, variantForPath(lastFocusPath));
             sendDBusSignal(lastFocusPath, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
                            QLatin1String("StateChanged"), stateArgs);
         }
         // send new focus
         {
             QString path = pathForInterface(interface, child);
-            QDBusVariant data;
-            data.setVariant(QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(path))));
 
-            QVariantList stateArgs = packDBusSignalArguments(QLatin1String("focused"), 1, 0, QVariant::fromValue(data));
+            QVariantList stateArgs = packDBusSignalArguments(QLatin1String("focused"), 1, 0, variantForPath(path));
             sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
                            QLatin1String("StateChanged"), stateArgs);
 
-            QVariantList focusArgs = packDBusSignalArguments(QString(), 0, 0, QVariant::fromValue(data));
+            QVariantList focusArgs = packDBusSignalArguments(QString(), 0, 0, variantForPath(path));
             sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_FOCUS),
                            QLatin1String("Focus"), focusArgs);
             lastFocusPath = path;
