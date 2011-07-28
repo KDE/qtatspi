@@ -30,6 +30,8 @@
 
 #include "constant_mappings.h"
 
+#define ACCESSIBLE_LAST_TEXT "QIA2_LAST_TEXT"
+
 QSpiAdaptorV2::QSpiAdaptorV2(DBusConnection *connection, QObject *parent)
     :QDBusVirtualObject(parent), m_dbus(connection)
 {
@@ -129,15 +131,26 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
     }
 
     switch (reason) {
-    //    case QAccessible::ObjectCreated:
-    //        qDebug() << "created" << interface->object();
+    case QAccessible::ObjectCreated:
+        qDebug() << "created" << interface->object();
     //        // make sure we don't duplicate this. seems to work for qml loaders.
     //        notifyAboutCreation(accessible);
-    //        break;
-    //    case QAccessible::ObjectShow:
-    //        qDebug() << "show" << interface->object();
-    //        break;
-
+        break;
+    case QAccessible::ObjectShow:
+        if (interface->textInterface()) {
+            Q_ASSERT(interface->object());
+            QString text = interface->textInterface()->text(0, interface->textInterface()->characterCount());
+            interface->object()->setProperty(ACCESSIBLE_LAST_TEXT, text);
+        }
+        break;
+    case QAccessible::ObjectHide:
+        // TODO - send status changed
+//        qWarning() << "Object hide";
+        break;
+//    case QAccessible::ObjectDestroyed:
+//        // TODO - maybe send children-changed and cache Removed
+////        qWarning() << "Object destroyed";
+//        break;
     //    case QAccessible::TableModelChanged:
     //        QAccessible2::TableModelChange change = interface->table2Interface()->modelChange();
     //        // assume we should reset if everything is 0
@@ -192,37 +205,39 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
         }
         break;
     }
-//#if (QT_VERSION >= QT_VERSION_CHECK(4, 8, 0))
-//    case QAccessible::TextUpdated: {
-//        Q_ASSERT(interface->textInterface());
+#if (QT_VERSION >= QT_VERSION_CHECK(4, 8, 0))
+    case QAccessible::TextUpdated: {
+        Q_ASSERT(interface->textInterface());
+        QString path = pathForInterface(interface, child);
+        // at-spi doesn't have a text updated/changed, so remove all and re-add the new text
+        QString oldText = interface->object()->property(ACCESSIBLE_LAST_TEXT).toString();
 
-//        // at-spi doesn't have a proper text updated/changed, so remove all and re-add the new text
-//        qDebug() << "Text changed: " << interface->object();
-//        QDBusVariant data;
-//        data.setVariant(QVariant::fromValue(oldText));
-//        emit TextChanged("delete", 0, oldText.length(), data, spiBridge->getRootReference());
+        QDBusVariant data;
+        data.setVariant(QVariant::fromValue(oldText));
+        QVariantList args = packDBusSignalArguments(QLatin1String("delete"), 0, oldText.length(), variantForPath(path));
+        sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                       QLatin1String("TextChanged"), args);
 
-//        QString text = interface->textInterface()->text(0, interface->textInterface()->characterCount());
-//        data.setVariant(QVariant::fromValue(text));
-//        emit TextChanged("insert", 0, text.length(), data, spiBridge->getRootReference());
-//        oldText = text;
+        QString text = interface->textInterface()->text(0, interface->textInterface()->characterCount());
+        data.setVariant(QVariant::fromValue(text));
+        args = packDBusSignalArguments(QLatin1String("insert"), 0, text.length(), variantForPath(path));
+        sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                       QLatin1String("TextChanged"), args);
 
-//        QDBusVariant cursorData;
-//        int pos = interface->textInterface()->cursorPosition();
-//        cursorData.setVariant(QVariant::fromValue(pos));
-//        emit TextCaretMoved(QString(), pos ,0, cursorData, spiBridge->getRootReference());
-//        break;
-//    }
-//    case QAccessible::TextCaretMoved: {
-//        Q_ASSERT(interface->textInterface());
-//        qDebug() << "Text caret moved: " << interface->object();
-//        QDBusVariant data;
-//        int pos = interface->textInterface()->cursorPosition();
-//        data.setVariant(QVariant::fromValue(pos));
-//        emit TextCaretMoved(QString(), pos ,0, data, spiBridge->getRootReference());
-//        break;
-//    }
-//#endif
+        interface->object()->setProperty(ACCESSIBLE_LAST_TEXT, text);
+    }
+    case QAccessible::TextCaretMoved: {
+        Q_ASSERT(interface->textInterface());
+        QString path = pathForInterface(interface, child);
+        QDBusVariant cursorData;
+        int pos = interface->textInterface()->cursorPosition();
+        cursorData.setVariant(QVariant::fromValue(pos));
+        QVariantList args = packDBusSignalArguments(QString(), pos, 0, QVariant::fromValue(cursorData));
+        sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                       QLatin1String("TextCaretMoved"), args);
+        break;
+    }
+#endif
     case QAccessible::ValueChanged: {
         Q_ASSERT(interface->valueInterface());
         QString path = pathForInterface(interface, child);
@@ -234,16 +249,7 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
                        QLatin1String("PropertyChange"), args);
         break;
     }
-    case QAccessible::ObjectShow:
-        break;
-    case QAccessible::ObjectHide:
-        // TODO - send status changed
-//        qWarning() << "Object hide";
-        break;
-//    case QAccessible::ObjectDestroyed:
-//        // TODO - maybe send children-changed and cache Removed
-////        qWarning() << "Object destroyed";
-//        break;
+
 //    case QAccessible::StateChanged: {
 //        QAccessible::State newState = interface->state(childIndex());
 ////        qDebug() << "StateChanged: old: " << state << " new: " << newState << " xor: " << (state^newState);
