@@ -332,6 +332,20 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QPushButton" name="hideButton">
+            <property name="text">
+             <string>Hide translations</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="showButton">
+            <property name="text">
+             <string>Show translations</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item row="2" column="0">
