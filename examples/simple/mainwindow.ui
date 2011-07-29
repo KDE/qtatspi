@@ -373,7 +373,7 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="0" column="1">
            <property name="text">
-            <string>ola</string>
+            <string>hola</string>
            </property>
           </item>
           <item row="0" column="2">
