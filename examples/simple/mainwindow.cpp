@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_Quit, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(ui->addListButton, SIGNAL(clicked()), this, SLOT(addListItem()));
     connect(ui->removeListButton, SIGNAL(clicked()), this, SLOT(removeListItem()));
+    connect(ui->greetButton, SIGNAL(clicked()), this, SLOT(greet()));
 
     ui->treeWidget->expandAll();
 
@@ -63,4 +64,12 @@ void MainWindow::removeListItem()
 {
     delete ui->listWidget->takeItem(ui->listWidget->count()-1);
 }
+
+void MainWindow::greet()
+{
+    QString greetMessage = QString(QLatin1String("Hi %1!")).arg(ui->lineEdit->text());;
+
+    QMessageBox::information(this, tr("Hi!"), greetMessage);
+}
+
 
