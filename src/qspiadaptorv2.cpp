@@ -68,6 +68,14 @@ QVariantList QSpiAdaptorV2::packDBusSignalArguments(const QString &type, int dat
     return arguments;
 }
 
+QVariantList QSpiAdaptorV2::packDBusSignalArguments(const QString &type, const QString &data1, int data2, int data3, const QVariant &variantData) const
+{
+    QVariantList arguments;
+    arguments << type << data1 << data2 << data3 << variantData
+              << QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT)));
+    return arguments;
+}
+
 QVariant QSpiAdaptorV2::variantForPath(const QString &path) const
 {
     QDBusVariant data;
@@ -100,10 +108,12 @@ QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString
 
     QString objectString = parts.at(5);
     quintptr uintptr = objectString.toULongLong();
+
     if (!uintptr)
         return QPair<QAccessibleInterface*, int>(0, 0);
 
     QObject* object = reinterpret_cast<QObject*>(uintptr);
+    
     inter = QAccessible::queryAccessibleInterface(object);
     QAccessibleInterface* childInter;
 
@@ -118,11 +128,42 @@ QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString
     return QPair<QAccessibleInterface*, int>(inter, index);
 }
 
+void QSpiAdaptorV2::notifyDestruction(QAccessibleInterface* interface) const
+{
+    if (!interface->isValid())
+        return;
+
+    QObject *object = interface->object();
+    QAccessibleInterface *parentInterface;
+    interface->navigate(QAccessible::Ancestor, 1, &parentInterface);
+    QObject *parentObject = object->parent();
+    int childIndex = 0;
+
+    if (parentObject) {
+       childIndex = parentObject->children().indexOf(object);
+       if (childIndex == -1) {
+            childIndex = 0;
+            parentObject = object;
+        } else {
+            childIndex++; //Accessible objects use 1-based indexes
+        }
+    } else {
+        parentObject = object;
+    }
+
+    QString path = pathForObject(parentObject);
+    QVariantList args = packDBusSignalArguments( QLatin1String("remove"), childIndex, 0, variantForPath(path));
+    sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT), QLatin1String("ChildrenChanged"), args);
+}
+
 void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int child) const
 {
     Q_UNUSED(child)
 
     Q_ASSERT(interface);
+
+    static QString lastFocusPath;
+
     if (!interface->isValid()) {
         //spiBridge->removeAdaptor(this);
         // FIXME announce that this thing is dead? will it ever happen?
@@ -132,7 +173,6 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
 
     switch (reason) {
     case QAccessible::ObjectCreated:
-        qDebug() << "created" << interface->object();
     //        // make sure we don't duplicate this. seems to work for qml loaders.
     //        notifyAboutCreation(accessible);
         break;
@@ -155,10 +195,10 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
                            QLatin1String("StateChanged"), stateArgs);
         }
         break;
-//    case QAccessible::ObjectDestroyed:
-//        // TODO - maybe send children-changed and cache Removed
-////        qWarning() << "Object destroyed";
-//        break;
+    case QAccessible::ObjectDestroyed:
+        lastFocusPath = QString();
+        notifyDestruction(interface);
+        break;
     //    case QAccessible::TableModelChanged:
     //        QAccessible2::TableModelChange change = interface->table2Interface()->modelChange();
     //        // assume we should reset if everything is 0
@@ -191,7 +231,6 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
         break;
     }
     case QAccessible::Focus: {
-        static QString lastFocusPath;
         // "remove" old focus
         if (!lastFocusPath.isEmpty()) {
             QVariantList stateArgs = packDBusSignalArguments(QLatin1String("focused"), 0, 0, variantForPath(lastFocusPath));
