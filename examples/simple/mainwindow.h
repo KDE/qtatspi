@@ -37,6 +37,7 @@ public Q_SLOTS:
     void createButton();
     void addListItem();
     void removeListItem();
+    void greet();
 
 private:
     Ui::MainWindow *ui;

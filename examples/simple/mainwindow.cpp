@@ -19,7 +19,8 @@
 #include "ui_mainwindow.h"
 
 #include <QDebug>
-#include <QtGui/QMessageBox>
+#include <QDialog>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_Quit, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(ui->addListButton, SIGNAL(clicked()), this, SLOT(addListItem()));
     connect(ui->removeListButton, SIGNAL(clicked()), this, SLOT(removeListItem()));
+    connect(ui->greetButton, SIGNAL(clicked()), this, SLOT(greet()));
 
     if (qgetenv("QT_ACCESSIBILITY") != "1")
         QMessageBox::warning(this, tr("Qt Accessibility not enabled"),
@@ -50,6 +52,13 @@ void MainWindow::createButton()
     button->setAccessibleDescription("This is an accessible description for a button.");
     ui->centralWidget->layout()->addWidget(button);
     ui->statusBar->showMessage("Button created.");
+}
+
+void MainWindow::greet()
+{
+    QString greetMessage = QString(QLatin1String("Hi %1!")).arg(ui->lineEdit->text());;
+
+    QMessageBox::information(this, tr("Hi!"), greetMessage);
 }
 
 void MainWindow::addListItem()
