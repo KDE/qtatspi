@@ -136,16 +136,24 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
     //        // make sure we don't duplicate this. seems to work for qml loaders.
     //        notifyAboutCreation(accessible);
         break;
-    case QAccessible::ObjectShow:
+    case QAccessible::ObjectShow: {
+            QString path = pathForInterface(interface, child);
+            QVariantList stateArgs = packDBusSignalArguments(QLatin1String("showing"), 1, 0, variantForPath(path));
+            sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                           QLatin1String("StateChanged"), stateArgs);
+        }
         if (interface->textInterface()) {
             Q_ASSERT(interface->object());
             QString text = interface->textInterface()->text(0, interface->textInterface()->characterCount());
             interface->object()->setProperty(ACCESSIBLE_LAST_TEXT, text);
         }
         break;
-    case QAccessible::ObjectHide:
-        // TODO - send status changed
-//        qWarning() << "Object hide";
+    case QAccessible::ObjectHide: {
+            QString path = pathForInterface(interface, child);
+            QVariantList stateArgs = packDBusSignalArguments(QLatin1String("showing"), 0, 0, variantForPath(path));
+            sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                           QLatin1String("StateChanged"), stateArgs);
+        }
         break;
 //    case QAccessible::ObjectDestroyed:
 //        // TODO - maybe send children-changed and cache Removed
