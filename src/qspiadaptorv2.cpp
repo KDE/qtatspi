@@ -283,7 +283,7 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
     default:
         qWarning() << "QSpiAccessible::accessibleEvent not handled: " << QString::number(reason, 16)
                    << " obj: " << interface->object()
-                   << (interface->isValid() ? interface->object()->objectName() : " invalid interface!");
+                   << ((interface->isValid() && interface->object()) ? interface->object()->objectName() : " invalid interface!");
         break;
     }
 }
