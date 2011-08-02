@@ -133,26 +133,18 @@ void QSpiAdaptorV2::notifyDestruction(QAccessibleInterface* interface) const
     if (!interface->isValid())
         return;
 
-    QObject *object = interface->object();
+    int index = -1;
     QAccessibleInterface *parentInterface;
-    interface->navigate(QAccessible::Ancestor, 1, &parentInterface);
-    QObject *parentObject = object->parent();
-    int childIndex = 0;
+    if (interface->navigate(QAccessible::Ancestor, 1, &parentInterface) > 0)
+        index = parentInterface->indexOfChild(interface);
 
-    if (parentObject) {
-       childIndex = parentObject->children().indexOf(object);
-       if (childIndex == -1) {
-            childIndex = 0;
-            parentObject = object;
-        } else {
-            childIndex++; //Accessible objects use 1-based indexes
-        }
-    } else {
-        parentObject = object;
+    if (index == -1) {
+        index = 0;
+        parentInterface = interface;
     }
 
-    QString path = pathForObject(parentObject);
-    QVariantList args = packDBusSignalArguments( QLatin1String("remove"), childIndex, 0, variantForPath(path));
+    QString path = pathForInterface(parentInterface, 0);
+    QVariantList args = packDBusSignalArguments( QLatin1String("remove"), index, 0, variantForPath(path));
     sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT), QLatin1String("ChildrenChanged"), args);
 }
 
