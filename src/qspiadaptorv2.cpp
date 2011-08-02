@@ -331,23 +331,28 @@ bool QSpiAdaptorV2::handleMessage(const QDBusMessage &message, const QDBusConnec
 }
 
 // Application
-bool QSpiAdaptorV2::applicationInterface(QAccessibleInterface *, int, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+bool QSpiAdaptorV2::applicationInterface(QAccessibleInterface *interface, int, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
+    if (function == "SetId") {
+        Q_ASSERT(message.signature() == "ssv");
+        QVariant value = qvariant_cast<QDBusVariant>(message.arguments().at(2)).variant();
 
-        if (function == "SetId") {
-            Q_ASSERT(message.signature() == "ssv");
-            QVariant value = qvariant_cast<QDBusVariant>(message.arguments().at(2)).variant();
+        m_applicationId = value.toInt();
+        return true;
 
-            m_applicationId = value.toInt();
-            return true;
+    } else if (function == "GetId") {
+        Q_ASSERT(message.signature() == "ss");
+        QDBusMessage reply = message.createReply(QVariant::fromValue(QDBusVariant(m_applicationId)));
+        return connection.send(reply);
+    } else if (function == "GetToolkitName") {
+        Q_ASSERT(message.signature() == "ss");
+        QDBusMessage reply = message.createReply(QVariant::fromValue(QDBusVariant(QLatin1String("Qt"))));
+        return connection.send(reply);
+    } else {
+        qDebug() << "QSpiAdaptorV2::applicationInterface " << message.path() << interface << function;
+    }
 
-        } else if (function == "GetId") {
-            Q_ASSERT(message.signature() == "ss");
-            QDBusMessage reply = message.createReply(QVariant::fromValue(QDBusVariant(m_applicationId)));
-            return connection.send(reply);
-        }
-
-        return false;
+    return false;
 }
 
 void QSpiAdaptorV2::registerApplication()
