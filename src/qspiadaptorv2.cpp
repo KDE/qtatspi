@@ -33,7 +33,7 @@
 #define ACCESSIBLE_LAST_TEXT "QIA2_LAST_TEXT"
 
 QSpiAdaptorV2::QSpiAdaptorV2(DBusConnection *connection, QObject *parent)
-    :QDBusVirtualObject(parent), m_dbus(connection)
+    :QDBusVirtualObject(parent), m_dbus(connection), initialized(false)
 {
 }
 
@@ -45,6 +45,11 @@ QString QSpiAdaptorV2::introspect(const QString &path) const
 {
     qWarning() << "QSpiAdaptorV2::introspect on " << path;
     return QString();
+}
+
+void QSpiAdaptorV2::setInitialized(bool init)
+{
+    initialized = init;
 }
 
 void QSpiAdaptorV2::windowActivated(QObject* window)
@@ -121,6 +126,8 @@ QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString
 void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int child) const
 {
     Q_UNUSED(child)
+    if (!initialized)
+        return;
 
     Q_ASSERT(interface);
     if (!interface->isValid()) {
@@ -134,7 +141,7 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
     case QAccessible::ObjectCreated:
         qDebug() << "created" << interface->object();
     //        // make sure we don't duplicate this. seems to work for qml loaders.
-    //        notifyAboutCreation(accessible);
+        notifyAboutCreation(interface, child);
         break;
     case QAccessible::ObjectShow: {
             QString path = pathForInterface(interface, child);
@@ -155,27 +162,9 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
                            QLatin1String("StateChanged"), stateArgs);
         }
         break;
-//    case QAccessible::ObjectDestroyed:
-//        // TODO - maybe send children-changed and cache Removed
-////        qWarning() << "Object destroyed";
-//        break;
-    //    case QAccessible::TableModelChanged:
-    //        QAccessible2::TableModelChange change = interface->table2Interface()->modelChange();
-    //        // assume we should reset if everything is 0
-    //        if (change.firstColumn == 0 && change.firstRow == 0 && change.lastColumn == 0 && change.lastRow == 0) {
-    //            notifyAboutDestruction(accessible);
-    //            notifyAboutCreation(accessible);
-    //        }
-    //        break;
-    //    if (!initialized)
-    //        return;
-    //    // this gets deleted, so create one if we don't have it yet
-    //    QSpiAdaptor* accessible = interfaceToAccessible(interface, index, false);
-    //    if (accessible->associatedInterface()->object() != interface->object()) {
-    //        qWarning() << "WARNING: Creating accessible with different object than the original interface"
-    //                   << accessible->associatedInterface()->object() << " new: " << interface->object();
-    //    }
-
+    case QAccessible::ObjectDestroyed:
+        notifyAboutDestruction(interface, child);
+        break;
     case QAccessible::NameChanged: {
         QString path = pathForInterface(interface, child);
         QVariantList args = packDBusSignalArguments(QLatin1String("accessible-name"), 0, 0, variantForPath(path));
@@ -191,26 +180,8 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
         break;
     }
     case QAccessible::Focus: {
-        static QString lastFocusPath;
-        // "remove" old focus
-        if (!lastFocusPath.isEmpty()) {
-            QVariantList stateArgs = packDBusSignalArguments(QLatin1String("focused"), 0, 0, variantForPath(lastFocusPath));
-            sendDBusSignal(lastFocusPath, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
-                           QLatin1String("StateChanged"), stateArgs);
-        }
-        // send new focus
-        {
-            QString path = pathForInterface(interface, child);
+        sendFocusChanged(interface, child);
 
-            QVariantList stateArgs = packDBusSignalArguments(QLatin1String("focused"), 1, 0, variantForPath(path));
-            sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
-                           QLatin1String("StateChanged"), stateArgs);
-
-            QVariantList focusArgs = packDBusSignalArguments(QString(), 0, 0, variantForPath(path));
-            sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_FOCUS),
-                           QLatin1String("Focus"), focusArgs);
-            lastFocusPath = path;
-        }
         break;
     }
 #if (QT_VERSION >= QT_VERSION_CHECK(4, 8, 0))
@@ -277,6 +248,15 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
 //        emit ChildrenChanged("add", 0, 0, data, spiBridge->getRootReference());
 //        break;
 //    }
+        //    case QAccessible::TableModelChanged:
+        //        QAccessible2::TableModelChange change = interface->table2Interface()->modelChange();
+        //        // assume we should reset if everything is 0
+        //        if (change.firstColumn == 0 && change.firstRow == 0 && change.lastColumn == 0 && change.lastRow == 0) {
+        //            notifyAboutDestruction(accessible);
+        //            notifyAboutCreation(accessible);
+        //        }
+        //        break;
+
     case QAccessible::ParentChanged:
         // FIXME send parent changed
         break;
@@ -286,6 +266,71 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
                    << ((interface->isValid() && interface->object()) ? interface->object()->objectName() : " invalid interface!");
         break;
     }
+}
+
+void QSpiAdaptorV2::sendFocusChanged(QAccessibleInterface *interface, int child) const
+{
+    static QString lastFocusPath;
+    // "remove" old focus
+    if (!lastFocusPath.isEmpty()) {
+        QVariantList stateArgs = packDBusSignalArguments(QLatin1String("focused"), 0, 0, variantForPath(lastFocusPath));
+        sendDBusSignal(lastFocusPath, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                       QLatin1String("StateChanged"), stateArgs);
+    }
+    // send new focus
+    {
+        QString path = pathForInterface(interface, child);
+
+        QVariantList stateArgs = packDBusSignalArguments(QLatin1String("focused"), 1, 0, variantForPath(path));
+        sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                       QLatin1String("StateChanged"), stateArgs);
+
+        QVariantList focusArgs = packDBusSignalArguments(QString(), 0, 0, variantForPath(path));
+        sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_FOCUS),
+                       QLatin1String("Focus"), focusArgs);
+        lastFocusPath = path;
+    }
+}
+
+void QSpiAdaptorV2::notifyAboutCreation(QAccessibleInterface *interface, int child) const
+{
+//    // say hello to d-bus
+//    cache->emitAddAccessible(accessible->getCacheItem());
+
+    // notify about the new child of our parent
+    QAccessibleInterface *parent = accessibleParent(interface, child);
+    if (!parent) {
+        qWarning() << "QSpiAdaptorV2::notifyAboutCreation: Could not find parent for " << interface->object() << child;
+        return;
+    }
+    QString path = pathForInterface(interface, child);
+    int childCount = parent->childCount();
+    QString parentPath = pathForInterface(parent, 0);
+    QVariantList args = packDBusSignalArguments(QLatin1String("add"), childCount, 0, variantForPath(path));
+    sendDBusSignal(parentPath, ATSPI_DBUS_INTERFACE_EVENT_OBJECT, "ChildrenChanged", args);
+}
+
+void QSpiAdaptorV2::notifyAboutDestruction(QAccessibleInterface *interface, int child) const
+{
+    QAccessibleInterface *parent = accessibleParent(interface, child);
+    if (!parent) {
+        qWarning() << "QSpiAdaptorV2::notifyAboutDestruction: Could not find parent for " << interface->object() << child;
+        return;
+    }
+    QString path = pathForInterface(interface, child);
+
+    // this is in the destructor. we have no clue which child we used to be.
+    // FIXME
+    //    int childIndex;
+    //    if (child) {
+    //        childIndex = child;
+    //    } else {
+    //        childIndex = parent->indexOfChild(interface);
+    //    }
+
+    QString parentPath = pathForInterface(parent, 0);
+    QVariantList args = packDBusSignalArguments(QLatin1String("remove"), -1, 0, variantForPath(path));
+    sendDBusSignal(parentPath, ATSPI_DBUS_INTERFACE_EVENT_OBJECT, "ChildrenChanged", args);
 }
 
 bool QSpiAdaptorV2::handleMessage(const QDBusMessage &message, const QDBusConnection &connection)

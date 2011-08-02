@@ -42,7 +42,7 @@
 QSpiAccessibleBridge* QSpiAccessibleBridge::self = 0;
 
 QSpiAccessibleBridge::QSpiAccessibleBridge()
-    : cache(0), initialized(false)
+    : cache(0)
 {
     Q_ASSERT(self == 0);
     self = this;
@@ -82,76 +82,15 @@ QDBusConnection QSpiAccessibleBridge::dBusConnection() const
 
 void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *interface)
 {
-    initialized = true;
-
     // the interface we get will be for the QApplication object.
     // we already cache it in the constructor.
     Q_ASSERT(interface->object() == qApp);
+    dbusAdaptor->setInitialized(true);
 }
 
 void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInterface *interface, int index)
 {
     dbusAdaptor->notify(reason, interface, index);
-
-//    switch (reason) {
-//    case QAccessible::ObjectCreated:
-//        qDebug() << "created" << interface->object();
-//        // make sure we don't duplicate this. seems to work for qml loaders.
-//        notifyAboutCreation(accessible);
-//        break;
-//    case QAccessible::ObjectShow:
-//        qDebug() << "show" << interface->object();
-//        break;
-//    case QAccessible::Focus: {
-//        static QSpiAccessible *lastFocused = 0;
-//        if (lastFocused) {
-//            QDBusVariant data;
-//            data.setVariant(QVariant::fromValue(lastFocused->getReference()));
-//            emit lastFocused->StateChanged("focused", 0, 0, data, getRootReference());
-//        }
-//        lastFocused = qobject_cast<QSpiAccessible*>(accessible);
-//        break;
-//    }
-//    case QAccessible::TableModelChanged:
-//        QAccessible2::TableModelChange change = interface->table2Interface()->modelChange();
-//        // assume we should reset if everything is 0
-//        if (change.firstColumn == 0 && change.firstRow == 0 && change.lastColumn == 0 && change.lastRow == 0) {
-//            notifyAboutDestruction(accessible);
-//            notifyAboutCreation(accessible);
-//        }
-//        break;
-//    if (!initialized)
-//        return;
-//    // this gets deleted, so create one if we don't have it yet
-//    QSpiAdaptor* accessible = interfaceToAccessible(interface, index, false);
-//    if (accessible->associatedInterface()->object() != interface->object()) {
-//        qWarning() << "WARNING: Creating accessible with different object than the original interface"
-//                   << accessible->associatedInterface()->object() << " new: " << interface->object();
-//    }
-//    switch (reason) {
-//    case QAccessible::ObjectCreated:
-//        qDebug() << "created" << interface->object();
-//        // make sure we don't duplicate this. seems to work for qml loaders.
-//        notifyAboutCreation(accessible);
-//        break;
-//    case QAccessible::ObjectShow:
-//        qDebug() << "show" << interface->object();
-//        break;
-//    case QAccessible::Focus: {
-//        static QSpiAccessible *lastFocused = 0;
-//        if (lastFocused) {
-//            QDBusVariant data;
-//            data.setVariant(QVariant::fromValue(lastFocused->getReference()));
-//            emit lastFocused->StateChanged("focused", 0, 0, data, getRootReference());
-//        }
-//        lastFocused = qobject_cast<QSpiAccessible*>(accessible);
-//    }
-//    }
-////    qDebug() << "QSpiAccessibleBridge::notifyAccessibilityUpdate" << QString::number(reason, 16)
-////             << " obj: " << interface->object()
-////             << (interface->isValid() ? interface->object()->objectName() : " invalid interface!")
-////             << accessible->interface;
-//    accessible->accessibleEvent((QAccessible::Event)reason);
 }
 
 //QSpiAdaptor* QSpiAccessibleBridge::interfaceToAccessible(QAccessibleInterface* interface, int index, bool takeOwnershipOfInterface)
@@ -212,67 +151,4 @@ void QSpiAccessibleBridge::notifyAccessibilityUpdate(int reason, QAccessibleInte
 //    return accessible;
 //}
 
-//void QSpiAccessibleBridge::notifyAboutCreation(QSpiAdaptor* /*accessible*/)
-//{
-//    // say hello to d-bus
-//    cache->emitAddAccessible(accessible->getCacheItem());
 
-//    // notify about the new child of our parent
-//    int childCount = 0;
-//    QSpiAdaptor* parentAdaptor = 0;
-//    if (accessible->childIndex() == 0) {
-//        QAccessibleInterface *parent = 0;
-//        accessible->associatedInterface()->navigate(QAccessible::Ancestor, 1, &parent);
-//        if (parent) {
-//            parentAdaptor = interfaceToAccessible(parent, 0, true);
-//            childCount = parent->childCount();
-//        }
-//    } else {
-//        parentAdaptor = interfaceToAccessible(accessible->associatedInterface(), 0, true);
-//        childCount = accessible->associatedInterface()->childCount();
-//    }
-
-//    if (parentAdaptor) {
-//        QSpiObjectReference r = accessible->getReference();
-//        QDBusVariant data;
-//        data.setVariant(QVariant::fromValue(r));
-//        parentAdaptor->signalChildrenChanged("add", childCount, 0, data);
-//    }
-//}
-
-//void QSpiAccessibleBridge::notifyAboutDestruction(QSpiAdaptor* /*accessible*/)
-//{
-//    int childCount = 0;
-//    QSpiAdaptor* parentAdaptor = 0;
-//    if (accessible->childIndex() == 0) {
-//        QAccessibleInterface *parent = 0;
-//        accessible->associatedInterface()->navigate(QAccessible::Ancestor, 1, &parent);
-//        if (parent) {
-//            parentAdaptor = interfaceToAccessible(parent, 0, true);
-//            childCount = parent->childCount();
-//        }
-//    } else {
-//        parentAdaptor = interfaceToAccessible(accessible->associatedInterface(), 0, true);
-//        childCount = accessible->associatedInterface()->childCount();
-//    }
-
-//    if (parentAdaptor) {
-//        QSpiObjectReference r = accessible->getReference();
-//        QDBusVariant data;
-//        data.setVariant(QVariant::fromValue(r));
-//        parentAdaptor->signalChildrenChanged("remove", 1, 0, data);
-//    }
-
-//    cache->emitRemoveAccessible(accessible->getReference());
-//}
-
-//void QSpiAccessibleBridge::objectDestroyed(QObject*)
-//{
-//    QString path = QSpiAccessible::pathForObject(o);
-//    adaptors.remove(path);
-//}
-
-//void QSpiAccessibleBridge::removeAdaptor(QSpiAdaptor *)
-//{
-//    adaptors.remove(adaptor->getReference().path.path());
-//}
