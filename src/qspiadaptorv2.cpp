@@ -353,21 +353,21 @@ bool QSpiAdaptorV2::handleMessage(const QDBusMessage &message, const QDBusConnec
     }
 
     // switch interface to call
-    if (interface == QSPI_INTERFACE_ACCESSIBLE) {
+    if (interface == ATSPI_DBUS_INTERFACE_ACCESSIBLE) {
         return accessibleInterface(accessible.first, accessible.second, function, message, connection);
-    } else if (interface == QSPI_INTERFACE_APPLICATION) {
+    } else if (interface == ATSPI_DBUS_INTERFACE_APPLICATION) {
         return applicationInterface(accessible.first, accessible.second, function, message, connection);
-    } else if (interface == QSPI_INTERFACE_COMPONENT) {
+    } else if (interface == ATSPI_DBUS_INTERFACE_COMPONENT) {
         return componentInterface(accessible.first, accessible.second, function, message, connection);
-    } else if (interface == QSPI_INTERFACE_ACTION) {
+    } else if (interface == ATSPI_DBUS_INTERFACE_ACTION) {
         return actionInterface(accessible.first, accessible.second, function, message, connection);
-    } else if (interface == QSPI_INTERFACE_TEXT) {
+    } else if (interface == ATSPI_DBUS_INTERFACE_TEXT) {
         return textInterface(accessible.first, accessible.second, function, message, connection);
-    } else if (interface == QSPI_INTERFACE_EDITABLE_TEXT) {
+    } else if (interface == ATSPI_DBUS_INTERFACE_EDITABLE_TEXT) {
         return editableTextInterface(accessible.first, accessible.second, function, message, connection);
-    } else if (interface == QSPI_INTERFACE_VALUE) {
+    } else if (interface == ATSPI_DBUS_INTERFACE_VALUE) {
         return valueInterface(accessible.first, accessible.second, function, message, connection);
-    } else if (interface == QSPI_INTERFACE_TABLE) {
+    } else if (interface == ATSPI_DBUS_INTERFACE_TABLE) {
         return tableInterface(accessible.first, accessible.second, function, message, connection);
     } else {
         qDebug() << "QSpiAdaptorV2::handleMessage " << message.path() << interface << function;
@@ -505,7 +505,7 @@ QStringList QSpiAdaptorV2::accessibleInterfaces(QAccessibleInterface *interface,
 #ifdef ACCESSIBLE_CREATION_DEBUG
     qDebug() << "ACCESSIBLE: " << interface->object();
 #endif
-    ifaces << QSPI_INTERFACE_ACCESSIBLE;
+    ifaces << ATSPI_DBUS_INTERFACE_ACCESSIBLE;
 
     if (    (!interface->rect(index).isEmpty()) ||
             (interface->object() && interface->object()->isWidgetType()) ||
@@ -515,7 +515,7 @@ QStringList QSpiAdaptorV2::accessibleInterfaces(QAccessibleInterface *interface,
             (interface->role(index) == QAccessible::Row) ||
             (interface->object() && interface->object()->inherits("QSGItem"))
             ) {
-        ifaces << QSPI_INTERFACE_COMPONENT;
+        ifaces << ATSPI_DBUS_INTERFACE_COMPONENT;
         }
 #ifdef ACCESSIBLE_CREATION_DEBUG
     else {
@@ -525,22 +525,22 @@ QStringList QSpiAdaptorV2::accessibleInterfaces(QAccessibleInterface *interface,
 
     if (!index) {
         if (interface->actionInterface())
-            ifaces << QSPI_INTERFACE_ACTION;
+            ifaces << ATSPI_DBUS_INTERFACE_ACTION;
 
         if (interface->textInterface()) {
-            ifaces << QSPI_INTERFACE_TEXT;
+            ifaces << ATSPI_DBUS_INTERFACE_TEXT;
             // Cache the last text?
             // oldText = interface->textInterface()->text(0, interface->textInterface()->characterCount());
         }
 
         if (interface->editableTextInterface())
-            ifaces << QSPI_INTERFACE_EDITABLE_TEXT;
+            ifaces << ATSPI_DBUS_INTERFACE_EDITABLE_TEXT;
 
         if (interface->valueInterface())
-            ifaces << QSPI_INTERFACE_VALUE;
+            ifaces << ATSPI_DBUS_INTERFACE_VALUE;
 
         if (interface->table2Interface())
-            ifaces << QSPI_INTERFACE_TABLE;
+            ifaces << ATSPI_DBUS_INTERFACE_TABLE;
     }
 
     // Do we need to cache the state?

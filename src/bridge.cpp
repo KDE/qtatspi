@@ -33,12 +33,6 @@
 #include "generated/dec_proxy.h"
 #include "generated/event_adaptor.h"
 
-
-#define QSPI_DEC_NAME        "/org/a11y/atspi/Registry"
-#define QSPI_DEC_OBJECT_PATH "/org/a11y/atspi/registry/deviceeventcontroller"
-
-#define QSPI_OBJECT_PATH_ACCESSIBLE  "/org/a11y/atspi/accessible"
-
 QSpiAccessibleBridge* QSpiAccessibleBridge::self = 0;
 
 QSpiAccessibleBridge::QSpiAccessibleBridge()
@@ -59,7 +53,7 @@ QSpiAccessibleBridge::QSpiAccessibleBridge()
     cache = new QSpiDBusCache(dBusConnection(), this);
     dec = new DeviceEventControllerProxy(this);
 
-    bool reg = dBusConnection().registerObject(QSPI_DEC_OBJECT_PATH, this, QDBusConnection::ExportAdaptors);
+    bool reg = dBusConnection().registerObject(ATSPI_DBUS_PATH_DEC, this, QDBusConnection::ExportAdaptors);
     qDebug() << "Registered DEC: " << reg;
 
     dbusAdaptor = new QSpiAdaptorV2(dbusConnection, this);
