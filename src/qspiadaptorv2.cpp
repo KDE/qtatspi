@@ -674,7 +674,7 @@ bool QSpiAdaptorV2::componentInterface(QAccessibleInterface *interface, int chil
                           QSpiObjectReference(connection, QDBusObjectPath(path))));
         } else {
             sendReply(connection, message, QVariant::fromValue(
-                          QSpiObjectReference(connection, QDBusObjectPath(QSPI_OBJECT_PATH_NULL))));
+                          QSpiObjectReference(connection, QDBusObjectPath(ATSPI_DBUS_PATH_NULL))));
         }
     } else if (function == "GetAlpha") {
         sendReply(connection, message, (double) 1.0);

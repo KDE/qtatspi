@@ -68,7 +68,6 @@
 #define ATSPI_DBUS_INTERFACE_EVENT_FOCUS  "org.a11y.atspi.Event.Focus"
 
 #define QSPI_OBJECT_PATH_PREFIX  "/org/a11y/atspi/accessible/"
-#define QSPI_OBJECT_PATH_NULL    QSPI_OBJECT_PATH_PREFIX "null"
 #define QSPI_OBJECT_PATH_ROOT    QSPI_OBJECT_PATH_PREFIX "root"
 
 #define QSPI_INTERFACE_PREFIX "org.a11y.atspi"
