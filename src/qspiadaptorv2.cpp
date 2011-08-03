@@ -31,6 +31,7 @@
 #include "constant_mappings.h"
 
 #define ACCESSIBLE_LAST_TEXT "QIA2_LAST_TEXT"
+#define ACCESSIBLE_LAST_STATE "QIA2_LAST_STATE"
 
 QSpiAdaptorV2::QSpiAdaptorV2(DBusConnection *connection, QObject *parent)
     :QDBusVirtualObject(parent), m_dbus(connection), initialized(false)
@@ -126,8 +127,6 @@ QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString
 void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int child) const
 {
     Q_UNUSED(child)
-    if (!initialized)
-        return;
 
     Q_ASSERT(interface);
     if (!interface->isValid()) {
@@ -137,10 +136,26 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
         return;
     }
 
+    if (interface->object()) {
+        if (child != 0) {
+            qWarning() << "State for child changed: " << interface->object() << child;
+            return;
+        }
+        int state = interface->state(child);
+        interface->object()->setProperty(ACCESSIBLE_LAST_STATE, state);
+    }
+    // Saving of the last text should not be skipped, even when initialized is still false.
+    if (reason == QAccessible::ObjectShow && interface->textInterface()) {
+        Q_ASSERT(interface->object());
+        QString text = interface->textInterface()->text(0, interface->textInterface()->characterCount());
+        interface->object()->setProperty(ACCESSIBLE_LAST_TEXT, text);
+    }
+
+    if (!initialized)
+        return;
+
     switch (reason) {
     case QAccessible::ObjectCreated:
-        qDebug() << "created" << interface->object();
-    //        // make sure we don't duplicate this. seems to work for qml loaders.
         notifyAboutCreation(interface, child);
         break;
     case QAccessible::ObjectShow: {
@@ -148,11 +163,6 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
             QVariantList stateArgs = packDBusSignalArguments(QLatin1String("showing"), 1, 0, variantForPath(path));
             sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
                            QLatin1String("StateChanged"), stateArgs);
-        }
-        if (interface->textInterface()) {
-            Q_ASSERT(interface->object());
-            QString text = interface->textInterface()->text(0, interface->textInterface()->characterCount());
-            interface->object()->setProperty(ACCESSIBLE_LAST_TEXT, text);
         }
         break;
     case QAccessible::ObjectHide: {
@@ -220,27 +230,31 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
     case QAccessible::ValueChanged: {
         Q_ASSERT(interface->valueInterface());
         QString path = pathForInterface(interface, child);
-        QDBusVariant data;
-        data.setVariant(QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(path))));
-
-        QVariantList args = packDBusSignalArguments(QLatin1String("accessible-value"), 0, 0, QVariant::fromValue(data));
+        QVariantList args = packDBusSignalArguments(QLatin1String("accessible-value"), 0, 0, variantForPath(path));
         sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
                        QLatin1String("PropertyChange"), args);
         break;
     }
 
-//    case QAccessible::StateChanged: {
-//        QAccessible::State newState = interface->state(childIndex());
-////        qDebug() << "StateChanged: old: " << state << " new: " << newState << " xor: " << (state^newState);
-//        if ((state^newState) & QAccessible::Checked) {
-//            int checked = (newState & QAccessible::Checked) ? 1 : 0;
-//            QDBusVariant data;
-//            data.setVariant(QVariant::fromValue(getReference()));
-//            emit StateChanged("checked", checked, 0, data, spiBridge->getRootReference());
-//        }
-//        state = newState;
-//        break;
-//    }
+    case QAccessible::StateChanged: {
+        if (child != 0) {
+            qWarning() << "State for child changed: " << interface->object() << child;
+            return;
+        }
+
+        QAccessible::State oldState = (QAccessible::State) interface->object()->property(ACCESSIBLE_LAST_STATE).toUInt();
+        QAccessible::State newState = interface->state(child);
+        //qDebug() << "StateChanged: old: " << oldState << " new: " << newState << " xor: " << (oldState^newState);
+        if ((oldState^newState) & QAccessible::Checked) {
+            int checked = (newState & QAccessible::Checked) ? 1 : 0;
+            QString path = pathForInterface(interface, child);
+            QVariantList args = packDBusSignalArguments(QLatin1String("checked"), checked, 0, variantForPath(path));
+            sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                           QLatin1String("StateChanged"), args);
+        }
+        interface->object()->setProperty(ACCESSIBLE_LAST_STATE, (uint)newState);
+        break;
+    }
 //    case QAccessible::TableModelChanged: {
 //        // This is rather evil. We don't send data and hope that at-spi fetches the right child.
 //        // This hack fails when a row gets removed and a different one added in its place.
