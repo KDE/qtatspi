@@ -46,7 +46,7 @@ public:
     virtual QString introspect(const QString &path) const;
     virtual bool handleMessage(const QDBusMessage &message, const QDBusConnection &connection);
 
-    void notify(int reason, QAccessibleInterface *interface, int child) const;
+    void notify(int reason, QAccessibleInterface *interface, int child);
 
 public Q_SLOTS:
     void windowActivated(QObject* window);
@@ -100,6 +100,8 @@ private:
 
     /// Assigned from the accessibility registry.
     int m_applicationId;
+
+    QSet<QObject *> m_handledObjects;
 };
 
 #endif // QSPIADAPTORV2_H

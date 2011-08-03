@@ -108,11 +108,10 @@ QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString
 
     QString objectString = parts.at(5);
     quintptr uintptr = objectString.toULongLong();
-
-    if (!uintptr)
-        return QPair<QAccessibleInterface*, int>(0, 0);
-
     QObject* object = reinterpret_cast<QObject*>(uintptr);
+
+    if (!uintptr || !m_handledObjects.contains(object))
+        return QPair<QAccessibleInterface*, int>(0, 0);
     
     inter = QAccessible::queryAccessibleInterface(object);
     QAccessibleInterface* childInter;
@@ -148,7 +147,7 @@ void QSpiAdaptorV2::notifyDestruction(QAccessibleInterface* interface) const
     sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT), QLatin1String("ChildrenChanged"), args);
 }
 
-void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int child) const
+void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int child)
 {
     Q_UNUSED(child)
 
@@ -165,6 +164,7 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
 
     switch (reason) {
     case QAccessible::ObjectCreated:
+        m_handledObjects << interface->object();
     //        // make sure we don't duplicate this. seems to work for qml loaders.
     //        notifyAboutCreation(accessible);
         break;
@@ -190,6 +190,7 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
     case QAccessible::ObjectDestroyed:
         lastFocusPath = QString();
         notifyDestruction(interface);
+        m_handledObjects.remove(interface->object());
         break;
     //    case QAccessible::TableModelChanged:
     //        QAccessible2::TableModelChange change = interface->table2Interface()->modelChange();
