@@ -599,6 +599,10 @@ QAccessibleInterface *QSpiAdaptorV2::accessibleParent(QAccessibleInterface *ifac
 QString QSpiAdaptorV2::pathForObject(QObject *object)
 {
     Q_ASSERT(object);
+
+    if (object->metaObject()->className() == QLatin1String("QAction")) {
+        qDebug() << "QSpiAdaptorV2::pathForObject: warning: creating path with QAction as object.";
+    }
     return QSPI_OBJECT_PATH_PREFIX + QString::number(reinterpret_cast<size_t>(object));
 }
 
@@ -609,10 +613,16 @@ QString QSpiAdaptorV2::pathForInterface(QAccessibleInterface *interface, int chi
     if (childIndex) {
         int ret = interface->navigate(QAccessible::Child, childIndex, &childInterface);
         if (ret == 0 && childInterface) {
-            interface = childInterface;
-            childIndex = 0;
+            // This is an ugly hack for QAction. It cannot create adaptors from the QObject.
+            QAccessibleInterface *tmp = QAccessible::queryAccessibleInterface(childInterface->object());
+            if (tmp) {
+                interface = childInterface;
+                childIndex = 0;
+                delete tmp;
+            }
         }
     }
+
     QString path;
     QAccessibleInterface* interfaceWithObject = interface;
     while(!interfaceWithObject->object()) {
