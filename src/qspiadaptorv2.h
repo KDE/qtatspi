@@ -54,7 +54,6 @@ public Q_SLOTS:
 private:
     // sending messages
     QVariantList packDBusSignalArguments(const QString &type, int data1, int data2, const QVariant &variantData) const;
-    QVariantList packDBusSignalArguments(const QString &type, const QString &data1, int data2, int data3, const QVariant &variantData) const;
     bool sendDBusSignal(const QString &path, const QString &interface, const QString &name, const QVariantList &arguments) const;
     QVariant variantForPath(const QString &path) const;
 

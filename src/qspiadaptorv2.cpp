@@ -68,14 +68,6 @@ QVariantList QSpiAdaptorV2::packDBusSignalArguments(const QString &type, int dat
     return arguments;
 }
 
-QVariantList QSpiAdaptorV2::packDBusSignalArguments(const QString &type, const QString &data1, int data2, int data3, const QVariant &variantData) const
-{
-    QVariantList arguments;
-    arguments << type << data1 << data2 << data3 << variantData
-              << QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT)));
-    return arguments;
-}
-
 QVariant QSpiAdaptorV2::variantForPath(const QString &path) const
 {
     QDBusVariant data;
