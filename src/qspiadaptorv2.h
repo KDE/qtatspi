@@ -20,6 +20,7 @@
 
 #include <qaccessible2.h>
 #include <qdbusvirtualobject.h>
+#include <qsharedpointer.h>
 
 #include "dbusconnection.h"
 #include "struct_marshallers.h"
@@ -80,8 +81,8 @@ private:
     QAccessibleInterface *accessibleParent(QAccessibleInterface *iface, int child) const;
 
     QPair<QAccessibleInterface*, int> interfaceFromPath(const QString& dbusPath) const;
-    static QString pathForInterface(QAccessibleInterface *interface, int index);
-    static QString pathForObject(QObject *object);
+    QString pathForInterface(QAccessibleInterface *interface, int index, bool inDestructor = false) const;
+    QString pathForObject(QObject *object) const;
 
     // accessible helper functions
     QSpiRelationArray relationSet(QAccessibleInterface *interface, int child, const QDBusConnection &connection) const;
@@ -108,7 +109,7 @@ private:
     int m_applicationId;
     bool initialized;
 
-    QSet<QObject *> m_handledObjects;
+    mutable QHash<quintptr, QWeakPointer<QObject> > m_handledObjects;
 };
 
 #endif // QSPIADAPTORV2_H

@@ -106,23 +106,30 @@ QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString
 
     QString objectString = parts.at(5);
     quintptr uintptr = objectString.toULongLong();
-    QObject* object = reinterpret_cast<QObject*>(uintptr);
 
-    if (!uintptr || !m_handledObjects.contains(object))
-        return QPair<QAccessibleInterface*, int>(0, 0);
-    
-    inter = QAccessible::queryAccessibleInterface(object);
-    QAccessibleInterface* childInter;
+    if (uintptr && m_handledObjects.contains(uintptr)) {
+        // We found the pointer, check if it's still valid:
+        if (m_handledObjects[uintptr].data() != 0) {
+            QObject* object = reinterpret_cast<QObject*>(uintptr);
 
-    for (int i = 6; i < parts.size(); ++i) {
-        index = inter->navigate(QAccessible::Child, parts.at(i).toInt(), &childInter);
-        if (index == 0) {
-            delete inter;
-            inter = childInter;
+            inter = QAccessible::queryAccessibleInterface(object);
+            QAccessibleInterface* childInter;
+
+            for (int i = 6; i < parts.size(); ++i) {
+                index = inter->navigate(QAccessible::Child, parts.at(i).toInt(), &childInter);
+                if (index == 0) {
+                    delete inter;
+                    inter = childInter;
+                }
+            }
+
+            return QPair<QAccessibleInterface*, int>(inter, index);
+
+        } else {
+            m_handledObjects.remove(uintptr);
         }
     }
-
-    return QPair<QAccessibleInterface*, int>(inter, index);
+    return QPair<QAccessibleInterface*, int>(0, 0);
 }
 
 void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int child)
@@ -140,7 +147,13 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
         return;
     }
 
-    if (interface->object()) {
+    // add to list of
+    if (reason == QAccessible::ObjectShow && interface->object()) {
+
+
+    }
+
+    if (reason == QAccessible::ObjectShow && interface->object()) {
         if (child != 0) {
             qWarning() << "State for child changed: " << interface->object() << child;
             return;
@@ -160,7 +173,6 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
 
     switch (reason) {
     case QAccessible::ObjectCreated:
-        m_handledObjects << interface->object();
         notifyAboutCreation(interface, child);
         break;
     case QAccessible::ObjectShow: {
@@ -351,7 +363,7 @@ void QSpiAdaptorV2::notifyAboutDestruction(QAccessibleInterface *interface, int 
     //        childIndex = parent->indexOfChild(interface);
     //    }
 
-    QString parentPath = pathForInterface(parent, 0);
+    QString parentPath = pathForInterface(parent, 0, true);
     QVariantList args = packDBusSignalArguments(QLatin1String("remove"), childIndex, 0, variantForPath(path));
     sendDBusSignal(parentPath, ATSPI_DBUS_INTERFACE_EVENT_OBJECT, "ChildrenChanged", args);
 }
@@ -619,17 +631,20 @@ QAccessibleInterface *QSpiAdaptorV2::accessibleParent(QAccessibleInterface *ifac
     return parent;
 }
 
-QString QSpiAdaptorV2::pathForObject(QObject *object)
+QString QSpiAdaptorV2::pathForObject(QObject *object) const
 {
     Q_ASSERT(object);
 
     if (object->metaObject()->className() == QLatin1String("QAction")) {
         qDebug() << "QSpiAdaptorV2::pathForObject: warning: creating path with QAction as object.";
     }
-    return QSPI_OBJECT_PATH_PREFIX + QString::number(reinterpret_cast<size_t>(object));
+    quintptr uintptr = reinterpret_cast<quintptr>(object);
+    if (!m_handledObjects.contains(uintptr))
+        m_handledObjects[uintptr] = QWeakPointer<QObject>(object);
+    return QSPI_OBJECT_PATH_PREFIX + QString::number(uintptr);
 }
 
-QString QSpiAdaptorV2::pathForInterface(QAccessibleInterface *interface, int childIndex)
+QString QSpiAdaptorV2::pathForInterface(QAccessibleInterface *interface, int childIndex, bool inDestructor) const
 {
     // Try to navigate to the child. If we get a proper interface, use it since it might have an object associated.
     QAccessibleInterface* childInterface = 0;
@@ -673,11 +688,14 @@ QString QSpiAdaptorV2::pathForInterface(QAccessibleInterface *interface, int chi
         path.prepend('/' + QString::number(index));
         interfaceWithObject = parentInterface;
     }
-    path.prepend(QSPI_OBJECT_PATH_PREFIX + QString::number(reinterpret_cast<quintptr>(interfaceWithObject->object())));
+    quintptr uintptr = reinterpret_cast<quintptr>(interfaceWithObject->object());
+    path.prepend(QSPI_OBJECT_PATH_PREFIX + QString::number(uintptr));
 
     if (childIndex > 0) {
         path.append('/' + QString::number(childIndex));
     }
+    if (!inDestructor && !m_handledObjects.contains(uintptr))
+        m_handledObjects[uintptr] = QWeakPointer<QObject>(interfaceWithObject->object());
     delete childInterface;
     return path;
 }
