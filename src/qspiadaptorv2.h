@@ -46,7 +46,7 @@ public:
     virtual QString introspect(const QString &path) const;
     virtual bool handleMessage(const QDBusMessage &message, const QDBusConnection &connection);
 
-    void notify(int reason, QAccessibleInterface *interface, int child) const;
+    void notify(int reason, QAccessibleInterface *interface, int child);
 
     /**
       When initialized we will send updates, not before this.
@@ -107,6 +107,8 @@ private:
     /// Assigned from the accessibility registry.
     int m_applicationId;
     bool initialized;
+
+    QSet<QObject *> m_handledObjects;
 };
 
 #endif // QSPIADAPTORV2_H

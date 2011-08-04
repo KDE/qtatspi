@@ -106,10 +106,11 @@ QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString
 
     QString objectString = parts.at(5);
     quintptr uintptr = objectString.toULongLong();
-    if (!uintptr)
-        return QPair<QAccessibleInterface*, int>(0, 0);
-
     QObject* object = reinterpret_cast<QObject*>(uintptr);
+
+    if (!uintptr || !m_handledObjects.contains(object))
+        return QPair<QAccessibleInterface*, int>(0, 0);
+    
     inter = QAccessible::queryAccessibleInterface(object);
     QAccessibleInterface* childInter;
 
@@ -124,11 +125,14 @@ QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString
     return QPair<QAccessibleInterface*, int>(inter, index);
 }
 
-void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int child) const
+void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int child)
 {
     Q_UNUSED(child)
 
     Q_ASSERT(interface);
+
+    static QString lastFocusPath;
+
     if (!interface->isValid()) {
         //spiBridge->removeAdaptor(this);
         // FIXME announce that this thing is dead? will it ever happen?
@@ -156,6 +160,7 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
 
     switch (reason) {
     case QAccessible::ObjectCreated:
+        m_handledObjects << interface->object();
         notifyAboutCreation(interface, child);
         break;
     case QAccessible::ObjectShow: {
@@ -174,6 +179,7 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
         break;
     case QAccessible::ObjectDestroyed:
         notifyAboutDestruction(interface, child);
+        break;
         break;
     case QAccessible::NameChanged: {
         QString path = pathForInterface(interface, child);
@@ -326,6 +332,9 @@ void QSpiAdaptorV2::notifyAboutCreation(QAccessibleInterface *interface, int chi
 
 void QSpiAdaptorV2::notifyAboutDestruction(QAccessibleInterface *interface, int child) const
 {
+    if (!interface->isValid())
+        return;
+
     QAccessibleInterface *parent = accessibleParent(interface, child);
     if (!parent) {
         qWarning() << "QSpiAdaptorV2::notifyAboutDestruction: Could not find parent for " << interface->object() << child;
@@ -335,7 +344,7 @@ void QSpiAdaptorV2::notifyAboutDestruction(QAccessibleInterface *interface, int 
 
     // this is in the destructor. we have no clue which child we used to be.
     // FIXME
-    //    int childIndex;
+    int childIndex = -1;
     //    if (child) {
     //        childIndex = child;
     //    } else {
@@ -343,7 +352,7 @@ void QSpiAdaptorV2::notifyAboutDestruction(QAccessibleInterface *interface, int 
     //    }
 
     QString parentPath = pathForInterface(parent, 0);
-    QVariantList args = packDBusSignalArguments(QLatin1String("remove"), -1, 0, variantForPath(path));
+    QVariantList args = packDBusSignalArguments(QLatin1String("remove"), childIndex, 0, variantForPath(path));
     sendDBusSignal(parentPath, ATSPI_DBUS_INTERFACE_EVENT_OBJECT, "ChildrenChanged", args);
 }
 
