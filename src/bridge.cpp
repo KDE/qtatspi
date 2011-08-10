@@ -31,7 +31,6 @@
 #include "struct_marshallers.h"
 
 #include "generated/dec_proxy.h"
-#include "generated/event_adaptor.h"
 
 QSpiAccessibleBridge* QSpiAccessibleBridge::self = 0;
 
