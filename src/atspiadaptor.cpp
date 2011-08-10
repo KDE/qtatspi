@@ -16,7 +16,7 @@
  */
 
 
-#include "qspiadaptorv2.h"
+#include "atspiadaptor.h"
 
 #include <qaccessible.h>
 #include <qaccessible2.h>
@@ -33,27 +33,27 @@
 #define ACCESSIBLE_LAST_TEXT "QIA2_LAST_TEXT"
 #define ACCESSIBLE_LAST_STATE "QIA2_LAST_STATE"
 
-QSpiAdaptorV2::QSpiAdaptorV2(DBusConnection *connection, QObject *parent)
+AtSpiAdaptor::AtSpiAdaptor(DBusConnection *connection, QObject *parent)
     :QDBusVirtualObject(parent), m_dbus(connection), initialized(false)
 {
 }
 
-QSpiAdaptorV2::~QSpiAdaptorV2()
+AtSpiAdaptor::~AtSpiAdaptor()
 {
 }
 
-QString QSpiAdaptorV2::introspect(const QString &path) const
+QString AtSpiAdaptor::introspect(const QString &path) const
 {
     qWarning() << "QSpiAdaptorV2::introspect on " << path;
     return QString();
 }
 
-void QSpiAdaptorV2::setInitialized(bool init)
+void AtSpiAdaptor::setInitialized(bool init)
 {
     initialized = init;
 }
 
-void QSpiAdaptorV2::windowActivated(QObject* window)
+void AtSpiAdaptor::windowActivated(QObject* window)
 {
     QAccessibleInterface *iface = QAccessible::queryAccessibleInterface(window);
     QString windowTitle = iface->text(QAccessible::Name, 0);
@@ -66,7 +66,7 @@ void QSpiAdaptorV2::windowActivated(QObject* window)
     sendDBusSignal(pathForObject(window), ATSPI_DBUS_INTERFACE_EVENT_WINDOW, QLatin1String("Activate"), args);
 }
 
-QVariantList QSpiAdaptorV2::packDBusSignalArguments(const QString &type, int data1, int data2, const QVariant &variantData) const
+QVariantList AtSpiAdaptor::packDBusSignalArguments(const QString &type, int data1, int data2, const QVariant &variantData) const
 {
     QVariantList arguments;
     arguments << type << data1 << data2 << variantData
@@ -74,21 +74,21 @@ QVariantList QSpiAdaptorV2::packDBusSignalArguments(const QString &type, int dat
     return arguments;
 }
 
-QVariant QSpiAdaptorV2::variantForPath(const QString &path) const
+QVariant AtSpiAdaptor::variantForPath(const QString &path) const
 {
     QDBusVariant data;
     data.setVariant(QVariant::fromValue(QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(path))));
     return QVariant::fromValue(data);
 }
 
-bool QSpiAdaptorV2::sendDBusSignal(const QString &path, const QString &interface, const QString &signalName, const QVariantList &arguments) const
+bool AtSpiAdaptor::sendDBusSignal(const QString &path, const QString &interface, const QString &signalName, const QVariantList &arguments) const
 {
     QDBusMessage message = QDBusMessage::createSignal(path, interface, signalName);
     message.setArguments(arguments);
     return m_dbus->connection().send(message);
 }
 
-QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString& dbusPath) const
+QPair<QAccessibleInterface*, int> AtSpiAdaptor::interfaceFromPath(const QString& dbusPath) const
 {
     QAccessibleInterface* inter = 0;
     int index = 0;
@@ -132,7 +132,7 @@ QPair<QAccessibleInterface*, int> QSpiAdaptorV2::interfaceFromPath(const QString
     return QPair<QAccessibleInterface*, int>(0, 0);
 }
 
-void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int child)
+void AtSpiAdaptor::notify(int reason, QAccessibleInterface *interface, int child)
 {
     Q_UNUSED(child)
 
@@ -300,7 +300,7 @@ void QSpiAdaptorV2::notify(int reason, QAccessibleInterface *interface, int chil
     }
 }
 
-void QSpiAdaptorV2::sendFocusChanged(QAccessibleInterface *interface, int child) const
+void AtSpiAdaptor::sendFocusChanged(QAccessibleInterface *interface, int child) const
 {
     static QString lastFocusPath;
     // "remove" old focus
@@ -324,7 +324,7 @@ void QSpiAdaptorV2::sendFocusChanged(QAccessibleInterface *interface, int child)
     }
 }
 
-void QSpiAdaptorV2::notifyAboutCreation(QAccessibleInterface *interface, int child) const
+void AtSpiAdaptor::notifyAboutCreation(QAccessibleInterface *interface, int child) const
 {
 //    // say hello to d-bus
 //    cache->emitAddAccessible(accessible->getCacheItem());
@@ -342,7 +342,7 @@ void QSpiAdaptorV2::notifyAboutCreation(QAccessibleInterface *interface, int chi
     sendDBusSignal(parentPath, ATSPI_DBUS_INTERFACE_EVENT_OBJECT, "ChildrenChanged", args);
 }
 
-void QSpiAdaptorV2::notifyAboutDestruction(QAccessibleInterface *interface, int child) const
+void AtSpiAdaptor::notifyAboutDestruction(QAccessibleInterface *interface, int child) const
 {
     if (!interface->isValid())
         return;
@@ -368,7 +368,7 @@ void QSpiAdaptorV2::notifyAboutDestruction(QAccessibleInterface *interface, int 
     sendDBusSignal(parentPath, ATSPI_DBUS_INTERFACE_EVENT_OBJECT, "ChildrenChanged", args);
 }
 
-bool QSpiAdaptorV2::handleMessage(const QDBusMessage &message, const QDBusConnection &connection)
+bool AtSpiAdaptor::handleMessage(const QDBusMessage &message, const QDBusConnection &connection)
 {
     // get accessible interface
     QPair<QAccessibleInterface*, int> accessible = interfaceFromPath(message.path());
@@ -411,7 +411,7 @@ bool QSpiAdaptorV2::handleMessage(const QDBusMessage &message, const QDBusConnec
 }
 
 // Application
-bool QSpiAdaptorV2::applicationInterface(QAccessibleInterface *interface, int, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+bool AtSpiAdaptor::applicationInterface(QAccessibleInterface *interface, int, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
     if (function == "SetId") {
         Q_ASSERT(message.signature() == "ssv");
@@ -435,7 +435,7 @@ bool QSpiAdaptorV2::applicationInterface(QAccessibleInterface *interface, int, c
     return false;
 }
 
-void QSpiAdaptorV2::registerApplication()
+void AtSpiAdaptor::registerApplication()
 {
     SocketProxy *registry;
     registry = new SocketProxy(QSPI_REGISTRY_NAME,
@@ -457,7 +457,7 @@ void QSpiAdaptorV2::registerApplication()
 }
 
 // Accessible
-bool QSpiAdaptorV2::accessibleInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+bool AtSpiAdaptor::accessibleInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
     Q_ASSERT(child >= 0);
 
@@ -534,7 +534,7 @@ bool QSpiAdaptorV2::accessibleInterface(QAccessibleInterface *interface, int chi
     return true;
 }
 
-QStringList QSpiAdaptorV2::accessibleInterfaces(QAccessibleInterface *interface, int index) const
+QStringList AtSpiAdaptor::accessibleInterfaces(QAccessibleInterface *interface, int index) const
 {
     QStringList ifaces;
 #ifdef ACCESSIBLE_CREATION_DEBUG
@@ -584,7 +584,7 @@ QStringList QSpiAdaptorV2::accessibleInterfaces(QAccessibleInterface *interface,
     return ifaces;
 }
 
-QSpiRelationArray QSpiAdaptorV2::relationSet(QAccessibleInterface *interface, int child, const QDBusConnection &connection) const
+QSpiRelationArray AtSpiAdaptor::relationSet(QAccessibleInterface *interface, int child, const QDBusConnection &connection) const
 {
     QSpiRelationArray relations;
     if (child == 0) {
@@ -616,13 +616,13 @@ QSpiRelationArray QSpiAdaptorV2::relationSet(QAccessibleInterface *interface, in
     return relations;
 }
 
-void QSpiAdaptorV2::sendReply(const QDBusConnection &connection, const QDBusMessage &message, const QVariant &argument) const
+void AtSpiAdaptor::sendReply(const QDBusConnection &connection, const QDBusMessage &message, const QVariant &argument) const
 {
     QDBusMessage reply = message.createReply(argument);
     connection.send(reply);
 }
 
-QAccessibleInterface *QSpiAdaptorV2::accessibleParent(QAccessibleInterface *iface, int child) const
+QAccessibleInterface *AtSpiAdaptor::accessibleParent(QAccessibleInterface *iface, int child) const
 {
     if (child)
         return iface;
@@ -631,7 +631,7 @@ QAccessibleInterface *QSpiAdaptorV2::accessibleParent(QAccessibleInterface *ifac
     return parent;
 }
 
-QString QSpiAdaptorV2::pathForObject(QObject *object) const
+QString AtSpiAdaptor::pathForObject(QObject *object) const
 {
     Q_ASSERT(object);
 
@@ -644,7 +644,7 @@ QString QSpiAdaptorV2::pathForObject(QObject *object) const
     return QSPI_OBJECT_PATH_PREFIX + QString::number(uintptr);
 }
 
-QString QSpiAdaptorV2::pathForInterface(QAccessibleInterface *interface, int childIndex, bool inDestructor) const
+QString AtSpiAdaptor::pathForInterface(QAccessibleInterface *interface, int childIndex, bool inDestructor) const
 {
     // Try to navigate to the child. If we get a proper interface, use it since it might have an object associated.
     QAccessibleInterface* childInterface = 0;
@@ -741,7 +741,7 @@ static QRect getRelativeRect(QAccessibleInterface* interface, int child)
     return cr;
 }
 
-bool QSpiAdaptorV2::componentInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+bool AtSpiAdaptor::componentInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
     if (function == "Contains") {
         bool ret = false;
@@ -834,7 +834,7 @@ bool QSpiAdaptorV2::componentInterface(QAccessibleInterface *interface, int chil
     return true;
 }
 
-QSpiRect QSpiAdaptorV2::getExtents(QAccessibleInterface *interface, int child, uint coordType)
+QSpiRect AtSpiAdaptor::getExtents(QAccessibleInterface *interface, int child, uint coordType)
 {
     QSpiRect val;
     QRect rect;
@@ -851,7 +851,7 @@ QSpiRect QSpiAdaptorV2::getExtents(QAccessibleInterface *interface, int child, u
 }
 
 // Action interface
-bool QSpiAdaptorV2::actionInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+bool AtSpiAdaptor::actionInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
     if (function == "GetNActions") {
         sendReply(connection, message, QVariant::fromValue(QDBusVariant(QVariant::fromValue(interface->actionInterface()->actionCount()))));
@@ -887,7 +887,7 @@ bool QSpiAdaptorV2::actionInterface(QAccessibleInterface *interface, int child, 
     return true;
 }
 
-QSpiActionArray QSpiAdaptorV2::getActions(QAccessibleInterface *interface) const
+QSpiActionArray AtSpiAdaptor::getActions(QAccessibleInterface *interface) const
 {
     QSpiActionArray actions;
     for (int i = 0; i < interface->actionInterface()->actionCount(); i++)
@@ -911,7 +911,7 @@ QSpiActionArray QSpiAdaptorV2::getActions(QAccessibleInterface *interface) const
 }
 
 // Text interface
-bool QSpiAdaptorV2::textInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+bool AtSpiAdaptor::textInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
     Q_ASSERT(child == 0); // We should never claim to have a text interface on a virtual child
     // properties
@@ -1045,7 +1045,7 @@ bool QSpiAdaptorV2::textInterface(QAccessibleInterface *interface, int child, co
     return true;
 }
 
-QAccessible2::BoundaryType QSpiAdaptorV2::qAccessibleBoundaryType(int atspiTextBoundaryType) const
+QAccessible2::BoundaryType AtSpiAdaptor::qAccessibleBoundaryType(int atspiTextBoundaryType) const
 {
     switch (atspiTextBoundaryType) {
     case ATSPI_TEXT_BOUNDARY_CHAR:
@@ -1065,7 +1065,7 @@ QAccessible2::BoundaryType QSpiAdaptorV2::qAccessibleBoundaryType(int atspiTextB
 }
 
 // FIXME all attribute methods below should share code
-QVariantList QSpiAdaptorV2::getAttributes(QAccessibleInterface *interface, int offset, bool includeDefaults) const
+QVariantList AtSpiAdaptor::getAttributes(QAccessibleInterface *interface, int offset, bool includeDefaults) const
 {
     Q_UNUSED(includeDefaults);
 
@@ -1087,7 +1087,7 @@ QVariantList QSpiAdaptorV2::getAttributes(QAccessibleInterface *interface, int o
     return list;
 }
 
-QVariantList QSpiAdaptorV2::getAttributeValue(QAccessibleInterface *interface, int offset, const QString &attributeName) const
+QVariantList AtSpiAdaptor::getAttributeValue(QAccessibleInterface *interface, int offset, const QString &attributeName) const
 {
     QString     mapped;
     QString     joined;
@@ -1114,7 +1114,7 @@ QVariantList QSpiAdaptorV2::getAttributeValue(QAccessibleInterface *interface, i
     return list;
 }
 
-QVariantList QSpiAdaptorV2::getCharacterExtents(QAccessibleInterface *interface, int offset, uint coordType) const
+QVariantList AtSpiAdaptor::getCharacterExtents(QAccessibleInterface *interface, int offset, uint coordType) const
 {
     int x;
     int y;
@@ -1151,7 +1151,7 @@ QVariantList QSpiAdaptorV2::getCharacterExtents(QAccessibleInterface *interface,
     return list;
 }
 
-QVariantList QSpiAdaptorV2::getRangeExtents(QAccessibleInterface *interface,
+QVariantList AtSpiAdaptor::getRangeExtents(QAccessibleInterface *interface,
                                             int startOffset, int endOffset, uint coordType) const
 {
     int x;
@@ -1215,7 +1215,7 @@ QVariantList QSpiAdaptorV2::getRangeExtents(QAccessibleInterface *interface,
 
 
 // Editable Text interface
-bool QSpiAdaptorV2::editableTextInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+bool AtSpiAdaptor::editableTextInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
     Q_ASSERT(child == 0); // We should never claim to have a text interface on a virtual child
     if (function == "CopyText") {
@@ -1259,7 +1259,7 @@ bool QSpiAdaptorV2::editableTextInterface(QAccessibleInterface *interface, int c
 }
 
 // Value interface
-bool QSpiAdaptorV2::valueInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+bool AtSpiAdaptor::valueInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
     Q_ASSERT(child == 0);
     if (0) {
@@ -1304,7 +1304,7 @@ bool QSpiAdaptorV2::valueInterface(QAccessibleInterface *interface, int child, c
 }
 
 // Table interface
-bool QSpiAdaptorV2::tableInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
+bool AtSpiAdaptor::tableInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
     Q_ASSERT(child == 0);
     if (0) {

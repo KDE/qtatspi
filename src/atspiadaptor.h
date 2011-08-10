@@ -15,8 +15,8 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef QSPIADAPTORV2_H
-#define QSPIADAPTORV2_H
+#ifndef ATSPIADAPTOR_H
+#define ATSPIADAPTOR_H
 
 #include <qaccessible2.h>
 #include <qdbusvirtualobject.h>
@@ -28,25 +28,32 @@
 class QAccessibleInterface;
 class QSpiAccessibleInterface;
 
-class QSpiAdaptorV2 :public QDBusVirtualObject
+class AtSpiAdaptor :public QDBusVirtualObject
 {
     Q_OBJECT
 
 public:
-    QSpiAdaptorV2();
-
-    explicit QSpiAdaptorV2(DBusConnection *connection, QObject *parent = 0);
-    virtual ~QSpiAdaptorV2();
-
+    explicit AtSpiAdaptor(DBusConnection *connection, QObject *parent = 0);
+    virtual ~AtSpiAdaptor();
 
     /**
       Register this application as accessible on the accessibility DBus.
       */
     void registerApplication();
 
+    /**
+      Provide DBus introspection.
+      */
     virtual QString introspect(const QString &path) const;
+
+    /**
+      Handle incoming DBus messages.
+      */
     virtual bool handleMessage(const QDBusMessage &message, const QDBusConnection &connection);
 
+    /**
+      Updates from Qt.
+      */
     void notify(int reason, QAccessibleInterface *interface, int child);
 
     /**
@@ -112,4 +119,4 @@ private:
     mutable QHash<quintptr, QWeakPointer<QObject> > m_handledObjects;
 };
 
-#endif // QSPIADAPTORV2_H
+#endif

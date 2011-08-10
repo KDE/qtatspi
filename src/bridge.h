@@ -29,7 +29,7 @@
 class DBusConnection;
 class DeviceEventControllerProxy;
 class QSpiDBusCache;
-class QSpiAdaptorV2;
+class AtSpiAdaptor;
 
 #define spiBridge QSpiAccessibleBridge::instance()
 
@@ -62,7 +62,7 @@ private:
         QSpiDBusCache *cache;
         DeviceEventControllerProxy *dec;
 
-        QSpiAdaptorV2 *dbusAdaptor;
+        AtSpiAdaptor *dbusAdaptor;
 
         DBusConnection* dbusConnection;
         bool initialized;

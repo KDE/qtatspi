@@ -22,7 +22,7 @@
 
 #include <qaccessible2.h>
 
-#include "qspiadaptorv2.h"
+#include "atspiadaptor.h"
 
 #include "application.h"
 #include "cache.h"
@@ -56,7 +56,7 @@ QSpiAccessibleBridge::QSpiAccessibleBridge()
     bool reg = dBusConnection().registerObject(ATSPI_DBUS_PATH_DEC, this, QDBusConnection::ExportAdaptors);
     qDebug() << "Registered DEC: " << reg;
 
-    dbusAdaptor = new QSpiAdaptorV2(dbusConnection, this);
+    dbusAdaptor = new AtSpiAdaptor(dbusConnection, this);
     dBusConnection().registerVirtualObject(QSPI_OBJECT_PATH_ACCESSIBLE, dbusAdaptor, QDBusConnection::SubPath);
     dbusAdaptor->registerApplication();
 
