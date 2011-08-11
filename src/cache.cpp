@@ -43,12 +43,8 @@ void QSpiDBusCache::emitRemoveAccessible(const QSpiObjectReference& item)
     emit RemoveAccessible(item);
 }
 
-//QSpiAccessibleCacheArray QSpiDBusCache::GetItems()
-//{
-//    QList <QSpiAccessibleCacheItem> cacheArray;
-
-//    foreach (QSpiAdaptor* obj, spiBridge->cacheObjects()) {
-//        cacheArray << obj->getCacheItem();
-//    }
-//    return cacheArray;
-//}
+QSpiAccessibleCacheArray QSpiDBusCache::GetItems()
+{
+    QList <QSpiAccessibleCacheItem> cacheArray;
+    return cacheArray;
+}
