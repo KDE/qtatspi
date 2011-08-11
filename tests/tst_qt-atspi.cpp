@@ -298,7 +298,7 @@ void tst_QtAtSpi::testTreeWidget()
     QCOMPARE(treeIface->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("tree"));
     QStringList tableChildren = getChildren(treeIface);
 
-    QCOMPARE(tableChildren.size(), 4);
+    QCOMPARE(tableChildren.size(), 6);
 
     QDBusInterface* cell1 = getInterface(tableChildren.at(0), "org.a11y.atspi.Accessible");
     QCOMPARE(cell1->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("tree item"));

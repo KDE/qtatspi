@@ -44,8 +44,473 @@ AtSpiAdaptor::~AtSpiAdaptor()
 
 QString AtSpiAdaptor::introspect(const QString &path) const
 {
-    qWarning() << "QSpiAdaptorV2::introspect on " << path;
-    return QString();
+
+    QLatin1String accessibleIntrospection(
+                "  <interface name=\"org.a11y.atspi.Accessible\">\n"
+                "    <property access=\"read\" type=\"s\" name=\"Name\"/>\n"
+                "    <property access=\"read\" type=\"s\" name=\"Description\"/>\n"
+                "    <property access=\"read\" type=\"(so)\" name=\"Parent\">\n"
+                "      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName\"/>\n"
+                "    </property>\n"
+                "    <property access=\"read\" type=\"i\" name=\"ChildCount\"/>\n"
+                "    <method name=\"GetChildAtIndex\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"index\"/>\n"
+                "      <arg direction=\"out\" type=\"(so)\"/>\n"
+                "      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetChildren\">\n"
+                "      <arg direction=\"out\" type=\"a(so)\"/>\n"
+                "      <annotation value=\"QSpiObjectReferenceArray\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetIndexInParent\">\n"
+                "      <arg direction=\"out\" type=\"i\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetRelationSet\">\n"
+                "      <arg direction=\"out\" type=\"a(ua(so))\"/>\n"
+                "      <annotation value=\"QSpiRelationArray\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetRole\">\n"
+                "      <arg direction=\"out\" type=\"u\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetRoleName\">\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetLocalizedRoleName\">\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetState\">\n"
+                "      <arg direction=\"out\" type=\"au\"/>\n"
+                "      <annotation value=\"QSpiUIntList\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetAttributes\">\n"
+                "      <arg direction=\"out\" type=\"a{ss}\"/>\n"
+                "      <annotation value=\"QSpiAttributeSet\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetApplication\">\n"
+                "      <arg direction=\"out\" type=\"(so)\"/>\n"
+                "      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "  </interface>\n"
+                );
+
+    QLatin1String actionIntrospection(
+                "  <interface name=\"org.a11y.atspi.Action\">\n"
+                "    <property access=\"read\" type=\"i\" name=\"NActions\"/>\n"
+                "    <method name=\"GetDescription\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"index\"/>\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetName\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"index\"/>\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetKeyBinding\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"index\"/>\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetActions\">\n"
+                "      <arg direction=\"out\" type=\"a(sss)\" name=\"index\"/>\n"
+                "      <annotation value=\"QSpiActionArray\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "    <method name=\"DoAction\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"index\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "  </interface>\n"
+                );
+
+    QLatin1String applicationIntrospection(
+                "  <interface name=\"org.a11y.atspi.Application\">\n"
+                "    <property access=\"read\" type=\"s\" name=\"ToolkitName\"/>\n"
+                "    <property access=\"read\" type=\"s\" name=\"Version\"/>\n"
+                "    <property access=\"readwrite\" type=\"i\" name=\"Id\"/>\n"
+                "    <method name=\"GetLocale\">\n"
+                "      <arg direction=\"in\" type=\"u\" name=\"lctype\"/>\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetApplicationBusAddress\">\n"
+                "      <arg direction=\"out\" type=\"s\" name=\"address\"/>\n"
+                "    </method>\n"
+                "    <!--\n"
+                "  <method name=\"RegisterEventListener\">\n"
+                "    <arg direction=\"in\" name=\"event\" type=\"s\"/>\n"
+                "  </method>\n"
+                "\n"
+                "  <method name=\"DeregisterEventListener\">\n"
+                "    <arg direction=\"in\" name=\"event\" type=\"s\"/>\n"
+                "  </method>\n"
+                "-->\n"
+                "  </interface>\n"
+                );
+
+    QLatin1String componentIntrospection(
+                "  <interface name=\"org.a11y.atspi.Component\">\n"
+                "    <method name=\"Contains\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"x\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"y\"/>\n"
+                "      <arg direction=\"in\" type=\"u\" name=\"coord_type\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetAccessibleAtPoint\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"x\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"y\"/>\n"
+                "      <arg direction=\"in\" type=\"u\" name=\"coord_type\"/>\n"
+                "      <arg direction=\"out\" type=\"(so)\"/>\n"
+                "      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetExtents\">\n"
+                "      <arg direction=\"in\" type=\"u\" name=\"coord_type\"/>\n"
+                "      <arg direction=\"out\" type=\"(iiii)\"/>\n"
+                "      <annotation value=\"QSpiRect\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetPosition\">\n"
+                "      <arg direction=\"in\" type=\"u\" name=\"coord_type\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"x\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"y\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetSize\">\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"width\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"height\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetLayer\">\n"
+                "      <arg direction=\"out\" type=\"u\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetMDIZOrder\">\n"
+                "      <arg direction=\"out\" type=\"n\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GrabFocus\">\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetAlpha\">\n"
+                "      <arg direction=\"out\" type=\"d\"/>\n"
+                "    </method>\n"
+                "    <method name=\"SetExtents\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"x\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"y\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"width\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"height\"/>\n"
+                "      <arg direction=\"in\" type=\"u\" name=\"coord_type\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"SetPosition\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"x\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"y\"/>\n"
+                "      <arg direction=\"in\" type=\"u\" name=\"coord_type\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"SetSize\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"width\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"height\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "  </interface>\n"
+                );
+
+    QLatin1String editableTextIntrospection(
+                "  <interface name=\"org.a11y.atspi.EditableText\">\n"
+                "    <method name=\"SetTextContents\">\n"
+                "      <arg direction=\"in\" type=\"s\" name=\"newContents\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"InsertText\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"position\"/>\n"
+                "      <arg direction=\"in\" type=\"s\" name=\"text\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"length\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"CopyText\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"startPos\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"endPos\"/>\n"
+                "    </method>\n"
+                "    <method name=\"CutText\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"startPos\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"endPos\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"DeleteText\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"startPos\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"endPos\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"PasteText\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"position\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "  </interface>\n"
+                );
+
+    QLatin1String tableIntrospection(
+                "  <interface name=\"org.a11y.atspi.Table\">\n"
+                "    <property access=\"read\" type=\"i\" name=\"NRows\"/>\n"
+                "    <property access=\"read\" type=\"i\" name=\"NColumns\"/>\n"
+                "    <property access=\"read\" type=\"(so)\" name=\"Caption\">\n"
+                "      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName\"/>\n"
+                "    </property>\n"
+                "    <property access=\"read\" type=\"(so)\" name=\"Summary\">\n"
+                "      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName\"/>\n"
+                "    </property>\n"
+                "    <property access=\"read\" type=\"i\" name=\"NSelectedRows\"/>\n"
+                "    <property access=\"read\" type=\"i\" name=\"NSelectedColumns\"/>\n"
+                "    <method name=\"GetAccessibleAt\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"row\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"column\"/>\n"
+                "      <arg direction=\"out\" type=\"(so)\"/>\n"
+                "      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetIndexAt\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"row\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"column\"/>\n"
+                "      <arg direction=\"out\" type=\"i\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetRowAtIndex\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"index\"/>\n"
+                "      <arg direction=\"out\" type=\"i\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetColumnAtIndex\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"index\"/>\n"
+                "      <arg direction=\"out\" type=\"i\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetRowDescription\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"row\"/>\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetColumnDescription\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"column\"/>\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetRowExtentAt\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"row\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"column\"/>\n"
+                "      <arg direction=\"out\" type=\"i\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetColumnExtentAt\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"row\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"column\"/>\n"
+                "      <arg direction=\"out\" type=\"i\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetRowHeader\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"row\"/>\n"
+                "      <arg direction=\"out\" type=\"(so)\"/>\n"
+                "      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetColumnHeader\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"column\"/>\n"
+                "      <arg direction=\"out\" type=\"(so)\"/>\n"
+                "      <annotation value=\"QSpiObjectReference\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetSelectedRows\">\n"
+                "      <arg direction=\"out\" type=\"ai\"/>\n"
+                "      <annotation value=\"QSpiIntList\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetSelectedColumns\">\n"
+                "      <arg direction=\"out\" type=\"ai\"/>\n"
+                "      <annotation value=\"QSpiIntList\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "    <method name=\"IsRowSelected\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"row\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"IsColumnSelected\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"column\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"IsSelected\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"row\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"column\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"AddRowSelection\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"row\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"AddColumnSelection\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"column\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"RemoveRowSelection\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"row\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"RemoveColumnSelection\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"column\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetRowColumnExtentsAtIndex\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"index\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"row\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"col\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"row_extents\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"col_extents\"/>\n"
+                "      <arg direction=\"out\" type=\"b\" name=\"is_selected\"/>\n"
+                "    </method>\n"
+                "  </interface>\n"
+                );
+
+    QLatin1String textIntrospection(
+                "  <interface name=\"org.a11y.atspi.Text\">\n"
+                "    <property access=\"read\" type=\"i\" name=\"CharacterCount\"/>\n"
+                "    <property access=\"read\" type=\"i\" name=\"CaretOffset\"/>\n"
+                "    <method name=\"GetText\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"startOffset\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"endOffset\"/>\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "    </method>\n"
+                "    <method name=\"SetCaretOffset\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"offset\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetTextBeforeOffset\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"offset\"/>\n"
+                "      <arg direction=\"in\" type=\"u\" name=\"type\"/>\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"startOffset\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"endOffset\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetTextAtOffset\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"offset\"/>\n"
+                "      <arg direction=\"in\" type=\"u\" name=\"type\"/>\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"startOffset\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"endOffset\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetTextAfterOffset\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"offset\"/>\n"
+                "      <arg direction=\"in\" type=\"u\" name=\"type\"/>\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"startOffset\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"endOffset\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetCharacterAtOffset\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"offset\"/>\n"
+                "      <arg direction=\"out\" type=\"i\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetAttributeValue\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"offset\"/>\n"
+                "      <arg direction=\"in\" type=\"s\" name=\"attributeName\"/>\n"
+                "      <arg direction=\"out\" type=\"s\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"startOffset\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"endOffset\"/>\n"
+                "      <arg direction=\"out\" type=\"b\" name=\"defined\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetAttributes\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"offset\"/>\n"
+                "      <arg direction=\"out\" type=\"a{ss}\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"startOffset\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"endOffset\"/>\n"
+                "      <annotation value=\"QSpiAttributeSet\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetDefaultAttributes\">\n"
+                "      <arg direction=\"out\" type=\"a{ss}\"/>\n"
+                "      <annotation value=\"QSpiAttributeSet\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetCharacterExtents\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"offset\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"x\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"y\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"width\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"height\"/>\n"
+                "      <arg direction=\"in\" type=\"u\" name=\"coordType\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetOffsetAtPoint\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"x\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"y\"/>\n"
+                "      <arg direction=\"in\" type=\"u\" name=\"coordType\"/>\n"
+                "      <arg direction=\"out\" type=\"i\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetNSelections\">\n"
+                "      <arg direction=\"out\" type=\"i\"/>\n"
+                "    <method name=\"GetSelection\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"selectionNum\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"startOffset\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"endOffset\"/>\n"
+                "    </method>\n"
+                "    <method name=\"AddSelection\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"startOffset\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"endOffset\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"RemoveSelection\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"selectionNum\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"SetSelection\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"selectionNum\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"startOffset\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"endOffset\"/>\n"
+                "      <arg direction=\"out\" type=\"b\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetRangeExtents\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"startOffset\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"endOffset\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"x\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"y\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"width\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"height\"/>\n"
+                "      <arg direction=\"in\" type=\"u\" name=\"coordType\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetBoundedRanges\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"x\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"y\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"width\"/>\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"height\"/>\n"
+                "      <arg direction=\"in\" type=\"u\" name=\"coordType\"/>\n"
+                "      <arg direction=\"in\" type=\"u\" name=\"xClipType\"/>\n"
+                "      <arg direction=\"in\" type=\"u\" name=\"yClipType\"/>\n"
+                "      <arg direction=\"out\" type=\"a(iisv)\"/>\n"
+                "      <annotation value=\"QSpiRangeList\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetAttributeRun\">\n"
+                "      <arg direction=\"in\" type=\"i\" name=\"offset\"/>\n"
+                "      <arg direction=\"in\" type=\"b\" name=\"includeDefaults\"/>\n"
+                "      <arg direction=\"out\" type=\"a{ss}\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"startOffset\"/>\n"
+                "      <arg direction=\"out\" type=\"i\" name=\"endOffset\"/>\n"
+                "      <annotation value=\"QSpiAttributeSet\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "    <method name=\"GetDefaultAttributeSet\">\n"
+                "      <arg direction=\"out\" type=\"a{ss}\"/>\n"
+                "      <annotation value=\"QSpiAttributeSet\" name=\"com.trolltech.QtDBus.QtTypeName.Out0\"/>\n"
+                "    </method>\n"
+                "  </interface>\n"
+                );
+
+    QLatin1String valueIntrospection(
+                "  <interface name=\"org.a11y.atspi.Value\">\n"
+                "    <property access=\"read\" type=\"d\" name=\"MinimumValue\"/>\n"
+                "    <property access=\"read\" type=\"d\" name=\"MaximumValue\"/>\n"
+                "    <property access=\"read\" type=\"d\" name=\"MinimumIncrement\"/>\n"
+                "    <property access=\"readwrite\" type=\"d\" name=\"CurrentValue\"/>\n"
+                "    <method name=\"SetCurrentValue\">\n"
+                "      <arg direction=\"in\" type=\"d\" name=\"value\"/>\n"
+                "    </method>\n"
+                "  </interface>\n"
+                );
+
+    QPair<QAccessibleInterface*, int> pair = interfaceFromPath(path);
+    QAccessibleInterface *interface = pair.first;
+    int child = pair.second;
+    QStringList interfaces = accessibleInterfaces(interface, child);
+
+    QString xml;
+    xml.append(accessibleIntrospection);
+
+    if (interfaces.contains(ATSPI_DBUS_INTERFACE_COMPONENT))
+        xml.append(componentIntrospection);
+    if (interfaces.contains(ATSPI_DBUS_INTERFACE_TEXT))
+        xml.append(textIntrospection);
+    if (interfaces.contains(ATSPI_DBUS_INTERFACE_EDITABLE_TEXT))
+        xml.append(editableTextIntrospection);
+    if (interfaces.contains(ATSPI_DBUS_INTERFACE_ACTION))
+        xml.append(actionIntrospection);
+    if (interfaces.contains(ATSPI_DBUS_INTERFACE_TABLE))
+        xml.append(tableIntrospection);
+    if (interfaces.contains(ATSPI_DBUS_INTERFACE_VALUE))
+        xml.append(valueIntrospection);
+    if (path == QSPI_OBJECT_PATH_ROOT)
+        xml.append(applicationIntrospection);
+
+    return xml;
 }
 
 void AtSpiAdaptor::setInitialized(bool init)
@@ -332,7 +797,7 @@ void AtSpiAdaptor::notifyAboutCreation(QAccessibleInterface *interface, int chil
     // notify about the new child of our parent
     QAccessibleInterface *parent = accessibleParent(interface, child);
     if (!parent) {
-        qWarning() << "QSpiAdaptorV2::notifyAboutCreation: Could not find parent for " << interface->object() << child;
+        qWarning() << "AtSpiAdaptor::notifyAboutCreation: Could not find parent for " << interface->object() << child;
         return;
     }
     QString path = pathForInterface(interface, child);
@@ -349,7 +814,7 @@ void AtSpiAdaptor::notifyAboutDestruction(QAccessibleInterface *interface, int c
 
     QAccessibleInterface *parent = accessibleParent(interface, child);
     if (!parent) {
-        qWarning() << "QSpiAdaptorV2::notifyAboutDestruction: Could not find parent for " << interface->object() << child;
+        qWarning() << "AtSpiAdaptor::notifyAboutDestruction: Could not find parent for " << interface->object() << child;
         return;
     }
     QString path = pathForInterface(interface, child);
@@ -380,6 +845,11 @@ bool AtSpiAdaptor::handleMessage(const QDBusMessage &message, const QDBusConnect
     QString interface = message.interface();
     QString function = message.member();
 
+    if (function == "Introspect") {
+        //introspect(message.path());
+        return false;
+    }
+
     // handle properties like regular functions
     if (interface == "org.freedesktop.DBus.Properties") {
         interface = message.arguments().at(0).toString();
@@ -405,7 +875,7 @@ bool AtSpiAdaptor::handleMessage(const QDBusMessage &message, const QDBusConnect
     } else if (interface == ATSPI_DBUS_INTERFACE_TABLE) {
         return tableInterface(accessible.first, accessible.second, function, message, connection);
     } else {
-        qDebug() << "QSpiAdaptorV2::handleMessage " << message.path() << interface << function;
+        qDebug() << "AtSpiAdaptor::handleMessage " << message.path() << interface << function;
     }
     return false;
 }
@@ -429,7 +899,7 @@ bool AtSpiAdaptor::applicationInterface(QAccessibleInterface *interface, int, co
         QDBusMessage reply = message.createReply(QVariant::fromValue(QDBusVariant(QLatin1String("Qt"))));
         return connection.send(reply);
     } else {
-        qDebug() << "QSpiAdaptorV2::applicationInterface " << message.path() << interface << function;
+        qDebug() << "AtSpiAdaptor::applicationInterface " << message.path() << interface << function;
     }
 
     return false;
@@ -528,7 +998,7 @@ bool AtSpiAdaptor::accessibleInterface(QAccessibleInterface *interface, int chil
         }
         connection.send(message.createReply(QVariant::fromValue(children)));
     } else {
-        qWarning() << "WARNING: QSpiAdaptorV2::handleMessage does not implement " << function << message.path();
+        qWarning() << "WARNING: AtSpiAdaptor::handleMessage does not implement " << function << message.path();
         return false;
     }
     return true;
@@ -588,7 +1058,7 @@ QSpiRelationArray AtSpiAdaptor::relationSet(QAccessibleInterface *interface, int
 {
     QSpiRelationArray relations;
     if (child == 0) {
-        qDebug() << "QSpiAdaptorV2::relationSet currently has a problem with child ids.";
+        qDebug() << "AtSpiAdaptor::relationSet currently has a problem with child ids.";
         // FIXME for example trees need to express their child relations here.
         return relations;
     }
@@ -636,7 +1106,7 @@ QString AtSpiAdaptor::pathForObject(QObject *object) const
     Q_ASSERT(object);
 
     if (object->metaObject()->className() == QLatin1String("QAction")) {
-        qDebug() << "QSpiAdaptorV2::pathForObject: warning: creating path with QAction as object.";
+        qDebug() << "AtSpiAdaptor::pathForObject: warning: creating path with QAction as object.";
     }
     quintptr uintptr = reinterpret_cast<quintptr>(object);
     if (!m_handledObjects.contains(uintptr))
@@ -828,7 +1298,7 @@ bool AtSpiAdaptor::componentInterface(QAccessibleInterface *interface, int child
         qWarning() << "SetSize is not implemented.";
         sendReply(connection, message, false);
     } else {
-        qWarning() << "WARNING: QSpiAdaptorV2::handleMessage does not implement " << function << message.path();
+        qWarning() << "WARNING: AtSpiAdaptor::handleMessage does not implement " << function << message.path();
         return false;
     }
     return true;
@@ -861,7 +1331,7 @@ bool AtSpiAdaptor::actionInterface(QAccessibleInterface *interface, int child, c
         sendReply(connection, message, true);
     } else if (function == "GetActions") {
         if (child) {
-            qWarning() << "QSpiAdaptorV2::actionInterface: Requesting action interface for child";
+            qWarning() << "AtSpiAdaptor::actionInterface: Requesting action interface for child";
             return false;
         }
         sendReply(connection, message, QVariant::fromValue(getActions(interface)));
@@ -881,7 +1351,7 @@ bool AtSpiAdaptor::actionInterface(QAccessibleInterface *interface, int child, c
         else
             sendReply(connection, message, QString());
     } else {
-        qWarning() << "WARNING: QSpiAdaptorV2::handleMessage does not implement " << function << message.path();
+        qWarning() << "WARNING: AtSpiAdaptor::handleMessage does not implement " << function << message.path();
         return false;
     }
     return true;
@@ -1039,7 +1509,7 @@ bool AtSpiAdaptor::textInterface(QAccessibleInterface *interface, int child, con
         interface->textInterface()->setSelection(selectionNum, startOffset, endOffset);
         sendReply(connection, message, true);
     } else {
-        qWarning() << "WARNING: QSpiAdaptorV2::handleMessage does not implement " << function << message.path();
+        qWarning() << "WARNING: AtSpiAdaptor::handleMessage does not implement " << function << message.path();
         return false;
     }
     return true;
@@ -1252,7 +1722,7 @@ bool AtSpiAdaptor::editableTextInterface(QAccessibleInterface *interface, int ch
     } else if (function == "") {
         connection.send(message.createReply());
     } else {
-        qWarning() << "WARNING: QSpiAdaptorV2::handleMessage does not implement " << function << message.path();
+        qWarning() << "WARNING: AtSpiAdaptor::handleMessage does not implement " << function << message.path();
         return false;
     }
     return true;
@@ -1273,7 +1743,7 @@ bool AtSpiAdaptor::valueInterface(QAccessibleInterface *interface, int child, co
         bool success;
         double val = interface->valueInterface()->currentValue().toDouble(&success);
         if (!success) {
-            qWarning ("QSpiAdaptorV2::valueInterface: Could not convert current value to double.");
+            qWarning ("AtSpiAdaptor::valueInterface: Could not convert current value to double.");
         }
         connection.send(message.createReply(
                             QVariant::fromValue(QDBusVariant(QVariant::fromValue(val)))));
@@ -1281,7 +1751,7 @@ bool AtSpiAdaptor::valueInterface(QAccessibleInterface *interface, int child, co
         bool success;
         double val = interface->valueInterface()->maximumValue().toDouble(&success);
         if (!success) {
-            qWarning ("QSpiAdaptorV2::valueInterface: Could not convert current value to double.");
+            qWarning ("AtSpiAdaptor::valueInterface: Could not convert current value to double.");
         }
         connection.send(message.createReply(
                             QVariant::fromValue(QDBusVariant(QVariant::fromValue(val)))));
@@ -1292,12 +1762,12 @@ bool AtSpiAdaptor::valueInterface(QAccessibleInterface *interface, int child, co
         bool success;
         double val = interface->valueInterface()->minimumValue().toDouble(&success);
         if (!success) {
-            qWarning ("QSpiAdaptorV2::valueInterface: Could not convert current value to double.");
+            qWarning ("AtSpiAdaptor::valueInterface: Could not convert current value to double.");
         }
         connection.send(message.createReply(
                             QVariant::fromValue(QDBusVariant(QVariant::fromValue(val)))));
     } else {
-        qWarning() << "WARNING: QSpiAdaptorV2::handleMessage does not implement " << function << message.path();
+        qWarning() << "WARNING: AtSpiAdaptor::handleMessage does not implement " << function << message.path();
         return false;
     }
     return true;
@@ -1504,7 +1974,7 @@ bool AtSpiAdaptor::tableInterface(QAccessibleInterface *interface, int child, co
         int row = message.arguments().at(0).toInt();
         connection.send(message.createReply(interface->table2Interface()->unselectRow(row)));
     } else {
-        qWarning() << "WARNING: QSpiAdaptorV2::handleMessage does not implement " << function << message.path();
+        qWarning() << "WARNING: AtSpiAdaptor::handleMessage does not implement " << function << message.path();
         return false;
     }
     return true;
