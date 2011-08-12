@@ -191,9 +191,10 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiDeviceEvent &
 
 /*---------------------------------------------------------------------------*/
 
-void qSpiInitializeStructTypes ()
+void qSpiInitializeStructTypes()
 {
     qDBusRegisterMetaType<QSpiIntList>();
+    qDBusRegisterMetaType<QSpiUIntList>();
     qDBusRegisterMetaType<QSpiAccessibleCacheItem>();
     qDBusRegisterMetaType<QSpiAccessibleCacheArray>();
     qDBusRegisterMetaType<QSpiObjectReference>();

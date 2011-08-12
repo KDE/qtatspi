@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>587</width>
+    <width>590</width>
     <height>526</height>
    </rect>
   </property>
@@ -64,7 +64,7 @@
           <item>
            <widget class="QPushButton" name="greetButton">
             <property name="text">
-             <string>View greeting</string>
+             <string>Display greeting</string>
             </property>
            </widget>
           </item>
@@ -234,7 +234,7 @@ p, li { white-space: pre-wrap; }
           </attribute>
           <column>
            <property name="text">
-            <string>Item</string>
+            <string>Offer</string>
            </property>
           </column>
           <column>
@@ -246,9 +246,15 @@ p, li { white-space: pre-wrap; }
            <property name="text">
             <string>Food</string>
            </property>
+           <property name="text">
+            <string>P Food</string>
+           </property>
            <item>
             <property name="text">
              <string>Vegetable</string>
+            </property>
+            <property name="text">
+             <string>P Veggies</string>
             </property>
             <item>
              <property name="text">
@@ -280,7 +286,7 @@ p, li { white-space: pre-wrap; }
              <string>Fruit</string>
             </property>
             <property name="text">
-             <string/>
+             <string>P Fruit</string>
             </property>
             <item>
              <property name="text">
@@ -326,6 +332,20 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QPushButton" name="hideButton">
+            <property name="text">
+             <string>Hide translations</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="showButton">
+            <property name="text">
+             <string>Show translations</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item row="2" column="0">
@@ -367,7 +387,7 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="0" column="1">
            <property name="text">
-            <string>ola</string>
+            <string>hola</string>
            </property>
           </item>
           <item row="0" column="2">
@@ -404,6 +424,72 @@ p, li { white-space: pre-wrap; }
            <property name="text">
             <string>Computer</string>
            </property>
+          </item>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QTreeWidget" name="treeWidget_2">
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+          <attribute name="headerShowSortIndicator" stdset="0">
+           <bool>true</bool>
+          </attribute>
+          <attribute name="headerStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Item</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Price</string>
+           </property>
+          </column>
+          <item>
+           <property name="text">
+            <string>take</string>
+           </property>
+           <property name="text">
+            <string>give</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>oink</string>
+           </property>
+           <property name="text">
+            <string>blah</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Top 2</string>
+           </property>
+           <property name="text">
+            <string>500</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Food</string>
+           </property>
+           <property name="text">
+            <string>99</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>Sub1</string>
+            </property>
+            <property name="text">
+             <string>1001</string>
+            </property>
+           </item>
           </item>
          </widget>
         </item>
@@ -509,7 +595,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>587</width>
+     <width>590</width>
      <height>23</height>
     </rect>
    </property>

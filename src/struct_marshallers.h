@@ -119,9 +119,11 @@ struct QSpiTextRange {
     int startOffset;
     int endOffset;
     QString contents;
-    QVariant v; // TODO: check
+    QVariant v;
 };
-typedef QList <QSpiTextRange> QSpiRangeList;
+Q_DECLARE_METATYPE(QSpiTextRange)
+typedef QList <QSpiTextRange> QSpiTextRangeList;
+Q_DECLARE_METATYPE(QSpiTextRangeList)
 
 /* QSpiRect */
 /*---------------------------------------------------------------------------*/

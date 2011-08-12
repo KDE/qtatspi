@@ -164,7 +164,7 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren() const
 
     // TODO: become independent of caching the interfaces...
     //    QPair<QAccessibleInterface*, int> pair = QSpiAccessible::interfaceFromPath(getReference().path.path());
-//    qDebug() << "CHILDREN: " << getReference().path.path();
+    qDebug() << "CHILDREN: " << getReference().path.path();
 
     // when we are a child that means that we cannot have children of our own
     if (child) {
@@ -178,8 +178,10 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren() const
 
     for (int i = 1; i <= interface->childCount(); ++i) {
         QSpiAdaptor* child = getChild(i);
-        if (child)
+        if (child) {
             children << child->getReference();
+            qDebug() << "   CHILD: " << child->getReference().path.path();
+        }
 
 //        // use navigate and return refernces
 //        QAccessibleInterface* childInterface;
@@ -191,11 +193,15 @@ QSpiObjectReferenceArray QSpiAdaptor::GetChildren() const
 //            Q_ASSERT(childInterface);
 //            path = QSpiAccessible::pathForInterface(childInterface, childIndex);
 //        }
-//        qDebug() << "   CHILD: " << path;
 //        children.append(QSpiObjectReference(spiBridge->dBusConnection(), QDBusObjectPath(path)));
     }
 
-    Q_ASSERT(interface->childCount() == children.count());
+//    Q_ASSERT(interface->childCount() == children.count());
+    if (interface->childCount() != children.count()) {
+        qWarning() << "WARNING: Widget reports more children than it has. This will lead to inconsistent behavior."
+                   << interface->object() << qSpiRoleMapping[interface->role(child)].name() << getReference().path.path();
+    }
+
 
     return children;
 }
@@ -219,17 +225,15 @@ int QSpiAdaptor::GetIndexInParent() const
 {
     if (!checkInterface()) return -1;
 
-//    qDebug() << "QSpiAdaptor::GetIndexInParent" << interface->text(QAccessible::Name, 0);
-//    qDebug() << "  obj: " << interface->object();
     if (child)
         return child;
 
     QAccessibleInterface* parent;
     interface->navigate(QAccessible::Ancestor, 1, &parent);
     if (parent) {
-        qDebug() << "QSpiAdaptor::GetIndexInParent" << parent->text(QAccessible::Name, 0);
         int index = parent->indexOfChild(interface);
-        qDebug() << "Index: " << index;
+        Q_ASSERT(index != 0);
+        delete parent;
         return index;
     }
     return -1;
@@ -261,7 +265,6 @@ QSpiRelationArray QSpiAdaptor::GetRelationSet() const
 
         for (int j = 1; navigateResult >= 0; j++) {
             navigateResult = interface->navigate(relationsToCheck[i], j, &target);
-
             if (navigateResult == 0) {
                 QSpiAdaptor *targetAdaptor = spiBridge->interfaceToAccessible(target, 0, false);
                 related.append(targetAdaptor->getReference());
@@ -289,7 +292,6 @@ uint QSpiAdaptor::GetRole() const
 QString QSpiAdaptor::GetRoleName() const
 {
     if (!checkInterface()) return QString();
-
     return qSpiRoleMapping[interface->role(child)].name();
 }
 
@@ -298,8 +300,11 @@ QSpiUIntList QSpiAdaptor::GetState() const
     if (!checkInterface()) return QSpiUIntList();
 
     quint64 spiState = spiStatesFromQState(interface->state(child));
-    if (interface->tableInterface()) {
+    if (interface->table2Interface()) {
         setSpiStateBit(&spiState, ATSPI_STATE_MANAGES_DESCENDANTS);
+    } else if (interface->role(child) == QAccessible::TreeItem
+               && static_cast<QAccessibleTable2CellInterface*>(interface)->isExpandable()) {
+        setSpiStateBit(&spiState, ATSPI_STATE_EXPANDABLE);
     }
     return spiStateSetFromSpiStates(spiState);
 }
@@ -364,7 +369,7 @@ QString QSpiAdaptor::GetKeyBinding(int index)
     if (keyBindings.length() > 0)
         return keyBindings[0];
     else
-        return "";
+        return QString();
 }
 
 QString QSpiAdaptor::GetName(int index)
@@ -469,9 +474,12 @@ QSpiObjectReference QSpiAdaptor::GetAccessibleAtPoint(int x, int y, uint coord_t
     if (!checkInterface()) return QSpiObjectReference();
     Q_UNUSED (coord_type)
 
+
     // Grab the top level widget. For complex widgets we want to return a child
     // at the right position instead.
     QWidget* w = qApp->widgetAt(x,y);
+//    qDebug() << "QSpiAdaptor::GetAccessibleAtPoint " << x << ", " << y << " Coord: " << coord_type << w;
+
     if (w) {
         QSpiAdaptor* adaptor = spiBridge->objectToAccessible(w);
 
@@ -567,7 +575,7 @@ bool QSpiAdaptor::GrabFocus()
 void QSpiAdaptor::CopyText(int startPos, int endPos)
 {
     if (!checkInterface()) return;
-    return interface->editableTextInterface()->copyText(startPos, endPos);
+    interface->editableTextInterface()->copyText(startPos, endPos);
 }
 
 bool QSpiAdaptor::CutText(int startPos, int endPos)
@@ -587,9 +595,7 @@ bool QSpiAdaptor::DeleteText(int startPos, int endPos)
 bool QSpiAdaptor::InsertText(int position, const QString &text, int length)
 {
     if (!checkInterface()) return false;
-    QString resized (text);
-    resized.resize(length);
-    interface->editableTextInterface()->insertText(position, resized);
+    ;
     return TRUE;
 }
 
@@ -610,153 +616,184 @@ bool QSpiAdaptor::SetTextContents(const QString &newContents)
 /* AT-SPI Table interface ---------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 
-#define MAX_SELECTED_COLUMNS 1000
-#define MAX_SELECTED_ROWS    1000
-
 QSpiObjectReference QSpiAdaptor::caption() const
 {
     if (!checkInterface()) return QSpiObjectReference();
-    return spiBridge->objectToAccessible (interface->tableInterface()->caption()->object())->getReference();
+
+    QAccessibleInterface* captionObject = interface->table2Interface()->caption();
+    if (captionObject)
+        return spiBridge->interfaceToAccessible(captionObject, 0, true)->getReference();
+
+    return QSpiObjectReference();
 }
 
 int QSpiAdaptor::nColumns() const
 {
     if (!checkInterface()) return 0;
-    return interface->tableInterface()->columnCount();
+    return interface->table2Interface()->columnCount();
 }
 
 int QSpiAdaptor::nRows() const
 {
     if (!checkInterface()) return 0;
-    return interface->tableInterface()->rowCount();
+    return interface->table2Interface()->rowCount();
 }
 
 int QSpiAdaptor::nSelectedColumns() const
 {
     if (!checkInterface()) return 0;
-    return interface->tableInterface()->selectedColumnCount();
+    return interface->table2Interface()->selectedColumnCount();
 }
 
 int QSpiAdaptor::nSelectedRows() const
 {
     if (!checkInterface()) return 0;
-    return interface->tableInterface()->selectedRowCount();
+    return interface->table2Interface()->selectedRowCount();
 }
 
 QSpiObjectReference QSpiAdaptor::summary() const
 {
     if (!checkInterface()) return QSpiObjectReference();
-    return spiBridge->objectToAccessible(interface->tableInterface()->summary()->object())->getReference();
-}
-
-bool QSpiAdaptor::AddColumnSelection(int column)
-{
-    if (!checkInterface()) return false;
-    interface->tableInterface()->selectColumn(column);
-    return TRUE;
-}
-
-bool QSpiAdaptor::AddRowSelection(int row)
-{
-    if (!checkInterface()) return false;
-    interface->tableInterface()->selectRow(row);
-    return TRUE;
+    QAccessibleInterface* summaryObject = interface->table2Interface()->summary();
+    if (summaryObject)
+        return spiBridge->interfaceToAccessible(summaryObject, 0, true)->getReference();
+    return QSpiObjectReference();
 }
 
 QSpiObjectReference QSpiAdaptor::GetAccessibleAt(int row, int column)
 {
     if (!checkInterface()) return QSpiObjectReference();
-    Q_ASSERT(interface->tableInterface());
 
+    qDebug() << "QSpiAdaptor::GetAccessibleAt" << row << column;
+
+    Q_ASSERT(interface->table2Interface());
     Q_ASSERT(row >= 0);
     Q_ASSERT(column >= 0);
-    qDebug() << "GetAccessibleAt" << row << column;
+    Q_ASSERT(row < interface->table2Interface()->rowCount());
+    Q_ASSERT(column < interface->table2Interface()->columnCount());
 
-    QAccessibleInterface* rowInterface;
-    interface->navigate(QAccessible::Child, row+1, &rowInterface);
-
-    if (!rowInterface) {
-        qWarning() << "WARNING: no row interface returned for " << interface->object();
+    QAccessibleInterface* cell = interface->table2Interface()->cellAt(row, column);
+    if (!cell) {
+        qWarning() << "WARNING: no cell interface returned for " << interface->object() << row << column;
         return QSpiObjectReference();
     }
-    return spiBridge->interfaceToAccessible(rowInterface, column+1, true)->getReference();
-}
-
-int QSpiAdaptor::GetColumnAtIndex(int index)
-{
-    if (!checkInterface()) return 0;
-    return interface->tableInterface()->columnIndex(index);
-}
-
-QString QSpiAdaptor::GetColumnDescription(int column)
-{
-    if (!checkInterface()) return QString();
-    return interface->tableInterface()->columnDescription(column);
-}
-
-int QSpiAdaptor::GetColumnExtentAt(int row, int column)
-{
-    if (!checkInterface()) return 0;
-    return interface->tableInterface()->columnSpan(row, column);
-}
-
-QSpiObjectReference QSpiAdaptor::GetColumnHeader(int column)
-{
-    if (!checkInterface()) return QSpiObjectReference();
-    Q_UNUSED (column);
-    // TODO There should be a column param in this function right?
-    return spiBridge->objectToAccessible(interface->tableInterface()->columnHeader()->object())->getReference();
+    return spiBridge->interfaceToAccessible(cell, 0, true)->getReference();
 }
 
 int QSpiAdaptor::GetIndexAt(int row, int column)
 {
     if (!checkInterface()) return 0;
-    return interface->tableInterface()->childIndex(row, column);
+
+    QAccessibleInterface *cell = interface->table2Interface()->cellAt(row, column);
+    int index = interface->indexOfChild(cell);
+
+    qDebug() << "QSpiAdaptor::GetIndexAt" << row << column << index;
+
+    Q_ASSERT(index > 0);
+
+    delete cell;
+    return index;
+}
+
+int QSpiAdaptor::GetColumnAtIndex(int index)
+{
+    if (!checkInterface()) return 0;
+
+    qDebug() << "QSpiAdaptor::GetColumnAtIndex" << index;
+    if (index < 2)
+        return -1;
+
+    QAccessibleInterface *iface;
+    interface->navigate(QAccessible::Child, index, &iface);
+    if (iface) {
+        qDebug() << "iface: " << iface->text(QAccessible::Name, 0);
+
+        QAccessibleTable2CellInterface *cell = static_cast<QAccessibleTable2CellInterface*>(iface);
+        int i = cell->columnIndex();
+        delete cell;
+        return i;
+    }
+    return 0;
 }
 
 int QSpiAdaptor::GetRowAtIndex(int index)
 {
     if (!checkInterface()) return 0;
-    int row, column, rowSpan, columnSpan;
-    bool isSelected;
 
-    interface->tableInterface()->cellAtIndex (index, &row, &column, &rowSpan, &columnSpan, &isSelected);
-    return row;
+    if (index < 2) // 0 is self, 1 the corner button
+        return -1;
+
+    qDebug() << "QSpiAdaptor::GetRowAtIndex" << index;
+    QAccessibleInterface *iface;
+    interface->navigate(QAccessible::Child, index, &iface);
+    if (iface) {
+        qDebug() << "iface: " << iface->text(QAccessible::Name, 0);
+
+        QAccessibleTable2CellInterface *cell = static_cast<QAccessibleTable2CellInterface*>(iface);
+        int i = cell->rowIndex();
+        delete cell;
+        return i;
+    }
+    return 0;
 }
 
-bool QSpiAdaptor::GetRowColumnExtentsAtIndex(int index,
-						  int &row,
-						  int &col,
-						  int &row_extents,
-						  int &col_extents,
-						  bool &is_selected)
+QString QSpiAdaptor::GetColumnDescription(int column)
 {
-    if (!checkInterface()) return false;
-    int row0, column, rowSpan, columnSpan;
-    bool isSelected;
-
-    interface->tableInterface()->cellAtIndex (index, &row0, &column, &rowSpan, &columnSpan, &isSelected);
-    row = row0;
-    col = column;
-    row_extents = rowSpan;
-    col_extents = columnSpan;
-    is_selected = isSelected;
-    if (index < interface->childCount())
-        return TRUE;
-    else
-        return FALSE;
+    if (!checkInterface()) return QString();
+    return interface->table2Interface()->columnDescription(column);
 }
 
 QString QSpiAdaptor::GetRowDescription(int row)
 {
     if (!checkInterface()) return QString();
-    return interface->tableInterface()->rowDescription (row);
+    return interface->table2Interface()->rowDescription(row);
+}
+
+bool QSpiAdaptor::GetRowColumnExtentsAtIndex(int index,
+                                                  int &row,
+                                                  int &col,
+                                                  int &row_extents,
+                                                  int &col_extents,
+                                                  bool &is_selected)
+{
+    if (!checkInterface()) return false;
+
+    int cols = interface->table2Interface()->columnCount();
+    row = index/cols;
+    col = index%cols;
+    QAccessibleTable2CellInterface *cell = interface->table2Interface()->cellAt(row, col);
+    if (cell) {
+        cell->rowColumnExtents(&row, &col, &row_extents, &col_extents, &is_selected);
+        return true;
+    }
+
+    return false;
+}
+
+int QSpiAdaptor::GetColumnExtentAt(int row, int column)
+{
+    if (!checkInterface()) return 0;
+    return interface->table2Interface()->cellAt(row, column)->columnExtent();
 }
 
 int QSpiAdaptor::GetRowExtentAt(int row, int column)
 {
     if (!checkInterface()) return 0;
-    return interface->tableInterface()->rowSpan (row, column);
+    return interface->table2Interface()->cellAt(row, column)->rowExtent();
+}
+
+QSpiObjectReference QSpiAdaptor::GetColumnHeader(int column)
+{
+    if (!checkInterface()) return QSpiObjectReference();
+
+    QAccessibleTable2CellInterface *cell = interface->table2Interface()->cellAt(0, column);
+    if (cell) {
+        QList<QAccessibleInterface*> header = cell->columnHeaderCells();
+        delete cell;
+        if (header.size() > 0)
+            return spiBridge->interfaceToAccessible(header.at(0), 0, true)->getReference();
+    }
+    return QSpiObjectReference();
 }
 
 QSpiObjectReference QSpiAdaptor::GetRowHeader(int row)
@@ -774,7 +811,7 @@ QSpiIntList QSpiAdaptor::GetSelectedColumns()
 {
     QSpiIntList columns;
     if (!checkInterface()) return columns;
-    interface->tableInterface()->selectedColumns(MAX_SELECTED_COLUMNS, &columns);
+    columns = interface->table2Interface()->selectedColumns();
     return columns;
 }
 
@@ -782,40 +819,53 @@ QSpiIntList QSpiAdaptor::GetSelectedRows()
 {
     QSpiIntList rows;
     if (!checkInterface()) return rows;
-    interface->tableInterface()->selectedRows(MAX_SELECTED_ROWS, &rows);
+    rows = interface->table2Interface()->selectedRows();
     return rows;
 }
 
 bool QSpiAdaptor::IsColumnSelected(int column)
 {
     if (!checkInterface()) return false;
-    return interface->tableInterface()->isColumnSelected (column);
+    return interface->table2Interface()->isColumnSelected(column);
 }
 
 bool QSpiAdaptor::IsRowSelected(int row)
 {
     if (!checkInterface()) return false;
-    return interface->tableInterface()->isRowSelected (row);
+    return interface->table2Interface()->isRowSelected(row);
 }
 
 bool QSpiAdaptor::IsSelected(int row, int column)
 {
     if (!checkInterface()) return false;
-    return interface->tableInterface()->isSelected (row, column);
+    QAccessibleTable2CellInterface* cell = interface->table2Interface()->cellAt(row, column);
+    bool selected = cell->isSelected();
+    delete cell;
+    return selected;
+}
+
+bool QSpiAdaptor::AddColumnSelection(int column)
+{
+    if (!checkInterface()) return false;
+    return interface->table2Interface()->selectColumn(column);
+}
+
+bool QSpiAdaptor::AddRowSelection(int row)
+{
+    if (!checkInterface()) return false;
+    return interface->table2Interface()->selectRow(row);
 }
 
 bool QSpiAdaptor::RemoveColumnSelection(int column)
 {
     if (!checkInterface()) return false;
-    interface->tableInterface()->unselectColumn (column);
-    return TRUE;
+    return interface->table2Interface()->unselectColumn(column);
 }
 
 bool QSpiAdaptor::RemoveRowSelection(int row)
 {
     if (!checkInterface()) return false;
-    interface->tableInterface()->unselectRow (row);
-    return TRUE;
+    return interface->table2Interface()->unselectRow(row);
 }
 
 /* AT-SPI Text interface ----------------------------------------------------*/
@@ -898,7 +948,7 @@ QSpiAttributeSet QSpiAdaptor::GetAttributes(int offset, int &startOffset, int &e
     return set;
 }
 
-QSpiRangeList QSpiAdaptor::GetBoundedRanges(int x,
+QSpiTextRangeList QSpiAdaptor::GetBoundedRanges(int x,
 					        int y,
 					        int width,
 					        int height,
@@ -906,12 +956,12 @@ QSpiRangeList QSpiAdaptor::GetBoundedRanges(int x,
 					        uint xClipType,
 					        uint yClipType)
 {
-    if (!checkInterface()) return QSpiRangeList();
+    if (!checkInterface()) return QSpiTextRangeList();
     qWarning("Not implemented: QSpiAdaptor::GetBoundedRanges");
     Q_UNUSED(x) Q_UNUSED (y) Q_UNUSED(width)
     Q_UNUSED(height) Q_UNUSED(coordType)
     Q_UNUSED(xClipType) Q_UNUSED(yClipType)
-    QSpiRangeList out0;
+    QSpiTextRangeList out0;
     return out0;
 }
 

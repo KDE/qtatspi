@@ -22,8 +22,6 @@
 #include "generated/cache_adaptor.h"
 
 #include "bridge.h"
-#include "adaptor.h"
-
 
 #define QSPI_OBJECT_PATH_CACHE "/org/a11y/atspi/cache"
 
@@ -48,9 +46,5 @@ void QSpiDBusCache::emitRemoveAccessible(const QSpiObjectReference& item)
 QSpiAccessibleCacheArray QSpiDBusCache::GetItems()
 {
     QList <QSpiAccessibleCacheItem> cacheArray;
-
-    foreach (QSpiAdaptor* obj, spiBridge->cacheObjects()) {
-        cacheArray << obj->getCacheItem();
-    }
     return cacheArray;
 }

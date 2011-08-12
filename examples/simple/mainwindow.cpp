@@ -34,6 +34,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->addListButton, SIGNAL(clicked()), this, SLOT(addListItem()));
     connect(ui->removeListButton, SIGNAL(clicked()), this, SLOT(removeListItem()));
     connect(ui->greetButton, SIGNAL(clicked()), this, SLOT(greet()));
+    connect(ui->hideButton, SIGNAL(clicked()), ui->showButton, SLOT(show()));
+    connect(ui->hideButton, SIGNAL(clicked()), ui->hideButton, SLOT(hide()));
+    connect(ui->hideButton, SIGNAL(clicked()), ui->tableWidget, SLOT(hide()));
+    connect(ui->showButton, SIGNAL(clicked()), ui->hideButton, SLOT(show()));
+    connect(ui->showButton, SIGNAL(clicked()), ui->showButton, SLOT(hide()));
+    connect(ui->showButton, SIGNAL(clicked()), ui->tableWidget, SLOT(show()));
+    ui->showButton->hide();
+
+    ui->treeWidget->expandAll();
 
     if (qgetenv("QT_ACCESSIBILITY") != "1")
         QMessageBox::warning(this, tr("Qt Accessibility not enabled"),
@@ -70,4 +79,12 @@ void MainWindow::removeListItem()
 {
     delete ui->listWidget->takeItem(ui->listWidget->count()-1);
 }
+
+void MainWindow::greet()
+{
+    QString greetMessage = QString(QLatin1String("Hi %1!")).arg(ui->lineEdit->text());;
+
+    QMessageBox::information(this, tr("Hi!"), greetMessage);
+}
+
 

@@ -26,27 +26,18 @@
 #include <QAccessibleInterface>
 #include <QQueue>
 
-#include "adaptor.h"
-
-class QSpiAccessible;
-
 /*
  * Used for the root object.
  *
  * Uses the root object reference and reports its parent as the desktop object.
  */
-class QSpiApplication : public QSpiAdaptor
+class QSpiApplicationAdaptor :public QObject
 {
     Q_OBJECT
 
 public:
-    QSpiApplication(const QDBusConnection& c, QAccessibleInterface *interface);
-    virtual ~QSpiApplication() {}
-
-    virtual QSpiObjectReference getParentReference() const;
-
-    virtual void accessibleEvent(QAccessible::Event event);
-
+    QSpiApplicationAdaptor(const QDBusConnection &connection, QObject *parent);
+    virtual ~QSpiApplicationAdaptor() {}
 
     // the Id property gets written and read by the accessibility framework
     // we do nothing with it internally, it is only for the at-spi2 to identify us
@@ -66,12 +57,11 @@ private Q_SLOTS:
 
 private:
     static QKeyEvent* copyKeyEvent(QKeyEvent*);
-    void callAccessibilityRegistry();
 
-    QDBusConnection dbusConnection;
-    QSpiObjectReference accessibilityRegistry;
     int applicationId;
     QQueue<QPair<QObject*, QKeyEvent*> > keyEvents;
+
+    QDBusConnection dbusConnection;
 };
 
 #endif

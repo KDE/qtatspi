@@ -171,24 +171,28 @@ public:
     QSpiObjectReference summary() const;
 
 public Q_SLOTS:
-    bool AddColumnSelection(int column);
-    bool AddRowSelection(int row);
     QSpiObjectReference GetAccessibleAt(int row, int column);
-    int GetColumnAtIndex(int index);
-    QString GetColumnDescription(int column);
-    int GetColumnExtentAt(int row, int column);
-    QSpiObjectReference GetColumnHeader(int column);
     int GetIndexAt(int row, int column);
+    int GetColumnAtIndex(int index);
     int GetRowAtIndex(int index);
-    bool GetRowColumnExtentsAtIndex(int index, int &row, int &col, int &row_extents, int &col_extents, bool &is_selected);
-    QString GetRowDescription(int row);
-    int GetRowExtentAt(int row, int column);
+
+    QSpiObjectReference GetColumnHeader(int column);
     QSpiObjectReference GetRowHeader(int row);
-    QSpiIntList GetSelectedColumns();
-    QSpiIntList GetSelectedRows();
+    QString GetColumnDescription(int column);
+    QString GetRowDescription(int row);
+
+    int GetColumnExtentAt(int row, int column);
+    int GetRowExtentAt(int row, int column);
+    bool GetRowColumnExtentsAtIndex(int index, int &row, int &col, int &row_extents, int &col_extents, bool &is_selected);
+
+    bool IsSelected(int row, int column);
     bool IsColumnSelected(int column);
     bool IsRowSelected(int row);
-    bool IsSelected(int row, int column);
+    QSpiIntList GetSelectedColumns();
+    QSpiIntList GetSelectedRows();
+
+    bool AddColumnSelection(int column);
+    bool AddRowSelection(int row);
     bool RemoveColumnSelection(int column);
     bool RemoveRowSelection(int row);
 
@@ -204,7 +208,7 @@ public Q_SLOTS:
     QSpiAttributeSet GetAttributeRun(int offset, bool includeDefaults, int &startOffset, int &endOffset);
     QString GetAttributeValue(int offset, const QString &attributeName, int &startOffset, int &endOffset, bool &defined);
     QSpiAttributeSet GetAttributes(int offset, int &startOffset, int &endOffset);
-    QSpiRangeList GetBoundedRanges(int x, int y, int width, int height, uint coordType, uint xClipType, uint yClipType);
+    QSpiTextRangeList GetBoundedRanges(int x, int y, int width, int height, uint coordType, uint xClipType, uint yClipType);
     int GetCharacterAtOffset(int offset);
     int GetCharacterExtents(int offset, uint coordType, int &y, int &width, int &height);
     QSpiAttributeSet GetDefaultAttributeSet();

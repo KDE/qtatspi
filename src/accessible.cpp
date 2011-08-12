@@ -28,6 +28,7 @@
 #include "adaptor.h"
 #include "bridge.h"
 #include "cache.h"
+#include "constant_mappings.h"
 
 #include "generated/accessible_adaptor.h"
 #include "generated/action_adaptor.h"
@@ -39,7 +40,7 @@
 #include "generated/text_adaptor.h"
 #include "generated/value_adaptor.h"
 
-// #define ACCESSIBLE_CREATION_DEBUG
+#define ACCESSIBLE_CREATION_DEBUG
 
 #define QSPI_REGISTRY_NAME "org.a11y.atspi.Registry"
 
@@ -129,7 +130,7 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
     reference = QSpiObjectReference(spiBridge->dBusConnection(),
                                                dbusPath);
 #ifdef ACCESSIBLE_CREATION_DEBUG
-    qDebug() << "ACCESSIBLE: " << interface->object() << reference.path.path();
+    qDebug() << "ACCESSIBLE: " << interface->object() << reference.path.path() << interface->text(QAccessible::Name, index) << qSpiRoleMapping[interface->role(index)].name();
 #endif
 
     new AccessibleAdaptor(this);
@@ -141,6 +142,8 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
             (interface->role(index) == QAccessible::Cell) ||
             (interface->role(index) == QAccessible::TreeItem) ||
             (interface->role(index) == QAccessible::Row) ||
+            (interface->role(index) == QAccessible::RowHeader) ||
+            (interface->role(index) == QAccessible::ColumnHeader) ||
             (interface->object() && interface->object()->inherits("QSGItem"))
             ) {
         new ComponentAdaptor(this);
@@ -186,7 +189,7 @@ QSpiAccessible::QSpiAccessible(QAccessibleInterface *interface, int index)
         new ValueAdaptor(this);
         supportedInterfaces << QSPI_INTERFACE_VALUE;
     }
-    if (interface->tableInterface())
+    if (interface->table2Interface())
     {
         new TableAdaptor(this);
         supportedInterfaces << QSPI_INTERFACE_TABLE;
@@ -239,6 +242,9 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
         break;
     }
     case QAccessible::Focus: {
+
+        qDebug() << "Focus: " << getReference().path.path() << interface->object() << interface->text(QAccessible::Name, 0);
+
         QDBusVariant data;
         data.setVariant(QVariant::fromValue(getReference()));
         emit StateChanged("focused", 1, 0, data, spiBridge->getRootReference());
@@ -309,6 +315,13 @@ void QSpiAccessible::accessibleEvent(QAccessible::Event event)
             emit StateChanged("checked", checked, 0, data, spiBridge->getRootReference());
         }
         state = newState;
+        break;
+    }
+    case QAccessible::TableModelChanged: {
+        // This is rather evil. We don't send data and hope that at-spi fetches the right child.
+        // This hack fails when a row gets removed and a different one added in its place.
+        QDBusVariant data;
+        emit ChildrenChanged("add", 0, 0, data, spiBridge->getRootReference());
         break;
     }
     case QAccessible::ParentChanged:
