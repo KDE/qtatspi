@@ -66,7 +66,6 @@ void MainWindow::createButton()
 void MainWindow::greet()
 {
     QString greetMessage = QString(QLatin1String("Hi %1!")).arg(ui->lineEdit->text());;
-
     QMessageBox::information(this, tr("Hi!"), greetMessage);
 }
 
