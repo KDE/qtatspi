@@ -74,6 +74,7 @@ private slots:
     void testListWidget();
     void testTreeWidget();
     void testTextEdit();
+    void testSlider();
 
     void cleanupTestCase();
 //     void rootObject();
@@ -366,6 +367,30 @@ void tst_QtAtSpi::testTextEdit()
     m_window->clearChildren();
     delete textInterface;
 }
+
+void tst_QtAtSpi::testSlider()
+{
+    QSlider *slider = new QSlider(m_window);
+    slider->setMinimum(2);
+    slider->setMaximum(5);
+    slider->setValue(3);
+    m_window->addWidget(slider);
+
+    QStringList children = getChildren(mainWindow);
+
+    QDBusInterface* accessibleInterface = getInterface(children.at(0), "org.a11y.atspi.Accessible");
+    QDBusInterface* valueInterface = getInterface(children.at(0), "org.a11y.atspi.Value");
+    QVERIFY(accessibleInterface->isValid());
+    QVERIFY(valueInterface->isValid());
+
+    QCOMPARE(valueInterface->property("CurrentValue").toInt(), 3);
+    QCOMPARE(valueInterface->property("MinimumValue").toInt(), 2);
+    QCOMPARE(valueInterface->property("MaximumValue").toInt(), 5);
+
+    valueInterface->setProperty("CurrentValue", 4);
+    QCOMPARE(valueInterface->property("CurrentValue").toInt(), 4);
+}
+
 
 // void tst_QtAtSpi::rootObject()
 // {

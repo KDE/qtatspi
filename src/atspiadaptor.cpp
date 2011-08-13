@@ -1734,7 +1734,8 @@ bool AtSpiAdaptor::valueInterface(QAccessibleInterface *interface, int child, co
     Q_ASSERT(child == 0);
     if (0) {
     } else if (function == "SetCurrentValue") {
-        double value = message.arguments().at(0).toInt();
+        QDBusVariant v = message.arguments().at(2).value<QDBusVariant>();
+        double value = v.variant().toDouble();
         //Temporal fix
         //See https://bugzilla.gnome.org/show_bug.cgi?id=652596
         interface->valueInterface()->setCurrentValue(value);
