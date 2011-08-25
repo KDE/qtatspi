@@ -20,6 +20,7 @@
 
 #include "dbusconnection.h"
 
+#include <QtDBus/QDBusMessage>
 #include <QtCore/QDebug>
 
 #include <QX11Info>
@@ -53,6 +54,32 @@ QDBusConnection DBusConnection::connectDBus()
 }
 
 QString DBusConnection::getAccessibilityBusAddress() const
+{
+    QString address = getAccessibilityBusAddressDBus();
+    if (address.isEmpty()) {
+        address = getAccessibilityBusAddressXAtom();
+    }
+    return address;
+}
+
+QString DBusConnection::getAccessibilityBusAddressDBus() const
+{
+    QDBusConnection c = QDBusConnection::sessionBus();
+
+    QDBusMessage m = QDBusMessage::createMethodCall("org.a11y.Bus",
+                                                    "/org/a11y/bus",
+                                                    "org.a11y.Bus", "GetAddress");
+    QDBusMessage reply = c.call(m);
+    if (reply.type() == QDBusMessage::ErrorMessage) {
+        qWarning() << "Qt at-spi: error getting the accessibility dbus address: " << reply.errorMessage();
+    }
+
+    QString busAddress = reply.arguments().at(0).toString();
+    qDebug() << "Got bus address: " << busAddress;
+    return busAddress;
+}
+
+QString DBusConnection::getAccessibilityBusAddressXAtom() const
 {
     Display* bridge_display = QX11Info::display();
 

@@ -31,6 +31,8 @@ public:
 
 private:
     QString getAccessibilityBusAddress() const;
+    QString getAccessibilityBusAddressDBus() const;
+    QString getAccessibilityBusAddressXAtom() const;
     QDBusConnection connectDBus();
 
     QDBusConnection dbusConnection;
