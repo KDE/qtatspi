@@ -109,7 +109,7 @@ quint64 spiStatesFromQState(QAccessible::State state)
     setSpiStateBit(&spiState, ATSPI_STATE_VISIBLE);
     setSpiStateBit(&spiState, ATSPI_STATE_SENSITIVE);
 
-    for (int mask = 1; mask <= int(QAccessible::Modal); mask <<= 1)
+    for (quint32 mask = 1; mask <= 0x10000000u; mask <<= 1)
     {
         switch (state & mask)
         {
