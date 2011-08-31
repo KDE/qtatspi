@@ -47,7 +47,7 @@ QString AtSpiAdaptor::introspect(const QString &path) const
     if (path != QSPI_OBJECT_PATH_ROOT) {
         QPair<QAccessibleInterface*, int> accessible = interfaceFromPath(path);
         if (!accessible.first) {
-            qWarning() << "Could not find accessible on path: " << path;
+            qWarning() << "WARNING Qt AtSpiAdaptor: Could not find accessible on path: " << path;
             return QString();
         }
     }
@@ -845,7 +845,7 @@ bool AtSpiAdaptor::handleMessage(const QDBusMessage &message, const QDBusConnect
     // get accessible interface
     QPair<QAccessibleInterface*, int> accessible = interfaceFromPath(message.path());
     if (!accessible.first) {
-        qWarning() << "Could not find accessible on path: " << message.path();
+        qWarning() << "WARNING Qt AtSpiAdaptor: Could not find accessible on path: " << message.path();
         return false;
     }
 
@@ -890,6 +890,11 @@ bool AtSpiAdaptor::handleMessage(const QDBusMessage &message, const QDBusConnect
 // Application
 bool AtSpiAdaptor::applicationInterface(QAccessibleInterface *interface, int, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
+    if (message.path() != ATSPI_DBUS_PATH_ROOT) {
+        qWarning() << "WARNING Qt AtSpiAdaptor: Could not find application interface for: " << message.path() << interface;
+        return false;
+    }
+
     if (function == "SetId") {
         Q_ASSERT(message.signature() == "ssv");
         QVariant value = qvariant_cast<QDBusVariant>(message.arguments().at(2)).variant();
@@ -1330,6 +1335,11 @@ QSpiRect AtSpiAdaptor::getExtents(QAccessibleInterface *interface, int child, ui
 // Action interface
 bool AtSpiAdaptor::actionInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
+    if (!interface->actionInterface()) {
+        qWarning() << "WARNING Qt AtSpiAdaptor: Could not find action interface for: " << message.path() << interface;
+        return false;
+    }
+
     if (function == "GetNActions") {
         sendReply(connection, message, QVariant::fromValue(QDBusVariant(QVariant::fromValue(interface->actionInterface()->actionCount()))));
     } else if (function == "DoAction") {
@@ -1391,6 +1401,11 @@ QSpiActionArray AtSpiAdaptor::getActions(QAccessibleInterface *interface) const
 bool AtSpiAdaptor::textInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
     Q_ASSERT(child == 0); // We should never claim to have a text interface on a virtual child
+    if (!interface->textInterface()) {
+        qWarning() << "WARNING Qt AtSpiAdaptor: Could not find text interface for: " << message.path() << interface;
+        return false;
+    }
+
     // properties
     if (function == "GetCaretOffset") {
         sendReply(connection, message, QVariant::fromValue(QDBusVariant(QVariant::fromValue(interface->textInterface()->cursorPosition()))));
@@ -1695,6 +1710,11 @@ QVariantList AtSpiAdaptor::getRangeExtents(QAccessibleInterface *interface,
 bool AtSpiAdaptor::editableTextInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
     Q_ASSERT(child == 0); // We should never claim to have a text interface on a virtual child
+    if (!interface->editableTextInterface()) {
+        qWarning() << "WARNING Qt AtSpiAdaptor: Could not find editable text interface for: " << message.path() << interface;
+        return false;
+    }
+
     if (function == "CopyText") {
         int startPos = message.arguments().at(0).toInt();
         int endPos = message.arguments().at(1).toInt();
@@ -1739,6 +1759,11 @@ bool AtSpiAdaptor::editableTextInterface(QAccessibleInterface *interface, int ch
 bool AtSpiAdaptor::valueInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
     Q_ASSERT(child == 0);
+    if (!interface->valueInterface()) {
+        qWarning() << "WARNING Qt AtSpiAdaptor: Could not find value interface for: " << message.path() << interface;
+        return false;
+    }
+
     if (0) {
     } else if (function == "SetCurrentValue") {
         QDBusVariant v = message.arguments().at(2).value<QDBusVariant>();
@@ -1785,6 +1810,11 @@ bool AtSpiAdaptor::valueInterface(QAccessibleInterface *interface, int child, co
 bool AtSpiAdaptor::tableInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
     Q_ASSERT(child == 0);
+    if (!interface->tableInterface()) {
+        qWarning() << "WARNING Qt AtSpiAdaptor: Could not find table interface for: " << message.path() << interface;
+        return false;
+    }
+
     if (0) {
     // properties
     } else if (function == "GetCaption") {
