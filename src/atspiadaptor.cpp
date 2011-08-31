@@ -44,6 +44,13 @@ AtSpiAdaptor::~AtSpiAdaptor()
 
 QString AtSpiAdaptor::introspect(const QString &path) const
 {
+    if (path != QSPI_OBJECT_PATH_ROOT) {
+        QPair<QAccessibleInterface*, int> accessible = interfaceFromPath(path);
+        if (!accessible.first) {
+            qWarning() << "Could not find accessible on path: " << path;
+            return QString();
+        }
+    }
 
     QLatin1String accessibleIntrospection(
                 "  <interface name=\"org.a11y.atspi.Accessible\">\n"
