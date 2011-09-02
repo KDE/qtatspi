@@ -72,6 +72,7 @@ QString DBusConnection::getAccessibilityBusAddressDBus() const
     QDBusMessage reply = c.call(m);
     if (reply.type() == QDBusMessage::ErrorMessage) {
         qWarning() << "Qt at-spi: error getting the accessibility dbus address: " << reply.errorMessage();
+        return QString();
     }
 
     QString busAddress = reply.arguments().at(0).toString();
