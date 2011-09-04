@@ -762,7 +762,16 @@ void AtSpiAdaptor::notify(int reason, QAccessibleInterface *interface, int child
         //        break;
 
     case QAccessible::ParentChanged:
-        // FIXME send parent changed
+        qDebug() << "FIXME: handle parent changed.";
+        break;
+    case QAccessible::DialogStart:
+        qDebug() << "FIXME: handle dialog start.";
+        break;
+    case QAccessible::DialogEnd:
+        qDebug() << "FIXME: handle dialog end.";
+        break;
+    case QAccessible::TableModelChanged:
+        // For now ignore this event, should be handled together with active descendant changed
         break;
     default:
         qWarning() << "QSpiAccessible::accessibleEvent not handled: " << QString::number(reason, 16)
