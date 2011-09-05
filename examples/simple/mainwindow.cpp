@@ -44,6 +44,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->treeWidget->expandAll();
 
+    QMenu *menu = new QMenu(ui->toolButtonWithMenu);
+    ui->toolButtonWithMenu->setMenu(menu);
+    QAction *foo = new QAction("foo", menu);
+    menu->addAction(foo);
+
     if (qgetenv("QT_ACCESSIBILITY") != "1")
         QMessageBox::warning(this, tr("Qt Accessibility not enabled"),
             tr("In order to test accessibility, please export \"QT_ACCESSIBILITY=1\" before starting this applicaton."));
