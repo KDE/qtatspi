@@ -537,7 +537,12 @@ void AtSpiAdaptor::windowActivated(QObject* window, bool active)
     QVariantList args = packDBusSignalArguments(QString(), 0, 0, QVariant::fromValue(data));
 
     QString status = active ? QLatin1String("Activate") : QLatin1String("Deactivate");
-    sendDBusSignal(pathForObject(window), ATSPI_DBUS_INTERFACE_EVENT_WINDOW, status, args);
+    QString path = pathForObject(window);
+    sendDBusSignal(path, ATSPI_DBUS_INTERFACE_EVENT_WINDOW, status, args);
+
+    QVariantList stateArgs = packDBusSignalArguments(QLatin1String("active"), active ? 1 : 0, 0, variantForPath(path));
+    sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                   QLatin1String("StateChanged"), stateArgs);
 }
 
 QVariantList AtSpiAdaptor::packDBusSignalArguments(const QString &type, int data1, int data2, const QVariant &variantData) const
@@ -1003,6 +1008,12 @@ bool AtSpiAdaptor::accessibleInterface(QAccessibleInterface *interface, int chil
         quint64 spiState = spiStatesFromQState(interface->state(child));
         if (interface->table2Interface()) {
             setSpiStateBit(&spiState, ATSPI_STATE_MANAGES_DESCENDANTS);
+        }
+        if (interface->object() && interface->object()->isWidgetType()) {
+            QWidget *w = qobject_cast<QWidget*>(interface->object());
+            if (w && w->topLevelWidget() && w->isActiveWindow()) {
+                setSpiStateBit(&spiState, ATSPI_STATE_ACTIVE);
+            }
         }
         sendReply(connection, message,
                   QVariant::fromValue(spiStateSetFromSpiStates(spiState)));
