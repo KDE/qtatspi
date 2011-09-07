@@ -60,7 +60,7 @@ QSpiAccessibleBridge::QSpiAccessibleBridge()
     dbusAdaptor->registerApplication();
 
     QSpiApplicationAdaptor *applicationAdaptor = new QSpiApplicationAdaptor(dbusConnection->connection(), this);
-    connect(applicationAdaptor, SIGNAL(windowActivated(QObject*)), dbusAdaptor, SLOT(windowActivated(QObject*)));
+    connect(applicationAdaptor, SIGNAL(windowActivated(QObject*,bool)), dbusAdaptor, SLOT(windowActivated(QObject*,bool)));
 }
 
 QSpiAccessibleBridge::~QSpiAccessibleBridge()

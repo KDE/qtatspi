@@ -62,7 +62,7 @@ public:
     void setInitialized(bool init);
 
 public Q_SLOTS:
-    void windowActivated(QObject* window);
+    void windowActivated(QObject* window, bool active);
 
 private:
     // sending messages

@@ -45,9 +45,12 @@ bool QSpiApplicationAdaptor::eventFilter(QObject *target, QEvent *event)
         return false;
 
     switch (event->type()) {
-        case QEvent::WindowActivate: {
-        emit windowActivated(target);
+    case QEvent::WindowActivate: {
+        emit windowActivated(target, true);
         break;
+    case QEvent::WindowDeactivate:
+            emit windowActivated(target, false);
+            break;
     }
         case QEvent::KeyPress:
         case QEvent::KeyRelease: {

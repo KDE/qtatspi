@@ -525,7 +525,7 @@ void AtSpiAdaptor::setInitialized(bool init)
     initialized = init;
 }
 
-void AtSpiAdaptor::windowActivated(QObject* window)
+void AtSpiAdaptor::windowActivated(QObject* window, bool active)
 {
     QAccessibleInterface *iface = QAccessible::queryAccessibleInterface(window);
     QString windowTitle = iface->text(QAccessible::Name, 0);
@@ -535,7 +535,9 @@ void AtSpiAdaptor::windowActivated(QObject* window)
     data.setVariant(windowTitle);
 
     QVariantList args = packDBusSignalArguments(QString(), 0, 0, QVariant::fromValue(data));
-    sendDBusSignal(pathForObject(window), ATSPI_DBUS_INTERFACE_EVENT_WINDOW, QLatin1String("Activate"), args);
+
+    QString status = active ? QLatin1String("Activate") : QLatin1String("Deactivate");
+    sendDBusSignal(pathForObject(window), ATSPI_DBUS_INTERFACE_EVENT_WINDOW, status, args);
 }
 
 QVariantList AtSpiAdaptor::packDBusSignalArguments(const QString &type, int data1, int data2, const QVariant &variantData) const

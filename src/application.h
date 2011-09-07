@@ -46,7 +46,7 @@ public:
     void setId(int value);
 
 Q_SIGNALS:
-    void windowActivated(QObject* window);
+    void windowActivated(QObject* window, bool active);
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
