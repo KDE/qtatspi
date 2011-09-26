@@ -46,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QMenu *menu = new QMenu(ui->toolButtonWithMenu);
     ui->toolButtonWithMenu->setMenu(menu);
+    ui->toolButtonWithMenu2->setMenu(menu);
     QAction *foo = new QAction("foo", menu);
     menu->addAction(foo);
 
