@@ -50,6 +50,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QAction *foo = new QAction("foo", menu);
     menu->addAction(foo);
 
+    ui->scrollArea->setWidget(ui->loremLabel);
+
     if (qgetenv("QT_ACCESSIBILITY") != "1")
         QMessageBox::warning(this, tr("Qt Accessibility not enabled"),
             tr("In order to test accessibility, please export \"QT_ACCESSIBILITY=1\" before starting this applicaton."));

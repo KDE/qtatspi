@@ -500,73 +500,13 @@ p, li { white-space: pre-wrap; }
         <string>&amp;Combobox</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="2" column="1">
-         <widget class="QSpinBox" name="spinBox"/>
-        </item>
-        <item row="14" column="0" colspan="2">
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>568</width>
-            <height>388</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="1">
-         <widget class="QComboBox" name="comboBox">
-          <item>
-           <property name="text">
-            <string>Comboboxes are fun!</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Or so I hear at least</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Crash for me!</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Last but not least</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QToolButton" name="toolButton_3">
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_6">
           <property name="text">
-           <string>Tool Button</string>
-          </property>
-          <property name="popupMode">
-           <enum>QToolButton::InstantPopup</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Here is a combo box:</string>
+           <string>Your height in meters:</string>
           </property>
           <property name="buddy">
-           <cstring>comboBox</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QToolButton" name="toolButton_2">
-          <property name="text">
-           <string>Tool Button</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
+           <cstring>comboBox_2</cstring>
           </property>
          </widget>
         </item>
@@ -580,32 +520,91 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
-         <widget class="QToolButton" name="toolButton">
+        <item row="7" column="0">
+         <widget class="QScrollArea" name="scrollArea">
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>408</width>
+             <height>70</height>
+            </rect>
+           </property>
+          </widget>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QToolButton" name="toolButtonWithMenu">
+          <property name="text">
+           <string>TB2</string>
+          </property>
+          <property name="checkable">
+           <bool>false</bool>
+          </property>
+          <property name="popupMode">
+           <enum>QToolButton::MenuButtonPopup</enum>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonIconOnly</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="18" column="0" colspan="2">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>568</width>
+            <height>388</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="4" column="1">
+         <widget class="QToolButton" name="toolButton_2">
           <property name="text">
            <string>Tool Button</string>
           </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>Your height in meters:</string>
-          </property>
-          <property name="buddy">
-           <cstring>comboBox_2</cstring>
+          <property name="checkable">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_4">
+        <item row="14" column="0">
+         <widget class="QLabel" name="loremLabel">
           <property name="text">
-           <string>Choose your favorite furniture:</string>
-          </property>
-          <property name="buddy">
-           <cstring>comboBox_2</cstring>
+           <string>Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+--
+Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
+Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.
+Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
+Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.
+At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.
+Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</string>
           </property>
          </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="spinBox"/>
+        </item>
+        <item row="5" column="1">
+         <widget class="QToolButton" name="toolButton_3">
+          <property name="text">
+           <string>Tool Button</string>
+          </property>
+          <property name="popupMode">
+           <enum>QToolButton::InstantPopup</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
         </item>
         <item row="1" column="1">
          <widget class="QComboBox" name="comboBox_2">
@@ -634,24 +633,32 @@ p, li { white-space: pre-wrap; }
           </item>
          </widget>
         </item>
-        <item row="5" column="0">
-         <widget class="QToolButton" name="toolButtonWithMenu">
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_4">
           <property name="text">
-           <string>TB2</string>
+           <string>Choose your favorite furniture:</string>
           </property>
-          <property name="checkable">
-           <bool>false</bool>
-          </property>
-          <property name="popupMode">
-           <enum>QToolButton::MenuButtonPopup</enum>
-          </property>
-          <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonIconOnly</enum>
+          <property name="buddy">
+           <cstring>comboBox_2</cstring>
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Here is a combo box:</string>
+          </property>
+          <property name="buddy">
+           <cstring>comboBox</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QToolButton" name="toolButton">
+          <property name="text">
+           <string>Tool Button</string>
+          </property>
+         </widget>
         </item>
         <item row="6" column="0">
          <widget class="QToolButton" name="toolButtonWithMenu2">
@@ -663,6 +670,66 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="popupMode">
            <enum>QToolButton::MenuButtonPopup</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="comboBox">
+          <item>
+           <property name="text">
+            <string>Comboboxes are fun!</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Or so I hear at least</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Crash for me!</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Last but not least</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="16" column="0">
+         <widget class="QDateEdit" name="dateEdit">
+          <property name="date">
+           <date>
+            <year>2011</year>
+            <month>9</month>
+            <day>11</day>
+           </date>
+          </property>
+         </widget>
+        </item>
+        <item row="15" column="0">
+         <widget class="QDateTimeEdit" name="dateTimeEdit">
+          <property name="dateTime">
+           <datetime>
+            <hour>10</hour>
+            <minute>42</minute>
+            <second>42</second>
+            <year>2011</year>
+            <month>10</month>
+            <day>17</day>
+           </datetime>
+          </property>
+         </widget>
+        </item>
+        <item row="17" column="0">
+         <widget class="QTimeEdit" name="timeEdit">
+          <property name="time">
+           <time>
+            <hour>11</hour>
+            <minute>55</minute>
+            <second>0</second>
+           </time>
           </property>
          </widget>
         </item>
