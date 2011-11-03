@@ -44,14 +44,6 @@ AtSpiAdaptor::~AtSpiAdaptor()
 
 QString AtSpiAdaptor::introspect(const QString &path) const
 {
-    if (path != QSPI_OBJECT_PATH_ROOT) {
-        QPair<QAccessibleInterface*, int> accessible = interfaceFromPath(path);
-        if (!accessible.first) {
-            qWarning() << "WARNING Qt AtSpiAdaptor: Could not find accessible on path: " << path;
-            return QString();
-        }
-    }
-
     QLatin1String accessibleIntrospection(
                 "  <interface name=\"org.a11y.atspi.Accessible\">\n"
                 "    <property access=\"read\" type=\"s\" name=\"Name\"/>\n"
@@ -493,11 +485,17 @@ QString AtSpiAdaptor::introspect(const QString &path) const
                 "    </method>\n"
                 "  </interface>\n"
                 );
+    QPair<QAccessibleInterface*, int> pair;
 
-    QPair<QAccessibleInterface*, int> pair = interfaceFromPath(path);
-    QAccessibleInterface *interface = pair.first;
-    int child = pair.second;
-    QStringList interfaces = accessibleInterfaces(interface, child);
+    if (path != QSPI_OBJECT_PATH_ROOT) {
+        QPair<QAccessibleInterfacePointer, int> pair = interfaceFromPath(path);
+        if (!pair.first) {
+            qWarning() << "WARNING Qt AtSpiAdaptor: Could not find accessible on path: " << path;
+            return QString();
+        }
+    }
+
+    QStringList interfaces = accessibleInterfaces(pair.first, pair.second);
 
     QString xml;
     xml.append(accessibleIntrospection);
@@ -567,20 +565,19 @@ bool AtSpiAdaptor::sendDBusSignal(const QString &path, const QString &interface,
     return m_dbus->connection().send(message);
 }
 
-QPair<QAccessibleInterface*, int> AtSpiAdaptor::interfaceFromPath(const QString& dbusPath) const
+QPair<QAccessibleInterfacePointer, int> AtSpiAdaptor::interfaceFromPath(const QString& dbusPath) const
 {
-    QAccessibleInterface* inter = 0;
     int index = 0;
 
     if (dbusPath == QSPI_OBJECT_PATH_ROOT) {
-        inter = QAccessible::queryAccessibleInterface(qApp);
-        return QPair<QAccessibleInterface*, int>(inter, index);
+        QAccessibleInterfacePointer interface = QAccessibleInterfacePointer(QAccessible::queryAccessibleInterface(qApp));
+        return QPair<QAccessibleInterfacePointer, int>(interface, index);
     }
 
     QStringList parts = dbusPath.split('/');
     if (parts.size() <= 5) {
         qWarning() << "invalid path: " << dbusPath;
-        return QPair<QAccessibleInterface*, int>(0, 0);
+        return QPair<QAccessibleInterfacePointer, int>(QAccessibleInterfacePointer(), 0);
     }
 
     QString objectString = parts.at(5);
@@ -591,24 +588,23 @@ QPair<QAccessibleInterface*, int> AtSpiAdaptor::interfaceFromPath(const QString&
         if (m_handledObjects[uintptr].data() != 0) {
             QObject* object = reinterpret_cast<QObject*>(uintptr);
 
-            inter = QAccessible::queryAccessibleInterface(object);
-            QAccessibleInterface* childInter;
+            QAccessibleInterfacePointer interface = QAccessibleInterfacePointer(QAccessible::queryAccessibleInterface(object));
+            QAccessibleInterfacePointer child;
 
             for (int i = 6; i < parts.size(); ++i) {
-                index = inter->navigate(QAccessible::Child, parts.at(i).toInt(), &childInter);
-                if (index == 0) {
-                    delete inter;
-                    inter = childInter;
-                }
+                QAccessibleInterface *childInterface;
+                index = interface->navigate(QAccessible::Child, parts.at(i).toInt(), &childInterface);
+                child = QAccessibleInterfacePointer(childInterface);
+                if (index == 0)
+                    interface = child;
             }
-
-            return QPair<QAccessibleInterface*, int>(inter, index);
+            return QPair<QAccessibleInterfacePointer, int>(interface, index);
 
         } else {
             m_handledObjects.remove(uintptr);
         }
     }
-    return QPair<QAccessibleInterface*, int>(0, 0);
+    return QPair<QAccessibleInterfacePointer, int>(QAccessibleInterfacePointer(), 0);
 }
 
 void AtSpiAdaptor::notify(int reason, QAccessibleInterface *interface, int child)
@@ -859,8 +855,8 @@ void AtSpiAdaptor::notifyAboutDestruction(QAccessibleInterface *interface, int c
 bool AtSpiAdaptor::handleMessage(const QDBusMessage &message, const QDBusConnection &connection)
 {
     // get accessible interface
-    QPair<QAccessibleInterface*, int> accessible = interfaceFromPath(message.path());
-    if (!accessible.first) {
+    QPair<QAccessibleInterfacePointer, int> accessible = interfaceFromPath(message.path());
+    if (!(accessible.first)) {
         qWarning() << "WARNING Qt AtSpiAdaptor: Could not find accessible on path: " << message.path();
         return false;
     }
@@ -882,21 +878,21 @@ bool AtSpiAdaptor::handleMessage(const QDBusMessage &message, const QDBusConnect
 
     // switch interface to call
     if (interface == ATSPI_DBUS_INTERFACE_ACCESSIBLE) {
-        return accessibleInterface(accessible.first, accessible.second, function, message, connection);
+        return accessibleInterface(accessible.first.data(), accessible.second, function, message, connection);
     } else if (interface == ATSPI_DBUS_INTERFACE_APPLICATION) {
-        return applicationInterface(accessible.first, accessible.second, function, message, connection);
+        return applicationInterface(accessible.first.data(), accessible.second, function, message, connection);
     } else if (interface == ATSPI_DBUS_INTERFACE_COMPONENT) {
-        return componentInterface(accessible.first, accessible.second, function, message, connection);
+        return componentInterface(accessible.first.data(), accessible.second, function, message, connection);
     } else if (interface == ATSPI_DBUS_INTERFACE_ACTION) {
-        return actionInterface(accessible.first, accessible.second, function, message, connection);
+        return actionInterface(accessible.first.data(), accessible.second, function, message, connection);
     } else if (interface == ATSPI_DBUS_INTERFACE_TEXT) {
-        return textInterface(accessible.first, accessible.second, function, message, connection);
+        return textInterface(accessible.first.data(), accessible.second, function, message, connection);
     } else if (interface == ATSPI_DBUS_INTERFACE_EDITABLE_TEXT) {
-        return editableTextInterface(accessible.first, accessible.second, function, message, connection);
+        return editableTextInterface(accessible.first.data(), accessible.second, function, message, connection);
     } else if (interface == ATSPI_DBUS_INTERFACE_VALUE) {
-        return valueInterface(accessible.first, accessible.second, function, message, connection);
+        return valueInterface(accessible.first.data(), accessible.second, function, message, connection);
     } else if (interface == ATSPI_DBUS_INTERFACE_TABLE) {
-        return tableInterface(accessible.first, accessible.second, function, message, connection);
+        return tableInterface(accessible.first.data(), accessible.second, function, message, connection);
     } else {
         qDebug() << "AtSpiAdaptor::handleMessage " << message.path() << interface << function;
     }

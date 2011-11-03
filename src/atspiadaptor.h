@@ -28,6 +28,8 @@
 class QAccessibleInterface;
 class QSpiAccessibleInterface;
 
+typedef QSharedPointer<QAccessibleInterface> QAccessibleInterfacePointer;
+
 class AtSpiAdaptor :public QDBusVirtualObject
 {
     Q_OBJECT
@@ -87,7 +89,7 @@ private:
     void sendReply(const QDBusConnection &connection, const QDBusMessage &message, const QVariant &argument) const;
     QAccessibleInterface *accessibleParent(QAccessibleInterface *iface, int child) const;
 
-    QPair<QAccessibleInterface*, int> interfaceFromPath(const QString& dbusPath) const;
+    QPair<QAccessibleInterfacePointer, int> interfaceFromPath(const QString& dbusPath) const;
     QString pathForInterface(QAccessibleInterface *interface, int index, bool inDestructor = false) const;
     QString pathForObject(QObject *object) const;
 
