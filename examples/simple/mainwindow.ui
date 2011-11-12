@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>590</width>
-    <height>526</height>
+    <width>6210</width>
+    <height>602</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -109,12 +109,12 @@
            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'DejaVu Sans'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif';&quot;&gt;Hello,&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif';&quot;&gt;this is an example text.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif';&quot;&gt;Text can be &lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-weight:600;&quot;&gt;bold&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; text-decoration: underline;&quot;&gt;underlined&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif';&quot;&gt;.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:12pt;&quot;&gt;Big fonts&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif';&quot;&gt; are possible too.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; background-color:#ff0000;&quot;&gt;Let's give some color to &lt;/span&gt;&lt;span style=&quot; font-size:10pt; color:#f0f1f2; background-color:#14f01e;&quot;&gt;Qt&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; also.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'DejaVu Sans'; font-size:10pt; background-color:#ff0000;&quot;&gt;Let's give some color to &lt;/span&gt;&lt;span style=&quot; font-family:'DejaVu Sans'; font-size:10pt; color:#f0f1f2; background-color:#14f01e;&quot;&gt;Qt&lt;/span&gt;&lt;span style=&quot; font-family:'DejaVu Sans'; font-size:10pt;&quot;&gt; also.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
         </item>
@@ -530,7 +530,7 @@ p, li { white-space: pre-wrap; }
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>408</width>
+             <width>6002</width>
              <height>70</height>
             </rect>
            </property>
@@ -744,8 +744,8 @@ Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>590</width>
-     <height>20</height>
+     <width>6210</width>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -877,6 +877,40 @@ Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>dateTimeEdit</tabstop>
+  <tabstop>dateEdit</tabstop>
+  <tabstop>timeEdit</tabstop>
+  <tabstop>tableWidget</tabstop>
+  <tabstop>radioButton</tabstop>
+  <tabstop>listWidget</tabstop>
+  <tabstop>treeWidget_2</tabstop>
+  <tabstop>addListButton</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>radioButton_3</tabstop>
+  <tabstop>removeListButton</tabstop>
+  <tabstop>hideButton</tabstop>
+  <tabstop>showButton</tabstop>
+  <tabstop>checkBox</tabstop>
+  <tabstop>greetButton</tabstop>
+  <tabstop>checkBox_2</tabstop>
+  <tabstop>textEdit</tabstop>
+  <tabstop>lineEdit</tabstop>
+  <tabstop>checkBox_3</tabstop>
+  <tabstop>radioButton_2</tabstop>
+  <tabstop>treeWidget</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>comboBox</tabstop>
+  <tabstop>comboBox_2</tabstop>
+  <tabstop>spinBox</tabstop>
+  <tabstop>doubleSpinBox</tabstop>
+  <tabstop>toolButton</tabstop>
+  <tabstop>toolButton_2</tabstop>
+  <tabstop>toolButtonWithMenu</tabstop>
+  <tabstop>toolButton_3</tabstop>
+  <tabstop>toolButtonWithMenu2</tabstop>
+  <tabstop>scrollArea</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
