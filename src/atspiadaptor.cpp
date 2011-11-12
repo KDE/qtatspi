@@ -953,7 +953,10 @@ void AtSpiAdaptor::registerApplication()
 // Accessible
 bool AtSpiAdaptor::accessibleInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
-    Q_ASSERT(child >= 0);
+    if (child < 0) {
+        qWarning() << "AtSpiAdaptor::accessibleInterface called with child<0. FIXME";
+        return false;
+    }
 
     if (function == "GetRole") {
         sendReply(connection, message, (uint) qSpiRoleMapping[interface->role(child)].spiRole());
