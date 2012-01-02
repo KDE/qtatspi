@@ -33,8 +33,72 @@
 #define ACCESSIBLE_LAST_TEXT "QIA2_LAST_TEXT"
 #define ACCESSIBLE_LAST_STATE "QIA2_LAST_STATE"
 
+
+void getArgs(const QDBusArgument &)
+{
+    qDebug() << "Hihi: "; // << arg;
+
+
+}
+
 AtSpiAdaptor::AtSpiAdaptor(DBusConnection *connection, QObject *parent)
-    :QDBusVirtualObject(parent), m_dbus(connection), initialized(false)
+    : QDBusVirtualObject(parent), m_dbus(connection), initialized(false)
+    , sendFocus(0)
+    , sendObject(0)
+    , sendObject_active_descendant_changed(0)
+    , sendObject_attributes_changed(0)
+    , sendObject_bounds_changed(0)
+    , sendObject_children_changed(0)
+//    , sendObject_children_changed_add(0)
+//    , sendObject_children_changed_remove(0)
+    , sendObject_column_deleted(0)
+    , sendObject_column_inserted(0)
+    , sendObject_column_reordered(0)
+    , sendObject_link_selected(0)
+    , sendObject_model_changed(0)
+    , sendObject_property_change(0)
+    , sendObject_property_change_accessible_description(0)
+    , sendObject_property_change_accessible_name(0)
+    , sendObject_property_change_accessible_parent(0)
+    , sendObject_property_change_accessible_role(0)
+    , sendObject_property_change_accessible_table_caption(0)
+    , sendObject_property_change_accessible_table_column_description(0)
+    , sendObject_property_change_accessible_table_column_header(0)
+    , sendObject_property_change_accessible_table_row_description(0)
+    , sendObject_property_change_accessible_table_row_header(0)
+    , sendObject_property_change_accessible_table_summary(0)
+    , sendObject_property_change_accessible_value(0)
+    , sendObject_row_deleted(0)
+    , sendObject_row_inserted(0)
+    , sendObject_row_reordered(0)
+    , sendObject_selection_changed(0)
+    , sendObject_text_attributes_changed(0)
+    , sendObject_text_bounds_changed(0)
+    , sendObject_text_caret_moved(0)
+    , sendObject_text_changed(0)
+//    , sendObject_text_changed_delete(0)
+//    , sendObject_text_changed_insert(0)
+    , sendObject_text_selection_changed(0)
+    , sendObject_value_changed(0)
+    , sendObject_visible_data_changed(0)
+    , sendWindow(0)
+    , sendWindow_activate(0)
+    , sendWindow_close(0)
+    , sendWindow_create(0)
+    , sendWindow_deactivate(0)
+//    , sendWindow_desktop_create(0)
+//    , sendWindow_desktop_destroy(0)
+    , sendWindow_lower(0)
+    , sendWindow_maximize(0)
+    , sendWindow_minimize(0)
+    , sendWindow_move(0)
+    , sendWindow_raise(0)
+    , sendWindow_reparent(0)
+    , sendWindow_resize(0)
+    , sendWindow_restore(0)
+    , sendWindow_restyle(0)
+    , sendWindow_shade(0)
+    , sendWindow_unshade(0)
 {
 }
 
@@ -521,10 +585,217 @@ QString AtSpiAdaptor::introspect(const QString &path) const
 void AtSpiAdaptor::setInitialized(bool init)
 {
     initialized = init;
+
+    if (!initialized)
+        return;
+
+    updateEventListeners();
+    bool success = m_dbus->connection().connect("org.a11y.atspi.Registry", "/org/a11y/atspi/registry",
+                                               "org.a11y.atspi.Registry", "EventListenerRegistered", this,
+                                               SLOT(eventListenerRegistered(QString,QString)));
+    success = success && m_dbus->connection().connect("org.a11y.atspi.Registry", "/org/a11y/atspi/registry",
+                                               "org.a11y.atspi.Registry", "EventListenerDeregistered", this,
+                                               SLOT(eventListenerDeregistered(QString,QString)));
+    qDebug() << "Registered event listener change listener: " << success;
+}
+
+void AtSpiAdaptor::setBitFlag(const QString &flag)
+{
+    Q_ASSERT(flag.size());
+
+    // assume we don't get nonsense - look at first letter only
+    switch (flag.at(0).toLower().toLatin1()) {
+    case 'o': {
+        if (flag.size() <= 8) { // Object::
+            sendObject = 1;
+            break;
+        } else { // Object:Foo:Bar
+            QString right = flag.mid(7);
+            if (false) {
+            } else if (right.startsWith(QLatin1String("ActiveDescendantChanged"))) {
+                sendObject_active_descendant_changed = 1;
+            } else if (right.startsWith(QLatin1String("AttributesChanged"))) {
+                sendObject_attributes_changed = 1;
+            } else if (right.startsWith(QLatin1String("BoundsChanged"))) {
+                sendObject_bounds_changed = 1;
+            } else if (right.startsWith(QLatin1String("ChildrenChanged"))) {
+                sendObject_children_changed = 1;
+            } else if (right.startsWith(QLatin1String("ColumnDeleted"))) {
+                sendObject_column_deleted = 1;
+            } else if (right.startsWith(QLatin1String("ColumnInserted"))) {
+                sendObject_column_inserted = 1;
+            } else if (right.startsWith(QLatin1String("ColumnReordered"))) {
+                sendObject_column_reordered = 1;
+            } else if (right.startsWith(QLatin1String("LinkSelected"))) {
+                sendObject_link_selected = 1;
+            } else if (right.startsWith(QLatin1String("ModelChanged"))) {
+                sendObject_model_changed = 1;
+            } else if (right.startsWith(QLatin1String("PropertyChange"))) {
+                if (right == QLatin1String("PropertyChange:AccessibleDescription")) {
+                    sendObject_property_change_accessible_description = 1;
+                } else if (right == QLatin1String("PropertyChange:AccessibleName")) {
+                    sendObject_property_change_accessible_name = 1;
+                } else if (right == QLatin1String("PropertyChange:AccessibleParent")) {
+                    sendObject_property_change_accessible_parent = 1;
+                } else if (right == QLatin1String("PropertyChange:AccessibleRole")) {
+                    sendObject_property_change_accessible_role = 1;
+                } else if (right == QLatin1String("PropertyChange:TableCaption")) {
+                    sendObject_property_change_accessible_table_caption = 1;
+                } else if (right == QLatin1String("PropertyChange:TableColumnDescription")) {
+                    sendObject_property_change_accessible_table_column_description = 1;
+                } else if (right == QLatin1String("PropertyChange:TableColumnHeader")) {
+                    sendObject_property_change_accessible_table_column_header = 1;
+                } else if (right == QLatin1String("PropertyChange:TableRowDescription")) {
+                    sendObject_property_change_accessible_table_row_description = 1;
+                } else if (right == QLatin1String("PropertyChange:TableRowHeader")) {
+                    sendObject_property_change_accessible_table_row_header = 1;
+                } else if (right == QLatin1String("PropertyChange:TableSummary")) {
+                    sendObject_property_change_accessible_table_summary = 1;
+                } else if (right == QLatin1String("PropertyChange:AccessibleValue")) {
+                    sendObject_property_change_accessible_value = 1;
+                } else {
+                    sendObject_property_change = 1;
+                }
+            } else if (right.startsWith(QLatin1String("RowDeleted"))) {
+                sendObject_row_deleted = 1;
+            } else if (right.startsWith(QLatin1String("RowInserted"))) {
+                sendObject_row_inserted = 1;
+            } else if (right.startsWith(QLatin1String("RowReordered"))) {
+                sendObject_row_reordered = 1;
+            } else if (right.startsWith(QLatin1String("SelectionChanged"))) {
+                sendObject_selection_changed = 1;
+            } else if (right.startsWith(QLatin1String("StateChanged"))) {
+                sendObject_state_changed = 1;
+            } else if (right.startsWith(QLatin1String("TextAttributesChanged"))) {
+                sendObject_text_attributes_changed = 1;
+            } else if (right.startsWith(QLatin1String("TextBoundsChanged"))) {
+                sendObject_text_bounds_changed = 1;
+            } else if (right.startsWith(QLatin1String("TextCaretMoved"))) {
+                sendObject_text_caret_moved = 1;
+            } else if (right.startsWith(QLatin1String("TextChanged"))) {
+                sendObject_text_changed = 1;
+            } else if (right.startsWith(QLatin1String("TextSelectionChanged"))) {
+                sendObject_text_selection_changed = 1;
+            } else if (right.startsWith(QLatin1String("ValueChanged"))) {
+                sendObject_value_changed = 1;
+            } else if (right.startsWith(QLatin1String("VisibleDataChanged"))) {
+                sendObject_visible_data_changed = 1;
+            } else {
+                qWarning() << "WARNING: subscription string not handled:" << flag;
+            }
+        }
+        break;
+    }
+    case 'w': { // window
+        if (flag.size() < 7) {
+            sendWindow = 1;
+        } else { // object:Foo:Bar
+            QString right = flag.mid(7);
+            if (false) {
+            } else if (right.startsWith(QLatin1String("Activate"))) {
+                sendWindow_activate = 1;
+            } else if (right.startsWith(QLatin1String("Close"))) {
+                sendWindow_close= 1;
+            } else if (right.startsWith(QLatin1String("Create"))) {
+                sendWindow_create = 1;
+            } else if (right.startsWith(QLatin1String("Deactivate"))) {
+                sendWindow_deactivate = 1;
+            } else if (right.startsWith(QLatin1String("Lower"))) {
+                sendWindow_lower = 1;
+            } else if (right.startsWith(QLatin1String("Maximize"))) {
+                sendWindow_maximize = 1;
+            } else if (right.startsWith(QLatin1String("Minimize"))) {
+                sendWindow_minimize = 1;
+            } else if (right.startsWith(QLatin1String("Move"))) {
+                sendWindow_move = 1;
+            } else if (right.startsWith(QLatin1String("Raise"))) {
+                sendWindow_raise = 1;
+            } else if (right.startsWith(QLatin1String("Reparent"))) {
+                sendWindow_reparent = 1;
+            } else if (right.startsWith(QLatin1String("Resize"))) {
+                sendWindow_resize = 1;
+            } else if (right.startsWith(QLatin1String("Restore"))) {
+                sendWindow_restore = 1;
+            } else if (right.startsWith(QLatin1String("Restyle"))) {
+                sendWindow_restyle = 1;
+            } else if (right.startsWith(QLatin1String("Shade"))) {
+                sendWindow_shade = 1;
+            } else if (right.startsWith(QLatin1String("Unshade"))) {
+                sendWindow_unshade = 1;
+            } else if (right.startsWith(QLatin1String("DesktopCreate"))) {
+                // ignore this one
+            } else if (right.startsWith(QLatin1String("DesktopDestroy"))) {
+                // ignore this one
+            } else {
+                qWarning() << "WARNING: subscription string not handled:" << flag;
+            }
+        }
+        break;
+    }
+    case 'f': {
+        sendFocus = 1;
+        break;
+    }
+    case 'd': { // document is not implemented
+        break;
+    }
+    case 't': { // terminal is not implemented
+        break;
+    }
+    case 'm': { // mouse* is handled in a different way by the gnome atspi stack
+        break;
+    }
+    default:
+        qWarning() << "WARNING: subscription string not handled:" << flag;
+    }
+}
+
+void AtSpiAdaptor::updateEventListeners()
+{
+//    QStringList watchedExpressions;
+    QDBusMessage m = QDBusMessage::createMethodCall("org.a11y.atspi.Registry",
+                                                    "/org/a11y/atspi/registry",
+                                                    "org.a11y.atspi.Registry", "GetRegisteredEvents");
+    QDBusMessage listenersReply = m_dbus->connection().call(m);
+    if (listenersReply.type() == QDBusMessage::ReplyMessage) {
+        const QVariant foo = listenersReply.arguments().at(0);
+        const QDBusArgument a = foo.value<QDBusArgument>();
+        Q_ASSERT(a.currentSignature() == "a(ss)");
+        a.beginArray();
+        while (!a.atEnd()) {
+            a.beginStructure();
+            QString listenerAddress;
+            a >> listenerAddress;
+            QString watchedExpression;
+            a >> watchedExpression;
+            setBitFlag(watchedExpression);
+//            watchedExpressions.append(watchedExpression);
+            a.endStructure();
+        }
+        a.endArray();
+//        qDebug() << "Currently active listeners: " << watchedExpressions;
+    } else {
+        qWarning() << "Could not query active accessibility event listeners.";
+    }
+}
+
+void AtSpiAdaptor::eventListenerDeregistered(const QString &/*bus*/, const QString &/*path*/)
+{
+//    qDebug() << "AtSpiAdaptor::eventListenerDeregistered: " << bus << path;
+    updateEventListeners();
+}
+
+void AtSpiAdaptor::eventListenerRegistered(const QString &/*bus*/, const QString &/*path*/)
+{
+//    qDebug() << "AtSpiAdaptor::eventListenerRegistered: " << bus << path;
+    updateEventListeners();
 }
 
 void AtSpiAdaptor::windowActivated(QObject* window, bool active)
 {
+    if (!(sendWindow || sendWindow_activate))
+        return;
+
     QAccessibleInterface *iface = QAccessible::queryAccessibleInterface(window);
     QString windowTitle = iface->text(QAccessible::Name, 0);
     delete iface;
@@ -609,23 +880,13 @@ QPair<QAccessibleInterfacePointer, int> AtSpiAdaptor::interfaceFromPath(const QS
 
 void AtSpiAdaptor::notify(int reason, QAccessibleInterface *interface, int child)
 {
-    Q_UNUSED(child)
-
     Q_ASSERT(interface);
-
-    static QString lastFocusPath;
 
     if (!interface->isValid()) {
         //spiBridge->removeAdaptor(this);
         // FIXME announce that this thing is dead? will it ever happen?
         Q_ASSERT_X(0, "", "Got an update for an invalid inteface. Investigate this.");
         return;
-    }
-
-    // add to list of
-    if (reason == QAccessible::ObjectShow && interface->object()) {
-
-
     }
 
     if (reason == QAccessible::ObjectShow && interface->object()) {
@@ -648,104 +909,121 @@ void AtSpiAdaptor::notify(int reason, QAccessibleInterface *interface, int child
 
     switch (reason) {
     case QAccessible::ObjectCreated:
-        notifyAboutCreation(interface, child);
+        if (sendObject || sendObject_children_changed)
+            notifyAboutCreation(interface, child);
         break;
     case QAccessible::ObjectShow: {
+        if (sendObject || sendObject_state_changed) {
             QString path = pathForInterface(interface, child);
             QVariantList stateArgs = packDBusSignalArguments(QLatin1String("showing"), 1, 0, variantForPath(path));
             sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
                            QLatin1String("StateChanged"), stateArgs);
         }
         break;
+    }
     case QAccessible::ObjectHide: {
+        if (sendObject || sendObject_state_changed) {
             QString path = pathForInterface(interface, child);
             QVariantList stateArgs = packDBusSignalArguments(QLatin1String("showing"), 0, 0, variantForPath(path));
             sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
                            QLatin1String("StateChanged"), stateArgs);
         }
         break;
-    case QAccessible::ObjectDestroyed:
-        notifyAboutDestruction(interface, child);
+    }
+    case QAccessible::ObjectDestroyed: {
+        if (sendObject || sendObject_state_changed)
+            notifyAboutDestruction(interface, child);
         break;
-        break;
+    }
     case QAccessible::NameChanged: {
-        QString path = pathForInterface(interface, child);
-        QVariantList args = packDBusSignalArguments(QLatin1String("accessible-name"), 0, 0, variantForPath(path));
-        sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
-                       QLatin1String("PropertyChange"), args);
+        if (sendObject || sendObject_property_change || sendObject_property_change_accessible_name) {
+            QString path = pathForInterface(interface, child);
+            QVariantList args = packDBusSignalArguments(QLatin1String("accessible-name"), 0, 0, variantForPath(path));
+            sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                           QLatin1String("PropertyChange"), args);
+        }
         break;
     }
     case QAccessible::DescriptionChanged: {
-        QString path = pathForInterface(interface, child);
-        QVariantList args = packDBusSignalArguments(QLatin1String("accessible-description"), 0, 0, variantForPath(path));
-        sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
-                       QLatin1String("PropertyChange"), args);
+        if (sendObject || sendObject_property_change || sendObject_property_change_accessible_description) {
+            QString path = pathForInterface(interface, child);
+            QVariantList args = packDBusSignalArguments(QLatin1String("accessible-description"), 0, 0, variantForPath(path));
+            sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                           QLatin1String("PropertyChange"), args);
+        }
         break;
     }
     case QAccessible::Focus: {
-        sendFocusChanged(interface, child);
-
+        if(sendFocus)
+            sendFocusChanged(interface, child);
         break;
     }
-#if (QT_VERSION >= QT_VERSION_CHECK(4, 8, 0))
     case QAccessible::TextUpdated: {
-        Q_ASSERT(interface->textInterface());
-        QString path = pathForInterface(interface, child);
-        // at-spi doesn't have a text updated/changed, so remove all and re-add the new text
-        QString oldText = interface->object()->property(ACCESSIBLE_LAST_TEXT).toString();
+        if (sendObject || sendObject_text_changed) {
+            Q_ASSERT(interface->textInterface());
+            QString path = pathForInterface(interface, child);
+            // at-spi doesn't have a text updated/changed, so remove all and re-add the new text
+            QString oldText = interface->object()->property(ACCESSIBLE_LAST_TEXT).toString();
 
-        QDBusVariant data;
-        data.setVariant(QVariant::fromValue(oldText));
-        QVariantList args = packDBusSignalArguments(QLatin1String("delete"), 0, oldText.length(), variantForPath(path));
-        sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
-                       QLatin1String("TextChanged"), args);
+            QDBusVariant data;
+            data.setVariant(QVariant::fromValue(oldText));
+            QVariantList args = packDBusSignalArguments(QLatin1String("delete"), 0, oldText.length(), variantForPath(path));
+            sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                           QLatin1String("TextChanged"), args);
 
-        QString text = interface->textInterface()->text(0, interface->textInterface()->characterCount());
-        data.setVariant(QVariant::fromValue(text));
-        args = packDBusSignalArguments(QLatin1String("insert"), 0, text.length(), variantForPath(path));
-        sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
-                       QLatin1String("TextChanged"), args);
+            QString text = interface->textInterface()->text(0, interface->textInterface()->characterCount());
+            data.setVariant(QVariant::fromValue(text));
+            args = packDBusSignalArguments(QLatin1String("insert"), 0, text.length(), variantForPath(path));
+            sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                           QLatin1String("TextChanged"), args);
 
-        interface->object()->setProperty(ACCESSIBLE_LAST_TEXT, text);
+            interface->object()->setProperty(ACCESSIBLE_LAST_TEXT, text);
+        }
+        break;
     }
     case QAccessible::TextCaretMoved: {
-        Q_ASSERT(interface->textInterface());
-        QString path = pathForInterface(interface, child);
-        QDBusVariant cursorData;
-        int pos = interface->textInterface()->cursorPosition();
-        cursorData.setVariant(QVariant::fromValue(pos));
-        QVariantList args = packDBusSignalArguments(QString(), pos, 0, QVariant::fromValue(cursorData));
-        sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
-                       QLatin1String("TextCaretMoved"), args);
+        if (sendObject || sendObject_text_caret_moved) {
+            Q_ASSERT(interface->textInterface());
+            QString path = pathForInterface(interface, child);
+            QDBusVariant cursorData;
+            int pos = interface->textInterface()->cursorPosition();
+            cursorData.setVariant(QVariant::fromValue(pos));
+            QVariantList args = packDBusSignalArguments(QString(), pos, 0, QVariant::fromValue(cursorData));
+            sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                           QLatin1String("TextCaretMoved"), args);
+        }
         break;
     }
-#endif
     case QAccessible::ValueChanged: {
-        Q_ASSERT(interface->valueInterface());
-        QString path = pathForInterface(interface, child);
-        QVariantList args = packDBusSignalArguments(QLatin1String("accessible-value"), 0, 0, variantForPath(path));
-        sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
-                       QLatin1String("PropertyChange"), args);
-        break;
+            if (sendObject || sendObject_value_changed) {
+                Q_ASSERT(interface->valueInterface());
+                QString path = pathForInterface(interface, child);
+                QVariantList args = packDBusSignalArguments(QLatin1String("accessible-value"), 0, 0, variantForPath(path));
+                sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                               QLatin1String("PropertyChange"), args);
+            }
+            break;
     }
 
     case QAccessible::StateChanged: {
-        if (child != 0) {
-            qWarning() << "State for child changed: " << interface->object() << child;
-            return;
-        }
+        if (sendObject || sendObject_state_changed) {
+            if (child != 0) {
+                qWarning() << "State for child changed: " << interface->object() << child;
+                return;
+            }
 
-        QAccessible::State oldState = (QAccessible::State) interface->object()->property(ACCESSIBLE_LAST_STATE).toUInt();
-        QAccessible::State newState = interface->state(child);
-        //qDebug() << "StateChanged: old: " << oldState << " new: " << newState << " xor: " << (oldState^newState);
-        if ((oldState^newState) & QAccessible::Checked) {
-            int checked = (newState & QAccessible::Checked) ? 1 : 0;
-            QString path = pathForInterface(interface, child);
-            QVariantList args = packDBusSignalArguments(QLatin1String("checked"), checked, 0, variantForPath(path));
-            sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
-                           QLatin1String("StateChanged"), args);
+            QAccessible::State oldState = (QAccessible::State) interface->object()->property(ACCESSIBLE_LAST_STATE).toUInt();
+            QAccessible::State newState = interface->state(child);
+            //qDebug() << "StateChanged: old: " << oldState << " new: " << newState << " xor: " << (oldState^newState);
+            if ((oldState^newState) & QAccessible::Checked) {
+                int checked = (newState & QAccessible::Checked) ? 1 : 0;
+                QString path = pathForInterface(interface, child);
+                QVariantList args = packDBusSignalArguments(QLatin1String("checked"), checked, 0, variantForPath(path));
+                sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                               QLatin1String("StateChanged"), args);
+            }
+            interface->object()->setProperty(ACCESSIBLE_LAST_STATE, (uint)newState);
         }
-        interface->object()->setProperty(ACCESSIBLE_LAST_STATE, (uint)newState);
         break;
     }
 //    case QAccessible::TableModelChanged: {
