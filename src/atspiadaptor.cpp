@@ -1102,6 +1102,7 @@ void AtSpiAdaptor::notifyAboutCreation(QAccessibleInterface *interface, int chil
     QString parentPath = pathForInterface(parent, 0);
     QVariantList args = packDBusSignalArguments(QLatin1String("add"), childCount, 0, variantForPath(path));
     sendDBusSignal(parentPath, ATSPI_DBUS_INTERFACE_EVENT_OBJECT, "ChildrenChanged", args);
+    delete parent;
 }
 
 void AtSpiAdaptor::notifyAboutDestruction(QAccessibleInterface *interface, int child) const
@@ -1128,6 +1129,7 @@ void AtSpiAdaptor::notifyAboutDestruction(QAccessibleInterface *interface, int c
     QString parentPath = pathForInterface(parent, 0, true);
     QVariantList args = packDBusSignalArguments(QLatin1String("remove"), childIndex, 0, variantForPath(path));
     sendDBusSignal(parentPath, ATSPI_DBUS_INTERFACE_EVENT_OBJECT, "ChildrenChanged", args);
+    delete parent;
 }
 
 bool AtSpiAdaptor::handleMessage(const QDBusMessage &message, const QDBusConnection &connection)
