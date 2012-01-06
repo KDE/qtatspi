@@ -40,11 +40,17 @@ public:
         virtual QStringList keys() const;
 };
 
+/*!
+  The contructor of the plugin.
+  */
 QSpiAccessibleBridgePlugin::QSpiAccessibleBridgePlugin(QObject *parent)
 : QAccessibleBridgePlugin(parent)
 {
 }
 
+/*!
+  Creates a new instance of the QAccessibleBridge plugin.
+  */
 QAccessibleBridge* QSpiAccessibleBridgePlugin::create(const QString &key)
 {
     if (key == "QSPIACCESSIBLEBRIDGE")
@@ -52,6 +58,9 @@ QAccessibleBridge* QSpiAccessibleBridgePlugin::create(const QString &key)
     return 0;
 }
 
+/*!
+
+  */
 QStringList QSpiAccessibleBridgePlugin::keys() const
 {
     return QStringList() << "QSPIACCESSIBLEBRIDGE";

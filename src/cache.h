@@ -23,17 +23,7 @@
 #include <QtCore/QObject>
 #include "struct_marshallers.h"
 
-/** This class is responsible for the AT-SPI cache interface.
-  *
-  * The idea behind the cache is that starting an application would
-  * result in many dbus calls. The way GTK/Gail/ATK work is that
-  * they create accessibles for all objects on startup.
-  * In order to avoid querying all the objects individually via DBus
-  * they get sent by using the GetItems call of the cache.
-  *
-  * Additionally the AddAccessible and RemoveAccessible signals
-  * are responsible for adding/removing objects from the cache.
-  */
+
 class QSpiDBusCache : public QObject
 {
     Q_OBJECT

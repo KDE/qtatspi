@@ -35,6 +35,12 @@
     DBusConnection
 */
 
+
+/*!
+  Connects to the accessibility dbus.
+
+  This is usually a different bus from the session bus.
+*/
 DBusConnection::DBusConnection()
     : dbusConnection(connectDBus())
 {}
@@ -112,6 +118,9 @@ QString DBusConnection::getAccessibilityBusAddressXAtom() const
     return busAddress;
 }
 
+/*!
+  Returns the DBus connection that got established.
+*/
 QDBusConnection DBusConnection::connection() const
 {
     return dbusConnection;

@@ -28,9 +28,18 @@
 /*!
     \class QSpiDBusCache
 
-    \brief QSpiDBusCache
+    \brief This class is responsible for the AT-SPI cache interface.
 
-    QSpiDBusCache
+    The idea behind the cache is that starting an application would
+    result in many dbus calls. The way GTK/Gail/ATK work is that
+    they create accessibles for all objects on startup.
+    In order to avoid querying all the objects individually via DBus
+    they get sent by using the GetItems call of the cache.
+
+    Additionally the AddAccessible and RemoveAccessible signals
+    are responsible for adding/removing objects from the cache.
+
+    Currently the Qt bridge chooses to ignore these.
 */
 
 QSpiDBusCache::QSpiDBusCache(QDBusConnection c, QObject* parent)
