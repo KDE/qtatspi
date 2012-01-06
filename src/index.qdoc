@@ -1,0 +1,64 @@
+/*!
+     \page index.html
+     \contentspage {Qt AT-SPI Bridge} {Contents}
+     \nextpage Getting Started
+
+     \indexpage Index
+     \startpage Qt AT-SPI Bridge
+
+     \title Qt AT-SPI Bridge
+
+     Table of contents:
+
+     \list
+     \o \l {Getting Started}
+     \o \l {All Classes}
+     \endlist
+ */
+
+
+/*!
+     \page gettingstarted.html
+     \contentspage {Qt AT-SPI Bridge} {Contents}
+     \nextpage All Classes
+     \previouspage Qt AT-SPI Bridge
+
+     \indexpage Index
+     \startpage Qt AT-SPI Bridge
+
+     \title Getting Started
+
+     Here could be instructions...
+
+     \l {All Classes}
+*/
+
+
+/*!
+     \page classes.html
+     \contentspage {Qt AT-SPI Bridge} {Contents}
+     \previouspage Getting Started
+
+     \indexpage Index
+     \startpage Qt AT-SPI Bridge
+
+     \title All Classes
+
+     List of classes in Qt AT-SPI
+
+    \generatelist classes
+
+     
+*/
+
+
+/*!
+     \page allmodules.html
+     \contentspage {Qt AT-SPI Bridge} {Contents}
+     \previouspage Qt AT-SPI Bridge
+
+     \indexpage Index
+     \startpage Qt AT-SPI Bridge
+
+     \title All Modules
+ */

@@ -27,6 +27,14 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 
+/*!
+    \class DBusConnection
+
+    \brief DBusConnection
+
+    DBusConnection
+*/
+
 DBusConnection::DBusConnection()
     : dbusConnection(connectDBus())
 {}

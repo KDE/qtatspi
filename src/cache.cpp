@@ -25,6 +25,13 @@
 
 #define QSPI_OBJECT_PATH_CACHE "/org/a11y/atspi/cache"
 
+/*!
+    \class QSpiDBusCache
+
+    \brief QSpiDBusCache
+
+    QSpiDBusCache
+*/
 
 QSpiDBusCache::QSpiDBusCache(QDBusConnection c, QObject* parent)
     : QObject(parent)

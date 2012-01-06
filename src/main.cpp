@@ -22,6 +22,14 @@
 
 QT_BEGIN_NAMESPACE
 
+/*!
+    \class QSpiAccessibleBridgePlugin
+
+    \brief QSpiAccessibleBridgePlugin
+
+    QSpiAccessibleBridgePlugin
+*/
+
 class QSpiAccessibleBridgePlugin: public QAccessibleBridgePlugin
 {
 public:

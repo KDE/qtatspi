@@ -34,6 +34,14 @@
 
 QSpiAccessibleBridge* QSpiAccessibleBridge::self = 0;
 
+/*!
+    \class QSpiAccessibleBridge
+
+    \brief QSpiAccessibleBridge
+
+    QSpiAccessibleBridge
+*/
+
 QSpiAccessibleBridge::QSpiAccessibleBridge()
     : cache(0)
 {

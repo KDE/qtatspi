@@ -27,6 +27,15 @@
 
 //#define KEYBOARD_DEBUG
 
+
+/*!
+    \class QSpiApplicationAdaptor
+
+    \brief QSpiApplicationAdaptor
+
+    QSpiApplicationAdaptor
+*/
+
 QSpiApplicationAdaptor::QSpiApplicationAdaptor(const QDBusConnection &connection, QObject *parent)
     : QObject(parent), dbusConnection(connection)
 {
