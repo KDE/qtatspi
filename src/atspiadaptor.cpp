@@ -34,13 +34,6 @@
 #define ACCESSIBLE_LAST_STATE "QIA2_LAST_STATE"
 
 
-void getArgs(const QDBusArgument &)
-{
-    qDebug() << "Hihi: "; // << arg;
-
-
-}
-
 AtSpiAdaptor::AtSpiAdaptor(DBusConnection *connection, QObject *parent)
     : QDBusVirtualObject(parent), m_dbus(connection), initialized(false)
     , sendFocus(0)
