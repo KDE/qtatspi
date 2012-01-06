@@ -6,6 +6,8 @@ examples/calculator/calculator
 examples/simple/simple
 examples/declarative/declarative
 
+doc/html
+
 callgrind.out.*
 pcviewer.cfg
 *~
