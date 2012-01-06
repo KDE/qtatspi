@@ -30,37 +30,20 @@ class QSpiAccessibleInterface;
 
 typedef QSharedPointer<QAccessibleInterface> QAccessibleInterfacePointer;
 
+
 class AtSpiAdaptor :public QDBusVirtualObject
 {
     Q_OBJECT
 
 public:
     explicit AtSpiAdaptor(DBusConnection *connection, QObject *parent = 0);
-    virtual ~AtSpiAdaptor();
+    ~AtSpiAdaptor();
 
-    /**
-      Register this application as accessible on the accessibility DBus.
-      */
     void registerApplication();
-
-    /**
-      Provide DBus introspection.
-      */
-    virtual QString introspect(const QString &path) const;
-
-    /**
-      Handle incoming DBus messages.
-      */
-    virtual bool handleMessage(const QDBusMessage &message, const QDBusConnection &connection);
-
-    /**
-      Updates from Qt.
-      */
+    QString introspect(const QString &path) const;
+    bool handleMessage(const QDBusMessage &message, const QDBusConnection &connection);
     void notify(int reason, QAccessibleInterface *interface, int child);
 
-    /**
-      When initialized we will send updates, not before this.
-      */
     void setInitialized(bool init);
 
 public Q_SLOTS:
@@ -69,10 +52,8 @@ public Q_SLOTS:
     void windowActivated(QObject* window, bool active);
 
 private:
-
     void updateEventListeners();
     void setBitFlag(const QString &flag);
-
 
     // sending messages
     QVariantList packDBusSignalArguments(const QString &type, int data1, int data2, const QVariant &variantData) const;

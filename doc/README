@@ -1,0 +1,5 @@
+You can create the API documentation with the following command:
+ $ qdoc3 qatspi.qdocconf
+
+The documentation will be generated in doc/html.
+

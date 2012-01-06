@@ -33,6 +33,14 @@
 #define ACCESSIBLE_LAST_TEXT "QIA2_LAST_TEXT"
 #define ACCESSIBLE_LAST_STATE "QIA2_LAST_STATE"
 
+/*!
+    \class AtSpiAdaptor
+
+    \brief AtSpiAdaptor is the main class to forward between QAccessibleInterface and AT-SPI DBus
+
+    AtSpiAdaptor implements the functions specified in all at-spi interfaces.
+    It sends notifications comming from Qt via dbus and listens to incoming dbus requests.
+*/
 
 AtSpiAdaptor::AtSpiAdaptor(DBusConnection *connection, QObject *parent)
     : QDBusVirtualObject(parent), m_dbus(connection), initialized(false)
@@ -99,6 +107,9 @@ AtSpiAdaptor::~AtSpiAdaptor()
 {
 }
 
+/*!
+  Provide DBus introspection.
+  */
 QString AtSpiAdaptor::introspect(const QString &path) const
 {
     QLatin1String accessibleIntrospection(
@@ -575,6 +586,11 @@ QString AtSpiAdaptor::introspect(const QString &path) const
     return xml;
 }
 
+/*!
+  When initialized we will send updates, not before this.
+
+  This function also checks which event listeners are registered in the at-spi registry.
+  */
 void AtSpiAdaptor::setInitialized(bool init)
 {
     initialized = init;
@@ -743,6 +759,9 @@ void AtSpiAdaptor::setBitFlag(const QString &flag)
     }
 }
 
+/*!
+  Checks via dbus which events should be sent.
+  */
 void AtSpiAdaptor::updateEventListeners()
 {
 //    QStringList watchedExpressions;
@@ -784,6 +803,10 @@ void AtSpiAdaptor::eventListenerRegistered(const QString &/*bus*/, const QString
     updateEventListeners();
 }
 
+/*!
+  This slot needs to get called when a \a window has be activated or deactivated (become focused).
+  When \a active is true, the window just received focus, otherwise it lost the focus.
+  */
 void AtSpiAdaptor::windowActivated(QObject* window, bool active)
 {
     if (!(sendWindow || sendWindow_activate))
@@ -871,6 +894,10 @@ QPair<QAccessibleInterfacePointer, int> AtSpiAdaptor::interfaceFromPath(const QS
     return QPair<QAccessibleInterfacePointer, int>(QAccessibleInterfacePointer(), 0);
 }
 
+
+/*!
+    This function gets called when Qt notifies about accessibility updates.
+*/
 void AtSpiAdaptor::notify(int reason, QAccessibleInterface *interface, int child)
 {
     Q_ASSERT(interface);
@@ -1125,6 +1152,10 @@ void AtSpiAdaptor::notifyAboutDestruction(QAccessibleInterface *interface, int c
     delete parent;
 }
 
+/*!
+  Handle incoming DBus message.
+  This function dispatches the dbus message to the right interface handler.
+  */
 bool AtSpiAdaptor::handleMessage(const QDBusMessage &message, const QDBusConnection &connection)
 {
     // get accessible interface
@@ -1202,6 +1233,9 @@ bool AtSpiAdaptor::applicationInterface(QAccessibleInterface *interface, int, co
     return false;
 }
 
+/*!
+  Register this application as accessible on the accessibility DBus.
+  */
 void AtSpiAdaptor::registerApplication()
 {
     SocketProxy *registry;
