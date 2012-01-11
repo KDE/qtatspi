@@ -1025,6 +1025,14 @@ void AtSpiAdaptor::notify(int reason, QAccessibleInterface *interface, int child
             break;
     }
 
+    case QAccessible::Selection: {
+        QString path = pathForInterface(interface, child);
+        int selected = (interface->state(child) & QAccessible::Selected) ? 1 : 0;
+        QVariantList stateArgs = packDBusSignalArguments(QLatin1String("selected"), selected, 0, variantForPath(path));
+        sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                       QLatin1String("StateChanged"), stateArgs);
+    }
+
     case QAccessible::StateChanged: {
         if (sendObject || sendObject_state_changed) {
             if (child != 0) {
