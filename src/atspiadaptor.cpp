@@ -2146,7 +2146,7 @@ bool AtSpiAdaptor::valueInterface(QAccessibleInterface *interface, int child, co
 bool AtSpiAdaptor::tableInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
     Q_ASSERT(child == 0);
-    if (!interface->tableInterface()) {
+    if (!interface->table2Interface()) {
         qWarning() << "WARNING Qt AtSpiAdaptor: Could not find table interface for: " << message.path() << interface;
         return false;
     }
@@ -2155,7 +2155,11 @@ bool AtSpiAdaptor::tableInterface(QAccessibleInterface *interface, int child, co
     // properties
     } else if (function == "GetCaption") {
         // fixme: leak of QAI
-        QObject *object = interface->tableInterface()->caption()->object();
+        QAccessibleInterface *caption = interface->table2Interface()->caption();
+        if (!caption)
+            caption = interface->tableInterface() ? interface->tableInterface()->caption() : 0;
+
+        QObject *object = caption ? caption->object() : 0;
         if (!object) {
             connection.send(message.createReply(QVariant::fromValue(QDBusVariant(QVariant::fromValue(QSpiObjectReference())))));
         } else {
@@ -2177,9 +2181,15 @@ bool AtSpiAdaptor::tableInterface(QAccessibleInterface *interface, int child, co
             QVariant::fromValue(interface->table2Interface()->selectedRowCount())))));
     } else if (function == "GetSummary") {
         // fixme: leak of QAI
-        QObject *object = interface->tableInterface()->summary()->object();
+        QAccessibleInterface *summary = interface->table2Interface()->summary();
+        if (!summary)
+            summary = interface->tableInterface() ? interface->tableInterface()->summary() : 0;
+
+        QObject *object = summary ? summary->object() : 0;
         if (!object) {
-            connection.send(message.createReply(QVariant::fromValue(QDBusVariant(QVariant::fromValue(QSpiObjectReference())))));
+            QDBusMessage reply = message.createReply(QVariant::fromValue(QDBusVariant(QVariant::fromValue(QSpiObjectReference()))));
+            qDebug() << "signature: " << reply.signature();
+            connection.send(reply);
         } else {
             QDBusObjectPath path(pathForObject(object));
             QSpiObjectReference ref(connection, path);
