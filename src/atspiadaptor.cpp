@@ -1035,6 +1035,10 @@ void AtSpiAdaptor::notify(int reason, QAccessibleInterface *interface, int child
 
     case QAccessible::StateChanged: {
         if (sendObject || sendObject_state_changed) {
+            if (!interface->object()) {
+                qWarning() << "Interface has no object";
+                return;
+            }
             if (child != 0) {
                 qWarning() << "State for child changed: " << interface->object() << child;
                 return;
