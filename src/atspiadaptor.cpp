@@ -1447,8 +1447,9 @@ void AtSpiAdaptor::sendReply(const QDBusConnection &connection, const QDBusMessa
 
 QAccessibleInterface *AtSpiAdaptor::accessibleParent(QAccessibleInterface *iface, int child) const
 {
-    if (child)
-        return iface;
+    if (child) //It's necessary to return a new instance as it might be deleted
+        return QAccessible::queryAccessibleInterface(iface->object());
+
     QAccessibleInterface *parent = 0;
     iface->navigate(QAccessible::Ancestor, 1, &parent);
     return parent;
