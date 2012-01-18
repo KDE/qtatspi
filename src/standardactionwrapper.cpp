@@ -27,11 +27,22 @@ StandardActionWrapper::StandardActionWrapper(QAccessibleInterface* interface, in
     m_child = child;
     QSet<QString> actionNames;
     QSet<int> toCheck;
-    toCheck << QAccessible::DefaultAction;
 
-    int state = interface->state(child);
-    if (state & QAccessible::Focusable) 
+    bool focusable = interface->state(child) & QAccessible::Focusable;
+
+    if (focusable) {
         toCheck << QAccessible::SetFocus;
+        toCheck << QAccessible::DefaultAction;
+    } else {
+        //There are a lot of widgets which set default action to set focus, even if they are not focusable
+        QString focusActionName = interface->actionText(QAccessible::SetFocus, QAccessible::Name, child);
+        QString defaultActionName = interface->actionText(QAccessible::DefaultAction, QAccessible::Name, child);
+        if (focusActionName != defaultActionName)
+            toCheck << QAccessible::DefaultAction;
+    }
+
+    if (interface->role(child) == QAccessible::PushButton)
+        toCheck << QAccessible::Press;
 
     for (QSet<int>::const_iterator it = toCheck.constBegin(); it != toCheck.constEnd(); it++) {
         QString actionName = interface->actionText(*it, QAccessible::Name, child);
