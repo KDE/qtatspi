@@ -10,6 +10,7 @@ HEADERS += \
            struct_marshallers.h \
            constant_mappings.h \
            dbusconnection.h \
+           standardactionwrapper.h \
            atspiadaptor.h
 
 SOURCES += \
@@ -23,6 +24,7 @@ SOURCES += \
            constant_mappings.cpp \
            main.cpp \
            dbusconnection.cpp \
+           standardactionwrapper.cpp \
            atspiadaptor.cpp
 
 QMAKE_CFLAGS+=-Werror

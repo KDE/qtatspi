@@ -28,6 +28,7 @@
 
 #include "generated/socket_proxy.h"
 
+#include "standardactionwrapper.h"
 #include "constant_mappings.h"
 
 #define ACCESSIBLE_LAST_TEXT "QIA2_LAST_TEXT"
@@ -1381,10 +1382,9 @@ QStringList AtSpiAdaptor::accessibleInterfaces(QAccessibleInterface *interface, 
     }
 #endif
 
-    if (!index) {
-        if (interface->actionInterface())
-            ifaces << ATSPI_DBUS_INTERFACE_ACTION;
+    ifaces << ATSPI_DBUS_INTERFACE_ACTION;
 
+    if (!index) {
         if (interface->textInterface()) {
             ifaces << ATSPI_DBUS_INTERFACE_TEXT;
             // Cache the last text?
@@ -1677,33 +1677,36 @@ QSpiRect AtSpiAdaptor::getExtents(QAccessibleInterface *interface, int child, ui
 // Action interface
 bool AtSpiAdaptor::actionInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)
 {
-    if (!interface->actionInterface()) {
-        qWarning() << "WARNING Qt AtSpiAdaptor: Could not find action interface for: " << message.path() << interface;
-        return false;
+    QAccessibleActionInterface *actionIface = interface->actionInterface();
+    bool deleteActionInterface = false;
+    if (!actionIface) {
+        actionIface = new StandardActionWrapper(interface, child);
+        deleteActionInterface = true;
+        child = 0;
     }
 
     if (function == "GetNActions") {
-        sendReply(connection, message, QVariant::fromValue(QDBusVariant(QVariant::fromValue(interface->actionInterface()->actionCount()))));
+        sendReply(connection, message, QVariant::fromValue(QDBusVariant(QVariant::fromValue(actionIface->actionCount()))));
     } else if (function == "DoAction") {
         int index = message.arguments().at(0).toInt();
-        interface->actionInterface()->doAction(index);
+        actionIface->doAction(index);
         sendReply(connection, message, true);
     } else if (function == "GetActions") {
         if (child) {
             qWarning() << "AtSpiAdaptor::actionInterface: Requesting action interface for child";
             return false;
         }
-        sendReply(connection, message, QVariant::fromValue(getActions(interface)));
+        sendReply(connection, message, QVariant::fromValue(getActions(actionIface)));
     } else if (function == "GetName") {
         int index = message.arguments().at(0).toInt();
-        sendReply(connection, message, interface->actionInterface()->name(index));
+        sendReply(connection, message, actionIface->name(index));
     } else if (function == "GetDescription") {
         int index = message.arguments().at(0).toInt();
-        sendReply(connection, message, interface->actionInterface()->description(index));
+        sendReply(connection, message, actionIface->description(index));
     } else if (function == "GetKeyBinding") {
         int index = message.arguments().at(0).toInt();
         QStringList keyBindings;
-        keyBindings = interface->actionInterface()->keyBindings(index);
+        keyBindings = actionIface->keyBindings(index);
         /* Might as well return the first key binding, what are the other options? */
         if (keyBindings.length() > 0)
             sendReply(connection, message, keyBindings.at(0));
@@ -1711,23 +1714,30 @@ bool AtSpiAdaptor::actionInterface(QAccessibleInterface *interface, int child, c
             sendReply(connection, message, QString());
     } else {
         qWarning() << "WARNING: AtSpiAdaptor::handleMessage does not implement " << function << message.path();
+        if (deleteActionInterface)
+            delete actionIface;
+
         return false;
     }
+
+    if (deleteActionInterface)
+        delete actionIface;
+
     return true;
 }
 
-QSpiActionArray AtSpiAdaptor::getActions(QAccessibleInterface *interface) const
+QSpiActionArray AtSpiAdaptor::getActions(QAccessibleActionInterface *actionInterface) const
 {
     QSpiActionArray actions;
-    for (int i = 0; i < interface->actionInterface()->actionCount(); i++)
+    for (int i = 0; i < actionInterface->actionCount(); i++)
     {
         QSpiAction action;
         QStringList keyBindings;
 
-        action.name = interface->actionInterface()->name(i);
-        action.description = interface->actionInterface()->description(i);
+        action.name = actionInterface->name(i);
+        action.description = actionInterface->description(i);
 
-        keyBindings = interface->actionInterface()->keyBindings(i);
+        keyBindings = actionInterface->keyBindings(i);
 
         if (keyBindings.length() > 0)
                 action.keyBinding = keyBindings[0];

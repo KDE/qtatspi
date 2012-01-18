@@ -30,7 +30,6 @@ class QSpiAccessibleInterface;
 
 typedef QSharedPointer<QAccessibleInterface> QAccessibleInterfacePointer;
 
-
 class AtSpiAdaptor :public QDBusVirtualObject
 {
     Q_OBJECT
@@ -89,7 +88,7 @@ private:
     static QSpiRect getExtents(QAccessibleInterface *interface, int child, uint coordType);
 
     // action helper functions
-    QSpiActionArray getActions(QAccessibleInterface *interface) const;
+    QSpiActionArray getActions(QAccessibleActionInterface* interface) const;
 
     // text helper functions
     QVariantList getAttributes(QAccessibleInterface *interface, int offset, bool includeDefaults) const;
