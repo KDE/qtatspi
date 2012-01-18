@@ -68,8 +68,9 @@ void StandardActionWrapper::doAction(int actionIndex)
 
 QStringList StandardActionWrapper::keyBindings(int actionIndex)
 {
-    Q_UNUSED(actionIndex);
-    return QStringList();
+    QStringList result;
+    result << m_interface->actionText(getAccessibleInterfaceIndex(actionIndex), QAccessible::Accelerator, m_child);
+    return result;
 }
 
 QString StandardActionWrapper::name(int actionIndex)
