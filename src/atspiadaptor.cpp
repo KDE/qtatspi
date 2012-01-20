@@ -1015,6 +1015,16 @@ void AtSpiAdaptor::notify(int reason, QAccessibleInterface *interface, int child
         }
         break;
     }
+    case QAccessible::TextSelectionChanged: {
+        if (sendObject || sendObject_text_selection_changed) {
+            QString path = pathForInterface(interface, child);
+            QVariantList args = packDBusSignalArguments(QString(), 0, 0, QVariant::fromValue(QDBusVariant(QVariant(QString()))));
+            sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                           QLatin1String("TextSelectionChanged"), args);
+
+        }
+        break;
+    }
     case QAccessible::ValueChanged: {
             if (sendObject || sendObject_value_changed) {
                 Q_ASSERT(interface->valueInterface());
