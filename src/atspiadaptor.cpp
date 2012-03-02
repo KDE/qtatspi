@@ -557,7 +557,7 @@ QString AtSpiAdaptor::introspect(const QString &path) const
     QPair<QAccessibleInterface*, int> pair;
 
     if (path != QSPI_OBJECT_PATH_ROOT) {
-        QPair<QAccessibleInterfacePointer, int> pair = interfaceFromPath(path);
+        QPair<QAIPointer, int> pair = interfaceFromPath(path);
         if (!pair.first) {
             qWarning() << "WARNING Qt AtSpiAdaptor: Could not find accessible on path: " << path;
             return QString();
@@ -853,19 +853,19 @@ bool AtSpiAdaptor::sendDBusSignal(const QString &path, const QString &interface,
     return m_dbus->connection().send(message);
 }
 
-QPair<QAccessibleInterfacePointer, int> AtSpiAdaptor::interfaceFromPath(const QString& dbusPath) const
+QPair<QAIPointer, int> AtSpiAdaptor::interfaceFromPath(const QString& dbusPath) const
 {
     int index = 0;
 
     if (dbusPath == QSPI_OBJECT_PATH_ROOT) {
-        QAccessibleInterfacePointer interface = QAccessibleInterfacePointer(QAccessible::queryAccessibleInterface(qApp));
-        return QPair<QAccessibleInterfacePointer, int>(interface, index);
+        QAIPointer interface = QAIPointer(QAccessible::queryAccessibleInterface(qApp));
+        return QPair<QAIPointer, int>(interface, index);
     }
 
     QStringList parts = dbusPath.split('/');
     if (parts.size() <= 5) {
         qWarning() << "invalid path: " << dbusPath;
-        return QPair<QAccessibleInterfacePointer, int>(QAccessibleInterfacePointer(), 0);
+        return QPair<QAIPointer, int>(QAIPointer(), 0);
     }
 
     QString objectString = parts.at(5);
@@ -876,23 +876,23 @@ QPair<QAccessibleInterfacePointer, int> AtSpiAdaptor::interfaceFromPath(const QS
         if (m_handledObjects[uintptr].data() != 0) {
             QObject* object = reinterpret_cast<QObject*>(uintptr);
 
-            QAccessibleInterfacePointer interface = QAccessibleInterfacePointer(QAccessible::queryAccessibleInterface(object));
-            QAccessibleInterfacePointer child;
+            QAIPointer interface = QAIPointer(QAccessible::queryAccessibleInterface(object));
+            QAIPointer child;
 
             for (int i = 6; i < parts.size(); ++i) {
                 QAccessibleInterface *childInterface;
                 index = interface->navigate(QAccessible::Child, parts.at(i).toInt(), &childInterface);
-                child = QAccessibleInterfacePointer(childInterface);
+                child = QAIPointer(childInterface);
                 if (index == 0)
                     interface = child;
             }
-            return QPair<QAccessibleInterfacePointer, int>(interface, index);
+            return QPair<QAIPointer, int>(interface, index);
 
         } else {
             m_handledObjects.remove(uintptr);
         }
     }
-    return QPair<QAccessibleInterfacePointer, int>(QAccessibleInterfacePointer(), 0);
+    return QPair<QAIPointer, int>(QAIPointer(), 0);
 }
 
 
@@ -1183,7 +1183,7 @@ void AtSpiAdaptor::notifyAboutDestruction(QAccessibleInterface *interface, int c
 bool AtSpiAdaptor::handleMessage(const QDBusMessage &message, const QDBusConnection &connection)
 {
     // get accessible interface
-    QPair<QAccessibleInterfacePointer, int> accessible = interfaceFromPath(message.path());
+    QPair<QAIPointer, int> accessible = interfaceFromPath(message.path());
     if (!(accessible.first)) {
         qWarning() << "WARNING Qt AtSpiAdaptor: Could not find accessible on path: " << message.path();
         return false;
