@@ -1487,44 +1487,33 @@ QString AtSpiAdaptor::pathForObject(QObject *object) const
 
 QString AtSpiAdaptor::pathForInterface(QAccessibleInterface *interface, int childIndex, bool inDestructor) const
 {
-    // Try to navigate to the child. If we get a proper interface, use it since it might have an object associated.
+    // Try to navigate to the child.
+    // If we get a proper interface, use it since it might have an object associated.
     QAccessibleInterface* childInterface = 0;
     if (childIndex) {
         int ret = interface->navigate(QAccessible::Child, childIndex, &childInterface);
         if (ret == 0 && childInterface) {
-            // This is an ugly hack for QAction. It cannot create adaptors from the QObject.
-            QAccessibleInterface *tmp = QAccessible::queryAccessibleInterface(childInterface->object());
-            if (tmp) {
-                interface = childInterface;
-                childIndex = 0;
-                delete tmp;
-            }
+            interface = childInterface;
+            childIndex = 0;
         }
     }
 
-    QString path;
     QAccessibleInterface* interfaceWithObject = interface;
+    if (interface->object() && interface->object()->metaObject()->className() == QLatin1String("QAction")) {
+        interface->navigate(QAccessible::Ancestor, 0, &interfaceWithObject);
+        childIndex = interfaceWithObject->indexOfChild(interface);
+    }
+
+    QString path;
     while(!interfaceWithObject->object()) {
         QAccessibleInterface* parentInterface;
         interfaceWithObject->navigate(QAccessible::Ancestor, 1, &parentInterface);
         Q_ASSERT(parentInterface->isValid());
         int index = parentInterface->indexOfChild(interfaceWithObject);
-        //Q_ASSERT(index >= 0);
-        // FIXME: This should never happen!
+
         if (index < 0) {
-
-            index = 999;
-            path.prepend("/BROKEN_OBJECT_HIERARCHY");
             qWarning() << "Object claims to have child that we cannot navigate to. FIX IT!" << parentInterface->object();
-
-            qDebug() << "Original interface: " << interface->object() << index;
-            qDebug() << "Parent interface: " << parentInterface->object() << " childcount:" << parentInterface->childCount();
-            QObject* p = parentInterface->object();
-            qDebug() << p->children();
-
-            QAccessibleInterface* tttt;
-            int id = parentInterface->navigate(QAccessible::Child, 1, &tttt);
-            qDebug() << "Nav child: " << id << tttt->object();
+            return ATSPI_DBUS_PATH_NULL;
         }
         path.prepend('/' + QString::number(index));
         interfaceWithObject = parentInterface;
