@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>4095</width>
+    <width>5756</width>
     <height>602</height>
    </rect>
   </property>
@@ -21,69 +21,31 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>4</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_1">
        <attribute name="title">
         <string>Line Edit</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="QLabel" name="label">
-          <property name="accessibleDescription">
-           <string>Accessible description for &quot;Some Text&quot; label</string>
-          </property>
-          <property name="text">
-           <string>Some Text</string>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="1" column="3" colspan="2">
+         <widget class="QLineEdit" name="lineEdit">
+          <property name="accessibleName">
+           <string>Name line edit</string>
           </property>
          </widget>
         </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Enter your name:</string>
-            </property>
-            <property name="buddy">
-             <cstring>lineEdit</cstring>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="lineEdit">
-            <property name="accessibleName">
-             <string>Name line edit</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+        <item row="2" column="3" colspan="2">
+         <widget class="QLineEdit" name="lineEditPassword">
+          <property name="accessibleName">
+           <string>Name line edit</string>
+          </property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
+         </widget>
         </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <item>
-           <widget class="QPushButton" name="greetButton">
-            <property name="text">
-             <string>Display greeting</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item>
+        <item row="5" column="1" colspan="2">
          <spacer name="verticalSpacer_5">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -95,6 +57,56 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Enter your name:</string>
+          </property>
+          <property name="buddy">
+           <cstring>lineEdit</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="accessibleDescription">
+           <string>Accessible description for &quot;Some Text&quot; label</string>
+          </property>
+          <property name="text">
+           <string>Some Text</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="2">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Test entering a password:</string>
+          </property>
+          <property name="buddy">
+           <cstring>lineEdit</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="4">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>5563</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="4" column="3">
+         <widget class="QPushButton" name="greetButton">
+          <property name="text">
+           <string>Display greeting</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -530,7 +542,7 @@ p, li { white-space: pre-wrap; }
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>3902</width>
+             <width>5563</width>
              <height>70</height>
             </rect>
            </property>
@@ -744,7 +756,7 @@ Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>4095</width>
+     <width>5756</width>
      <height>21</height>
     </rect>
    </property>
@@ -892,7 +904,6 @@ Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
   <tabstop>hideButton</tabstop>
   <tabstop>showButton</tabstop>
   <tabstop>checkBox</tabstop>
-  <tabstop>greetButton</tabstop>
   <tabstop>checkBox_2</tabstop>
   <tabstop>textEdit</tabstop>
   <tabstop>lineEdit</tabstop>

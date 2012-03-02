@@ -18,6 +18,8 @@
 #ifndef ATSPIADAPTOR_H
 #define ATSPIADAPTOR_H
 
+#include <atspi/atspi-constants.h>
+
 #include <qaccessible2.h>
 #include <qdbusvirtualobject.h>
 #include <qsharedpointer.h>
@@ -81,6 +83,7 @@ private:
     QString pathForObject(QObject *object) const;
 
     // accessible helper functions
+    AtspiRole getRole(QAccessibleInterface *interface, int child) const;
     QSpiRelationArray relationSet(QAccessibleInterface *interface, int child, const QDBusConnection &connection) const;
     QStringList accessibleInterfaces(QAccessibleInterface *interface, int child) const;
 

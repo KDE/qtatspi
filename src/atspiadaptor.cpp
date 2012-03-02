@@ -1290,7 +1290,7 @@ bool AtSpiAdaptor::accessibleInterface(QAccessibleInterface *interface, int chil
     }
 
     if (function == "GetRole") {
-        sendReply(connection, message, (uint) qSpiRoleMapping[interface->role(child)].spiRole());
+        sendReply(connection, message, (uint) getRole(interface, child));
     } else if (function == "GetName") {
         sendReply(connection, message, QVariant::fromValue(QDBusVariant(interface->text(QAccessible::Name, child))));
     } else if (function == "GetRoleName") {
@@ -1366,6 +1366,13 @@ bool AtSpiAdaptor::accessibleInterface(QAccessibleInterface *interface, int chil
         return false;
     }
     return true;
+}
+
+AtspiRole AtSpiAdaptor::getRole(QAccessibleInterface *interface, int child) const
+{
+    if (interface->role(child) == QAccessible::EditableText && interface->state(child) | QAccessible::Protected)
+        return ATSPI_ROLE_PASSWORD_TEXT;
+    return qSpiRoleMapping[interface->role(child)].spiRole();
 }
 
 QStringList AtSpiAdaptor::accessibleInterfaces(QAccessibleInterface *interface, int index) const
