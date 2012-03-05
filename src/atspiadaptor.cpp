@@ -1487,6 +1487,9 @@ QString AtSpiAdaptor::pathForObject(QObject *object) const
 
 QString AtSpiAdaptor::pathForInterface(QAccessibleInterface *interface, int childIndex, bool inDestructor) const
 {
+    if (!interface)
+        return ATSPI_DBUS_PATH_NULL;
+
     // Try to navigate to the child.
     // If we get a proper interface, use it since it might have an object associated.
     QAccessibleInterface* childInterface = 0;
@@ -1500,7 +1503,7 @@ QString AtSpiAdaptor::pathForInterface(QAccessibleInterface *interface, int chil
 
     QAccessibleInterface* interfaceWithObject = interface;
     if (interface->object() && interface->object()->metaObject()->className() == QLatin1String("QAction")) {
-        interface->navigate(QAccessible::Ancestor, 0, &interfaceWithObject);
+        interface->navigate(QAccessible::Ancestor, 1, &interfaceWithObject);
         childIndex = interfaceWithObject->indexOfChild(interface);
     }
 
