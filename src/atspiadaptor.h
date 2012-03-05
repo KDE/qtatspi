@@ -100,6 +100,8 @@ private:
     QVariantList getRangeExtents(QAccessibleInterface *interface, int startOffset, int endOffset, uint coordType) const;
     QAccessible2::BoundaryType qAccessibleBoundaryType(int atspiTextBoundaryType) const;
 
+    static bool inheritsQAction(QObject *object);
+
     // private vars
     QSpiObjectReference accessibilityRegistry;
     DBusConnection *m_dbus;

@@ -1502,7 +1502,11 @@ QString AtSpiAdaptor::pathForInterface(QAccessibleInterface *interface, int chil
     }
 
     QAccessibleInterface* interfaceWithObject = interface;
-    if (interface->object() && interface->object()->metaObject()->className() == QLatin1String("QAction")) {
+
+
+    if (interface->role(0) == QAccessible::MenuItem && interface->object() &&
+            inheritsQAction(interface->object())) {
+        qDebug() << "Role: " << interface->role(0);
         interface->navigate(QAccessible::Ancestor, 1, &interfaceWithObject);
         childIndex = interfaceWithObject->indexOfChild(interface);
     }
@@ -1531,6 +1535,18 @@ QString AtSpiAdaptor::pathForInterface(QAccessibleInterface *interface, int chil
         m_handledObjects[uintptr] = QWeakPointer<QObject>(interfaceWithObject->object());
     delete childInterface;
     return path;
+}
+
+bool AtSpiAdaptor::inheritsQAction(QObject *object)
+{
+    const QMetaObject *mo = object->metaObject();
+    while (mo) {
+        const QLatin1String cn(mo->className());
+        if (cn == "QAction")
+            return true;
+        mo = mo->superClass();
+    }
+    return false;
 }
 
 // Component
