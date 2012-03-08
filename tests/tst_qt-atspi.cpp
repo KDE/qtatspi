@@ -133,6 +133,9 @@ QDBusInterface* tst_QtAtSpi::getInterface(const QString& path, const QString& in
 
 void tst_QtAtSpi::initTestCase()
 {
+    // Oxygen style creates many extra items, it's simply unusable here
+    qDebug() << "Using plastique style...";
+    qApp->setStyle("plastique");
     QCOMPARE(qgetenv("QT_ACCESSIBILITY"), QByteArray("1"));
 
     dbus = DBusConnection();
