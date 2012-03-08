@@ -554,17 +554,14 @@ QString AtSpiAdaptor::introspect(const QString &path) const
                 "    </method>\n"
                 "  </interface>\n"
                 );
-    QPair<QAccessibleInterface*, int> pair;
 
-    if (path != QSPI_OBJECT_PATH_ROOT) {
-        QPair<QAIPointer, int> pair = interfaceFromPath(path);
-        if (!pair.first) {
-            qWarning() << "WARNING Qt AtSpiAdaptor: Could not find accessible on path: " << path;
-            return QString();
-        }
+    QPair<QAIPointer, int> pair = interfaceFromPath(path);
+    if (!pair.first) {
+        qWarning() << "WARNING Qt AtSpiAdaptor: Could not find accessible on path: " << path;
+        return QString();
     }
 
-    QStringList interfaces = accessibleInterfaces(pair.first, pair.second);
+    QStringList interfaces = accessibleInterfaces(pair.first.data(), pair.second);
 
     QString xml;
     xml.append(accessibleIntrospection);
