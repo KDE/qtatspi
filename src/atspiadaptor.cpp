@@ -1503,7 +1503,6 @@ QString AtSpiAdaptor::pathForInterface(QAccessibleInterface *interface, int chil
 
     if (interface->role(0) == QAccessible::MenuItem && interface->object() &&
             inheritsQAction(interface->object())) {
-        qDebug() << "Role: " << interface->role(0);
         interface->navigate(QAccessible::Ancestor, 1, &interfaceWithObject);
         childIndex = interfaceWithObject->indexOfChild(interface);
     }
