@@ -1500,7 +1500,6 @@ QString AtSpiAdaptor::pathForInterface(QAccessibleInterface *interface, int chil
 
     QAccessibleInterface* interfaceWithObject = interface;
 
-
     if (interface->role(0) == QAccessible::MenuItem && interface->object() &&
             inheritsQAction(interface->object())) {
         interface->navigate(QAccessible::Ancestor, 1, &interfaceWithObject);
@@ -1728,9 +1727,13 @@ bool AtSpiAdaptor::actionInterface(QAccessibleInterface *interface, int child, c
         int index = message.arguments().at(0).toInt();
         QStringList keyBindings;
         keyBindings = actionIface->keyBindings(index);
-        /* Might as well return the first key binding, what are the other options? */
+        if (keyBindings.isEmpty()) {
+            QString acc = interface->text(QAccessible::Accelerator, child);
+            if (!acc.isEmpty())
+                keyBindings.append(acc);
+        }
         if (keyBindings.length() > 0)
-            sendReply(connection, message, keyBindings.at(0));
+            sendReply(connection, message, keyBindings.join(";"));
         else
             sendReply(connection, message, QString());
     } else {

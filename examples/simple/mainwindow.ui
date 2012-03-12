@@ -104,7 +104,10 @@
         <item row="4" column="3">
          <widget class="QPushButton" name="greetButton">
           <property name="text">
-           <string>Display greeting</string>
+           <string>Display &amp;greeting</string>
+          </property>
+          <property name="shortcut">
+           <string>Ctrl+G</string>
           </property>
          </widget>
         </item>
