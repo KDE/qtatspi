@@ -985,13 +985,13 @@ void AtSpiAdaptor::notify(int reason, QAccessibleInterface *interface, int child
 
             QDBusVariant data;
             data.setVariant(QVariant::fromValue(oldText));
-            QVariantList args = packDBusSignalArguments(QLatin1String("delete"), 0, oldText.length(), variantForPath(path));
+            QVariantList args = packDBusSignalArguments(QLatin1String("delete"), 0, oldText.length(), QVariant::fromValue(data));
             sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
                            QLatin1String("TextChanged"), args);
 
             QString text = interface->textInterface()->text(0, interface->textInterface()->characterCount());
             data.setVariant(QVariant::fromValue(text));
-            args = packDBusSignalArguments(QLatin1String("insert"), 0, text.length(), variantForPath(path));
+            args = packDBusSignalArguments(QLatin1String("insert"), 0, text.length(), QVariant::fromValue(data));
             sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
                            QLatin1String("TextChanged"), args);
 
