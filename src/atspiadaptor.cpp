@@ -1367,7 +1367,7 @@ bool AtSpiAdaptor::accessibleInterface(QAccessibleInterface *interface, int chil
 
 AtspiRole AtSpiAdaptor::getRole(QAccessibleInterface *interface, int child) const
 {
-    if (interface->role(child) == QAccessible::EditableText && interface->state(child) | QAccessible::Protected)
+    if ((interface->role(child) == QAccessible::EditableText) && (interface->state(child) & QAccessible::Protected))
         return ATSPI_ROLE_PASSWORD_TEXT;
     return qSpiRoleMapping[interface->role(child)].spiRole();
 }
