@@ -23,6 +23,7 @@
 #include <QDBusConnection>
 #include <QDBusMessage>
 #include <QDBusInterface>
+#include <QDBusReply>
 
 #include <atspi/atspi-constants.h>
 
@@ -366,6 +367,16 @@ void tst_QtAtSpi::testTextEdit()
     QCOMPARE(callResult.at(1).toInt(), 10);
     QEXPECT_FAIL("", "Due to missing space the count is off by one.", Continue);
     QCOMPARE(callResult.at(2).toInt(), 17);
+
+    // Check if at least CharacterExtents and RangeExtents give a consistent result
+    QDBusReply<QRect> replyRect20 = textInterface->call(QDBus::Block, "GetCharacterExtents", 20, ATSPI_COORD_TYPE_SCREEN);
+    QVERIFY(replyRect20.isValid());
+    QRect r1 = replyRect20.value();
+    QDBusReply<QRect> replyRect21  = textInterface->call(QDBus::Block, "GetCharacterExtents", 21, ATSPI_COORD_TYPE_SCREEN);
+    QRect r2 = replyRect21.value();
+    QDBusReply<QRect> reply = textInterface->call(QDBus::Block, "GetRangeExtents", 20, 21, ATSPI_COORD_TYPE_SCREEN);
+    QRect rect = reply.value();
+    QCOMPARE(rect, r1|r2);
 
     m_window->clearChildren();
     delete textInterface;

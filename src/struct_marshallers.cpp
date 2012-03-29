@@ -105,27 +105,6 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAction &actio
     return argument;
 }
 
-/* QSpiRect */
-/*---------------------------------------------------------------------------*/
-
-QDBusArgument &operator<<(QDBusArgument &argument, const QSpiRect &rect)
-{
-    argument.beginStructure();
-    argument << rect.x;
-    argument << rect.y;
-    argument << rect.width;
-    argument << rect.height;
-    argument.endStructure();
-    return argument;
-}
-
-const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiRect &rect)
-{
-    Q_UNUSED(rect)
-    qWarning() << "QDBusArgument &operator>>(const QDBusArgument &argument, QSpiRect &rect): implement me!";
-    return argument;
-}
-
 /* QSpiAppUpdate */
 /*---------------------------------------------------------------------------*/
 
@@ -199,7 +178,6 @@ void qSpiInitializeStructTypes()
     qDBusRegisterMetaType<QSpiAccessibleCacheArray>();
     qDBusRegisterMetaType<QSpiObjectReference>();
     qDBusRegisterMetaType<QSpiObjectReferenceArray>();
-    qDBusRegisterMetaType<QSpiRect>();
     qDBusRegisterMetaType<QSpiAttributeSet>();
     qDBusRegisterMetaType<QSpiAction>();
     qDBusRegisterMetaType<QSpiActionArray>();

@@ -125,22 +125,6 @@ Q_DECLARE_METATYPE(QSpiTextRange)
 typedef QList <QSpiTextRange> QSpiTextRangeList;
 Q_DECLARE_METATYPE(QSpiTextRangeList)
 
-/* QSpiRect */
-/*---------------------------------------------------------------------------*/
-
-struct QSpiRect
-{
-    int x;
-    int y;
-    int width;
-    int height;
-};
-
-Q_DECLARE_METATYPE(QSpiRect)
-
-QDBusArgument &operator<<(QDBusArgument &argument, const QSpiRect &rect);
-const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiRect &rect);
-
 /* QSpiAttributeSet */
 /*---------------------------------------------------------------------------*/
 

@@ -1547,24 +1547,13 @@ bool AtSpiAdaptor::inheritsQAction(QObject *object)
 // Component
 static QAccessibleInterface *getWindow(QAccessibleInterface* interface)
 {
-    QAccessibleInterface *current=NULL, *tmp=NULL;
-
-    interface->navigate(QAccessible::Ancestor, 0, &current);
-
-    while (current &&
-           current->role(0) != QAccessible::Window &&
-           current->role(0) != QAccessible::Application)
-    {
-        tmp = NULL;
-        current->navigate (QAccessible::Ancestor, 1, &tmp);
-        current = tmp;
+    while (interface &&
+           interface->role(0) != QAccessible::Window) {
+        QAccessibleInterface *oldParent = interface;
+        oldParent->navigate(QAccessible::Ancestor, 1, &interface);
+        delete oldParent;
     }
-
-    if (current) {
-        return current;
-    } else {
-        return NULL;
-    }
+    return interface;
 }
 
 static QRect getRelativeRect(QAccessibleInterface* interface, int child)
@@ -1678,20 +1667,15 @@ bool AtSpiAdaptor::componentInterface(QAccessibleInterface *interface, int child
     return true;
 }
 
-QSpiRect AtSpiAdaptor::getExtents(QAccessibleInterface *interface, int child, uint coordType)
+QRect AtSpiAdaptor::getExtents(QAccessibleInterface *interface, int child, uint coordType)
 {
-    QSpiRect val;
     QRect rect;
-    if (coordType == 0)
+    if (coordType == ATSPI_COORD_TYPE_SCREEN) {
         rect = interface->rect(child);
-    else
+    } else {
         rect = getRelativeRect(interface, child);
-
-    val.x = rect.x();
-    val.y = rect.y();
-    val.width = rect.width();
-    val.height = rect.height();
-    return val;
+    }
+    return rect;
 }
 
 // Action interface
@@ -1982,105 +1966,47 @@ QVariantList AtSpiAdaptor::getAttributeValue(QAccessibleInterface *interface, in
     return list;
 }
 
-QVariantList AtSpiAdaptor::getCharacterExtents(QAccessibleInterface *interface, int offset, uint coordType) const
+QRect AtSpiAdaptor::getCharacterExtents(QAccessibleInterface *interface, int offset, uint coordType) const
 {
-    int x;
-    int y;
-    int width;
-    int height;
-
-    // QAccessible2 has RelativeToParent as a coordinate type instead of relative
-    // to top-level window, which is an AT-SPI coordinate type.
-    if (static_cast<QAccessible2::CoordinateType>(coordType) != QAccessible2::RelativeToScreen) {
-        const QWidget *widget = qobject_cast<const QWidget*>(interface->object());
-        if (!widget) {
-            return QVariantList() << 0 << 0 << 0 << 0;
-        }
-        const QWidget *parent = widget->parentWidget();
-        while (parent) {
-            widget = parent;
-            parent = widget->parentWidget();
-        }
-        x = -widget->x();
-        y = -widget->y();
-    } else {
-        x = 0;
-        y = 0;
-    }
-
     QRect rect = interface->textInterface()->characterRect(offset, QAccessible2::RelativeToScreen);
-    width = rect.width();
-    height = rect.height();
-    x += rect.x();
-    y += rect.y();
-
-    QVariantList list;
-    list << x << y << width << height;
-    return list;
+    if (coordType == ATSPI_COORD_TYPE_WINDOW)
+        rect = translateRectToWindowCoordinates(interface, rect);
+    return rect;
 }
 
-QVariantList AtSpiAdaptor::getRangeExtents(QAccessibleInterface *interface,
-                                            int startOffset, int endOffset, uint coordType) const
+QRect AtSpiAdaptor::getRangeExtents(QAccessibleInterface *interface,
+                                    int startOffset, int endOffset, uint coordType) const
 {
-    int x;
-    int y;
-    int width;
-    int height;
-
     if (endOffset == -1)
         endOffset = interface->textInterface()->characterCount();
 
     if (endOffset <= startOffset) {
-        return QVariantList() << 0 << 0 << 0 << 0;
+        return QRect();
     }
 
-    int xOffset = 0, yOffset = 0;
-    QAccessibleTextInterface *textInterface = interface->textInterface();
-
-    // QAccessible2 has RelativeToParent as a coordinate type instead of relative
-    // to top-level window, which is an AT-SPI coordinate type.
-    if (static_cast<QAccessible2::CoordinateType>(coordType) != QAccessible2::RelativeToScreen) {
-        const QWidget *widget = qobject_cast<const QWidget*>(interface->object());
-        if (!widget) {
-            return QVariantList() << 0 << 0 << 0 << 0;
-        }
-        const QWidget *parent = widget->parentWidget();
-        while (parent) {
-            widget = parent;
-            parent = widget->parentWidget();
-        }
-        xOffset = -widget->x();
-        yOffset = -widget->y();
+    QRect rect = interface->textInterface()->characterRect(startOffset, QAccessible2::RelativeToScreen);
+    for (int i=startOffset + 1; i <= endOffset; i++) {
+        rect = rect | interface->textInterface()->characterRect(i, QAccessible2::RelativeToScreen);
     }
 
-    int minX=INT_MAX, minY=INT_MAX, maxX=0, maxY=0;
+    // relative to window
+    if (coordType == ATSPI_COORD_TYPE_WINDOW)
+        rect = translateRectToWindowCoordinates(interface, rect);
 
-    for (int i=startOffset; i<endOffset; i++) {
-        QRect rect = textInterface->characterRect(i, QAccessible2::RelativeToScreen);
-        if (rect.x() < minX) {
-            minX = rect.x();
-        }
-        if (rect.y() < minY) {
-            minY = rect.y();
-        }
-        if ((rect.x() + rect.width()) > maxX) {
-            maxX = (rect.x() + rect.width());
-        }
-        if ((rect.y() + rect.height()) > maxY) {
-            maxY = (rect.y() + rect.height());
-        }
-    }
-
-    width = maxX - minX;
-    height = maxY - minY;
-    y = minY + yOffset;
-    x = minX + xOffset;
-    QVariantList list;
-    list << x << y << width << height;
-    return list;
+    return rect;
 }
 
+QRect translateRectToWindowCoordinates(QAccessibleInterface *interface, const QRect &rect)
+{
+    QAccessibleInterface *window = getWindow(interface);
+    if (window) {
+        QRect ret = rect.translated(-window->rect(0).x(), -window->rect(0).y());
+        delete window;
+        return ret;
+    }
 
+    return rect;
+}
 
 // Editable Text interface
 bool AtSpiAdaptor::editableTextInterface(QAccessibleInterface *interface, int child, const QString &function, const QDBusMessage &message, const QDBusConnection &connection)

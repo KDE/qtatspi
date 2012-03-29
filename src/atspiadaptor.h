@@ -88,7 +88,9 @@ private:
     QStringList accessibleInterfaces(QAccessibleInterface *interface, int child) const;
 
     // component helper functions
-    static QSpiRect getExtents(QAccessibleInterface *interface, int child, uint coordType);
+    static QRect getExtents(QAccessibleInterface *interface, int child, uint coordType);
+    static QRect getExtents(const QAIPointer &interface, uint coordType);
+    static QRect translateRectToWindowCoordinates(QAccessibleInterface *interface, const QRect &rect);
 
     // action helper functions
     QSpiActionArray getActions(QAccessibleActionInterface* interface) const;
@@ -96,8 +98,8 @@ private:
     // text helper functions
     QVariantList getAttributes(QAccessibleInterface *interface, int offset, bool includeDefaults) const;
     QVariantList getAttributeValue(QAccessibleInterface *interface, int offset, const QString &attributeName) const;
-    QVariantList getCharacterExtents(QAccessibleInterface *interface, int offset, uint coordType) const;
-    QVariantList getRangeExtents(QAccessibleInterface *interface, int startOffset, int endOffset, uint coordType) const;
+    QRect getCharacterExtents(QAccessibleInterface *interface, int offset, uint coordType) const;
+    QRect getRangeExtents(QAccessibleInterface *interface, int startOffset, int endOffset, uint coordType) const;
     QAccessible2::BoundaryType qAccessibleBoundaryType(int atspiTextBoundaryType) const;
 
     static bool inheritsQAction(QObject *object);
