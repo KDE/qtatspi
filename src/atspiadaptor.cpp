@@ -1540,11 +1540,14 @@ bool AtSpiAdaptor::inheritsQAction(QObject *object)
 // Component
 static QAccessibleInterface *getWindow(QAccessibleInterface* interface)
 {
+    QAccessibleInterface *original = interface;
     while (interface &&
            interface->role(0) != QAccessible::Window) {
         QAccessibleInterface *oldParent = interface;
         oldParent->navigate(QAccessible::Ancestor, 1, &interface);
-        delete oldParent;
+        // do not delete the parameter we got as that would lead to double delete
+        if (oldParent != original)
+            delete oldParent;
     }
     return interface;
 }
