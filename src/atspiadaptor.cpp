@@ -31,6 +31,8 @@
 #include "standardactionwrapper.h"
 #include "constant_mappings.h"
 
+#include "application.h"
+
 #define ACCESSIBLE_LAST_TEXT "QIA2_LAST_TEXT"
 #define ACCESSIBLE_LAST_STATE "QIA2_LAST_STATE"
 
@@ -102,6 +104,8 @@ AtSpiAdaptor::AtSpiAdaptor(DBusConnection *connection, QObject *parent)
     , sendWindow_shade(0)
     , sendWindow_unshade(0)
 {
+    QSpiApplicationAdaptor *applicationAdaptor = new QSpiApplicationAdaptor(m_dbus->connection(), this);
+    connect(applicationAdaptor, SIGNAL(windowActivated(QObject*,bool)), this, SLOT(windowActivated(QObject*,bool)));
 }
 
 AtSpiAdaptor::~AtSpiAdaptor()

@@ -24,7 +24,6 @@
 
 #include "atspiadaptor.h"
 
-#include "application.h"
 #include "cache.h"
 #include "constant_mappings.h"
 #include "dbusconnection.h"
@@ -66,9 +65,6 @@ QSpiAccessibleBridge::QSpiAccessibleBridge()
     dbusAdaptor = new AtSpiAdaptor(dbusConnection, this);
     dBusConnection().registerVirtualObject(QSPI_OBJECT_PATH_ACCESSIBLE, dbusAdaptor, QDBusConnection::SubPath);
     dbusAdaptor->registerApplication();
-
-    QSpiApplicationAdaptor *applicationAdaptor = new QSpiApplicationAdaptor(dbusConnection->connection(), this);
-    connect(applicationAdaptor, SIGNAL(windowActivated(QObject*,bool)), dbusAdaptor, SLOT(windowActivated(QObject*,bool)));
 }
 
 QSpiAccessibleBridge::~QSpiAccessibleBridge()
