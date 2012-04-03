@@ -39,7 +39,6 @@
 QSpiApplicationAdaptor::QSpiApplicationAdaptor(const QDBusConnection &connection, QObject *parent)
     : QObject(parent), dbusConnection(connection)
 {
-    qApp->installEventFilter(this);
 }
 
 enum QSpiKeyEventType {
@@ -47,6 +46,16 @@ enum QSpiKeyEventType {
       QSPI_KEY_EVENT_RELEASE,
       QSPI_KEY_EVENT_LAST_DEFINED
 };
+
+void QSpiApplicationAdaptor::sendEvents(bool active)
+{
+    if (active) {
+        qApp->installEventFilter(this);
+    } else {
+        qApp->removeEventFilter(this);
+    }
+}
+
 
 bool QSpiApplicationAdaptor::eventFilter(QObject *target, QEvent *event)
 {

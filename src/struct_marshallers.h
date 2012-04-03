@@ -103,6 +103,23 @@ Q_DECLARE_METATYPE(QSpiActionArray)
 QDBusArgument &operator<<(QDBusArgument &argument, const QSpiAction &action);
 const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiAction &action);
 
+/* QSpiEventListenerArray */
+/*---------------------------------------------------------------------------*/
+
+struct QSpiEventListener
+{
+    QString listenerAddress;
+    QString eventName;
+};
+
+typedef QList <QSpiEventListener> QSpiEventListenerArray;
+
+Q_DECLARE_METATYPE(QSpiEventListener)
+Q_DECLARE_METATYPE(QSpiEventListenerArray)
+
+QDBusArgument &operator<<(QDBusArgument &argument, const QSpiEventListener &action);
+const QDBusArgument &operator>>(const QDBusArgument &argument, QSpiEventListener &action);
+
 /* QSpiRelationArray */
 /*---------------------------------------------------------------------------*/
 
@@ -170,6 +187,6 @@ Q_DECLARE_METATYPE(QSpiDeviceEvent)
 
 /*---------------------------------------------------------------------------*/
 
-void qSpiInitializeStructTypes ();
+void qSpiInitializeStructTypes();
 
 #endif /* Q_SPI_STRUCT_MARSHALLERS_H */

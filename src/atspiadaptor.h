@@ -29,6 +29,7 @@
 
 class QAccessibleInterface;
 class QSpiAccessibleInterface;
+class QSpiApplicationAdaptor;
 
 typedef QSharedPointer<QAccessibleInterface> QAIPointer;
 
@@ -107,6 +108,7 @@ private:
     // private vars
     QSpiObjectReference accessibilityRegistry;
     DBusConnection *m_dbus;
+    QSpiApplicationAdaptor *m_applicationAdaptor;
 
     /// Assigned from the accessibility registry.
     int m_applicationId;

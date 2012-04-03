@@ -22,6 +22,7 @@
 #include <qaccessible2.h>
 #include <qapplication.h>
 #include <qdbusmessage.h>
+#include <qdbusreply.h>
 #include <qwidget.h>
 
 #include <qdebug.h>
@@ -104,8 +105,8 @@ AtSpiAdaptor::AtSpiAdaptor(DBusConnection *connection, QObject *parent)
     , sendWindow_shade(0)
     , sendWindow_unshade(0)
 {
-    QSpiApplicationAdaptor *applicationAdaptor = new QSpiApplicationAdaptor(m_dbus->connection(), this);
-    connect(applicationAdaptor, SIGNAL(windowActivated(QObject*,bool)), this, SLOT(windowActivated(QObject*,bool)));
+    m_applicationAdaptor = new QSpiApplicationAdaptor(m_dbus->connection(), this);
+    connect(m_applicationAdaptor, SIGNAL(windowActivated(QObject*,bool)), this, SLOT(windowActivated(QObject*,bool)));
 }
 
 AtSpiAdaptor::~AtSpiAdaptor()
@@ -766,28 +767,16 @@ void AtSpiAdaptor::setBitFlag(const QString &flag)
   */
 void AtSpiAdaptor::updateEventListeners()
 {
-//    QStringList watchedExpressions;
     QDBusMessage m = QDBusMessage::createMethodCall("org.a11y.atspi.Registry",
                                                     "/org/a11y/atspi/registry",
                                                     "org.a11y.atspi.Registry", "GetRegisteredEvents");
-    QDBusMessage listenersReply = m_dbus->connection().call(m);
-    if (listenersReply.type() == QDBusMessage::ReplyMessage) {
-        const QVariant foo = listenersReply.arguments().at(0);
-        const QDBusArgument a = foo.value<QDBusArgument>();
-        Q_ASSERT(a.currentSignature() == "a(ss)");
-        a.beginArray();
-        while (!a.atEnd()) {
-            a.beginStructure();
-            QString listenerAddress;
-            a >> listenerAddress;
-            QString watchedExpression;
-            a >> watchedExpression;
-            setBitFlag(watchedExpression);
-//            watchedExpressions.append(watchedExpression);
-            a.endStructure();
+    QDBusReply<QSpiEventListenerArray> listenersReply = m_dbus->connection().call(m);
+    if (listenersReply.isValid()) {
+        const QSpiEventListenerArray evList = listenersReply.value();
+        Q_FOREACH(const QSpiEventListener &ev, evList) {
+            setBitFlag(ev.eventName);
         }
-        a.endArray();
-//        qDebug() << "Currently active listeners: " << watchedExpressions;
+        m_applicationAdaptor->sendEvents(!evList.isEmpty());
     } else {
         qWarning() << "Could not query active accessibility event listeners.";
     }
