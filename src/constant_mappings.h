@@ -36,7 +36,6 @@
 #define ATSPI_DBUS_PATH_REGISTRY "/org/a11y/atspi/registry"
 #define ATSPI_DBUS_INTERFACE_REGISTRY "org.a11y.atspi.Registry"
 
-#define ATSPI_DBUS_PATH_NULL "/org/a11y/atspi/null"
 #define ATSPI_DBUS_PATH_ROOT "/org/a11y/atspi/accessible/root"
 
 #define ATSPI_DBUS_PATH_DEC "/org/a11y/atspi/registry/deviceeventcontroller"

@@ -186,6 +186,7 @@ void tst_QtAtSpi::testLabel()
     l->setText("Hello A11y");
     m_window->addWidget(l);
 
+    QCOMPARE(getParent(mainWindow), QLatin1String(ATSPI_DBUS_PATH_NULL));
     QStringList children = getChildren(mainWindow);
 
     QDBusInterface* labelInterface = getInterface(children.at(0), "org.a11y.atspi.Accessible");

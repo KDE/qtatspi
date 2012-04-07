@@ -1305,7 +1305,7 @@ bool AtSpiAdaptor::accessibleInterface(QAccessibleInterface *interface, int chil
         QString path;
         QAccessibleInterface *parent = accessibleParent(interface, child);
         if (!parent || parent->role(0) == QAccessible::Application) {
-            path = QSPI_OBJECT_PATH_ROOT;
+            path = ATSPI_DBUS_PATH_NULL;
         } else {
             path = pathForInterface(parent, 0);
         }
@@ -1316,8 +1316,11 @@ bool AtSpiAdaptor::accessibleInterface(QAccessibleInterface *interface, int chil
         sendReply(connection, message, QVariant::fromValue(
                       QDBusVariant(QVariant::fromValue(QSpiObjectReference(connection, QDBusObjectPath(path))))));
     } else if (function == "GetChildAtIndex") {
-        Q_ASSERT(child == 0); // Don't support child of virtual child
         int index = message.arguments().first().toInt() + 1;
+        if (child || index < 0 || index > interface->childCount()) {
+            interface = 0;
+            child = 0;
+        }
         sendReply(connection, message, QVariant::fromValue(
                       QSpiObjectReference(connection, QDBusObjectPath(pathForInterface(interface, index)))));
     } else if (function == "GetInterfaces") {

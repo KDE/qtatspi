@@ -17,16 +17,15 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "struct_marshallers.h"
+
+#include <atspi/atspi-constants.h>
 #include <QtDBus>
 
-#include "struct_marshallers.h"
 #include "bridge.h"
 
-#define QSPI_OBJECT_PATH_PREFIX  "/org/a11y/atspi/accessible/"
-#define QSPI_OBJECT_PATH_NULL    QSPI_OBJECT_PATH_PREFIX "null"
-
 QSpiObjectReference::QSpiObjectReference()
-    : path(QDBusObjectPath(QSPI_OBJECT_PATH_NULL))
+    : path(QDBusObjectPath(ATSPI_DBUS_PATH_NULL))
 {}
 
 /* QSpiAccessibleCacheArray */
