@@ -118,10 +118,20 @@ QStringList tst_QtAtSpi::getChildren(QDBusInterface* interface)
 
 QString tst_QtAtSpi::getParent(QDBusInterface* interface)
 {
-    interface->property("Parent");
-    QSpiObjectReference parent;
-    const QDBusArgument a = interface->property("Parent").value<QDBusArgument>();
-    a >> parent;
+    if (!interface->isValid())
+        return QString();
+
+    QVariant var = interface->property("Parent");
+    if (!var.canConvert<QSpiObjectReference>()) {
+        qWarning() << "Invalid parent";
+        return QString();
+    }
+    qDebug() << "VAR: " << var;
+
+    QSpiObjectReference parent = var.value<QSpiObjectReference>();
+//    const QDBusArgument a = var.value<QDBusArgument>();
+
+//    a >> parent;
     return parent.path.path();
 }
 
@@ -137,6 +147,7 @@ void tst_QtAtSpi::initTestCase()
     // Oxygen style creates many extra items, it's simply unusable here
     qDebug() << "Using plastique style...";
     qApp->setStyle("plastique");
+    qApp->setApplicationName("tst_QtAtSpi app");
     QCOMPARE(qgetenv("QT_ACCESSIBILITY"), QByteArray("1"));
 
     dbus = DBusConnection();
@@ -186,7 +197,8 @@ void tst_QtAtSpi::testLabel()
     l->setText("Hello A11y");
     m_window->addWidget(l);
 
-    QCOMPARE(getParent(mainWindow), QLatin1String(ATSPI_DBUS_PATH_NULL));
+    // Application
+    QCOMPARE(getParent(mainWindow), QLatin1String(ATSPI_DBUS_PATH_ROOT));
     QStringList children = getChildren(mainWindow);
 
     QDBusInterface* labelInterface = getInterface(children.at(0), "org.a11y.atspi.Accessible");
@@ -195,6 +207,7 @@ void tst_QtAtSpi::testLabel()
     QCOMPARE(getChildren(labelInterface).count(), 0);
     QCOMPARE(labelInterface->call(QDBus::Block, "GetRoleName").arguments().first().toString(), QLatin1String("label"));
     QCOMPARE(labelInterface->call(QDBus::Block, "GetRole").arguments().first().toUInt(), 29u);
+    QCOMPARE(getParent(labelInterface), mainWindow->path());
 
     l->setText("New text");
     QCOMPARE(labelInterface->property("Name").toString(), l->text());

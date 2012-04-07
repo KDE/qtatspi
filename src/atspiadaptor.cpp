@@ -1304,8 +1304,10 @@ bool AtSpiAdaptor::accessibleInterface(QAccessibleInterface *interface, int chil
     } else if (function == "GetParent") {
         QString path;
         QAccessibleInterface *parent = accessibleParent(interface, child);
-        if (!parent || parent->role(0) == QAccessible::Application) {
+        if (!parent) {
             path = ATSPI_DBUS_PATH_NULL;
+        } else if (parent->role(0) == QAccessible::Application) {
+            path = ATSPI_DBUS_PATH_ROOT;
         } else {
             path = pathForInterface(parent, 0);
         }
