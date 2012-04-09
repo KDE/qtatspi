@@ -1297,7 +1297,7 @@ bool AtSpiAdaptor::accessibleInterface(QAccessibleInterface *interface, int chil
         } else {
             QAccessibleInterface *parent = accessibleParent(interface, child);
             if (parent)
-                childIndex = parent->indexOfChild(interface);
+                childIndex = parent->indexOfChild(interface) - 1;
             delete parent;
         }
         sendReply(connection, message, childIndex);
