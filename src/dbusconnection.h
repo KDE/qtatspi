@@ -28,6 +28,7 @@ class DBusConnection
 public:
     DBusConnection();
     QDBusConnection connection() const;
+    QDBusConnection peerToPeerServerAddress() const;
 
 private:
     QString getAccessibilityBusAddress() const;

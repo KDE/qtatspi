@@ -21,6 +21,7 @@
 #include <atspi/atspi-constants.h>
 
 #include <qaccessible2.h>
+#include <qdbusserver.h>
 #include <qdbusvirtualobject.h>
 #include <qsharedpointer.h>
 
@@ -113,6 +114,8 @@ private:
     /// Assigned from the accessibility registry.
     int m_applicationId;
     bool initialized;
+
+    QDBusServer m_peerToPeerServer;
 
     mutable QHash<quintptr, QWeakPointer<QObject> > m_handledObjects;
 

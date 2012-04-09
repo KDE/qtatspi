@@ -48,6 +48,7 @@
 
 AtSpiAdaptor::AtSpiAdaptor(DBusConnection *connection, QObject *parent)
     : QDBusVirtualObject(parent), m_dbus(connection), initialized(false)
+    , m_peerToPeerServer("unix:tmpdir=/tmp", 0)
     , sendFocus(0)
     , sendObject(0)
     , sendObject_active_descendant_changed(0)
@@ -965,8 +966,11 @@ void AtSpiAdaptor::notify(int reason, QAccessibleInterface *interface, int child
         break;
     }
     case QAccessible::Focus: {
-        if(sendFocus)
+        qDebug() << "qt-at-spi focus: " << interface;
+        if(sendFocus || sendObject || sendObject_state_changed) {
+            qDebug() << "   qt-at-spi focus: SENDING";
             sendFocusChanged(interface, child);
+        }
         break;
     }
     case QAccessible::TextUpdated: {
@@ -1239,6 +1243,14 @@ bool AtSpiAdaptor::applicationInterface(QAccessibleInterface *interface, int, co
     } else if (function == "GetToolkitName") {
         Q_ASSERT(message.signature() == "ss");
         QDBusMessage reply = message.createReply(QVariant::fromValue(QDBusVariant(QLatin1String("Qt"))));
+        return connection.send(reply);
+    } else if (function == "GetApplicationBusAddress") {
+        QDBusServer *server = new QDBusServer(this);
+
+        qDebug() << "Sending p2p address: " << server->address();
+        QDBusMessage reply = message.createReply(QVariant::fromValue(server->address()));
+        server->connecti registerVirtualObject(QSPI_OBJECT_PATH_ACCESSIBLE, dbusAdaptor, QDBusConnection::SubPath);
+        qDebug() << "Implement me already: GetApplicationBusAddress";
         return connection.send(reply);
     } else {
         qDebug() << "AtSpiAdaptor::applicationInterface " << message.path() << interface << function;
