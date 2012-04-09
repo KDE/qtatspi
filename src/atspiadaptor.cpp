@@ -965,7 +965,7 @@ void AtSpiAdaptor::notify(int reason, QAccessibleInterface *interface, int child
         break;
     }
     case QAccessible::Focus: {
-        if(sendFocus)
+        if(sendFocus || sendObject || sendObject_state_changed)
             sendFocusChanged(interface, child);
         break;
     }
