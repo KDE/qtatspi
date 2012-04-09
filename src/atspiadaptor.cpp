@@ -1340,6 +1340,15 @@ bool AtSpiAdaptor::accessibleInterface(QAccessibleInterface *interface, int chil
                 setSpiStateBit(&spiState, ATSPI_STATE_ACTIVE);
             }
         }
+        QAccessible::Role role = interface->role(child);
+        if (role == QAccessible::TreeItem ||
+            role == QAccessible::ListItem) {
+            /* Transient means libatspi2 will not cache items.
+               This is important because when adding/removing an item
+               the cache becomes outdated and we don't change the paths of
+               items in lists/trees/tables. */
+            setSpiStateBit(&spiState, ATSPI_STATE_TRANSIENT);
+        }
         sendReply(connection, message,
                   QVariant::fromValue(spiStateSetFromSpiStates(spiState)));
     } else if (function == "GetAttributes") {
