@@ -141,8 +141,10 @@ quint64 spiStatesFromQState(QAccessible::State state)
             || (state & QAccessible::Animated))
         setSpiStateBit(&spiState, ATSPI_STATE_ANIMATED);
     if ((state & QAccessible::Invisible)
-            || (state & QAccessible::Offscreen))
+            || (state & QAccessible::Offscreen)) {
         unsetSpiStateBit(&spiState, ATSPI_STATE_SHOWING);
+        unsetSpiStateBit(&spiState, ATSPI_STATE_VISIBLE);
+    }
     if (state & QAccessible::Sizeable)
         setSpiStateBit(&spiState, ATSPI_STATE_RESIZABLE);
     //        if (state & QAccessible::Movable)
