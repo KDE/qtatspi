@@ -346,6 +346,27 @@ void tst_QtAtSpi::testTreeWidget()
     QCOMPARE(cell6->property("Name").toString(), QLatin1String("1.0 0.1"));
 
 
+    QDBusInterface* treeTableIface = getInterface(children.at(0), "org.a11y.atspi.Table");
+
+    QCOMPARE(treeTableIface->call(QDBus::Block, "GetRowAtIndex", 0).arguments().first().toInt(), -1);
+    QCOMPARE(treeTableIface->call(QDBus::Block, "GetRowAtIndex", 1).arguments().first().toInt(), -1);
+    QCOMPARE(treeTableIface->call(QDBus::Block, "GetRowAtIndex", 2).arguments().first().toInt(), 0);
+    QCOMPARE(treeTableIface->call(QDBus::Block, "GetRowAtIndex", 3).arguments().first().toInt(), 0);
+    QCOMPARE(treeTableIface->call(QDBus::Block, "GetRowAtIndex", 4).arguments().first().toInt(), 1);
+    QCOMPARE(treeTableIface->call(QDBus::Block, "GetRowAtIndex", 5).arguments().first().toInt(), 1);
+    QCOMPARE(treeTableIface->call(QDBus::Block, "GetRowAtIndex", 6).arguments().first().toInt(), 2);
+    QCOMPARE(treeTableIface->call(QDBus::Block, "GetRowAtIndex", 7).arguments().first().toInt(), 2);
+
+    QCOMPARE(treeTableIface->call(QDBus::Block, "GetColumnAtIndex", 0).arguments().first().toInt(), 0);
+    QCOMPARE(treeTableIface->call(QDBus::Block, "GetColumnAtIndex", 1).arguments().first().toInt(), 1);
+    QCOMPARE(treeTableIface->call(QDBus::Block, "GetColumnAtIndex", 2).arguments().first().toInt(), 0);
+    QCOMPARE(treeTableIface->call(QDBus::Block, "GetColumnAtIndex", 3).arguments().first().toInt(), 1);
+    QCOMPARE(treeTableIface->call(QDBus::Block, "GetColumnAtIndex", 4).arguments().first().toInt(), 0);
+    QCOMPARE(treeTableIface->call(QDBus::Block, "GetColumnAtIndex", 5).arguments().first().toInt(), 1);
+    QCOMPARE(treeTableIface->call(QDBus::Block, "GetColumnAtIndex", 6).arguments().first().toInt(), 0);
+    QCOMPARE(treeTableIface->call(QDBus::Block, "GetColumnAtIndex", 7).arguments().first().toInt(), 1);
+
+    delete treeTableIface;
     delete cell1; delete cell2; delete cell3; delete cell4;
     m_window->clearChildren();
     delete treeIface;

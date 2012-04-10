@@ -2205,33 +2205,40 @@ bool AtSpiAdaptor::tableInterface(QAccessibleInterface *interface, int child, co
 
     } else if (function == "GetColumnAtIndex") {
         int index = message.arguments().at(0).toInt();
-        int ret = 0;
-        if (index > 1) {
+        int ret = -1;
+        if (index >= 0) {
             QAccessibleInterface *iface;
-            interface->navigate(QAccessible::Child, index, &iface);
+            interface->navigate(QAccessible::Child, index + 1, &iface);
             if (iface) {
-                qDebug() << "iface: " << iface->text(QAccessible::Name, 0);
-
-                QAccessibleTable2CellInterface *cell = static_cast<QAccessibleTable2CellInterface*>(iface);
-                ret = cell->columnIndex();
-                delete cell;
+                if (iface->role(0) == QAccessible::ColumnHeader) {
+                    ret = index;
+                } else if (iface->role(0) == QAccessible::RowHeader) {
+                    ret = -1;
+                } else {
+                    QAccessibleTable2CellInterface *cell = static_cast<QAccessibleTable2CellInterface*>(iface);
+                    ret = cell->columnIndex();
+                    delete cell;
+                }
             }
         }
         connection.send(message.createReply(ret));
     } else if (function == "GetRowAtIndex") {
         // FIXME merge with GetColumnAtIndex
         int index = message.arguments().at(0).toInt();
-        int ret = 0;
-        qDebug() << "QSpiAdaptor::GetRowAtIndex" << index;
-        if (index > 1) {
+        int ret = -1;
+        if (index >= 0) {
             QAccessibleInterface *iface;
-            interface->navigate(QAccessible::Child, index, &iface);
+            interface->navigate(QAccessible::Child, index + 1, &iface);
             if (iface) {
-                qDebug() << "iface: " << iface->text(QAccessible::Name, 0);
-
-                QAccessibleTable2CellInterface *cell = static_cast<QAccessibleTable2CellInterface*>(iface);
-                ret = cell->rowIndex();
-                delete cell;
+                if (iface->role(0) == QAccessible::ColumnHeader) {
+                    ret = -1;
+                } else if (iface->role(0) == QAccessible::RowHeader) {
+                    ret = index % interface->table2Interface()->columnCount();
+                } else {
+                    QAccessibleTable2CellInterface *cell = static_cast<QAccessibleTable2CellInterface*>(iface);
+                    ret = cell->rowIndex();
+                    delete cell;
+                }
             }
         }
         connection.send(message.createReply(ret));
