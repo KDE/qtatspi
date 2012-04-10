@@ -849,13 +849,13 @@ QPair<QAIPointer, int> AtSpiAdaptor::interfaceFromPath(const QString& dbusPath) 
 
     if (dbusPath == QSPI_OBJECT_PATH_ROOT) {
         QAIPointer interface = QAIPointer(QAccessible::queryAccessibleInterface(qApp));
-        return QPair<QAIPointer, int>(interface, index);
+        return qMakePair(interface, index);
     }
 
     QStringList parts = dbusPath.split('/');
     if (parts.size() <= 5) {
         qWarning() << "invalid path: " << dbusPath;
-        return QPair<QAIPointer, int>(QAIPointer(), 0);
+        return qMakePair(QAIPointer(), 0);
     }
 
     QString objectString = parts.at(5);
@@ -873,16 +873,19 @@ QPair<QAIPointer, int> AtSpiAdaptor::interfaceFromPath(const QString& dbusPath) 
                 QAccessibleInterface *childInterface;
                 index = interface->navigate(QAccessible::Child, parts.at(i).toInt(), &childInterface);
                 child = QAIPointer(childInterface);
-                if (index == 0)
+                if (index < 0)
+                    return qMakePair(QAIPointer(), 0);
+
+                if (index == 0 && child)
                     interface = child;
             }
-            return QPair<QAIPointer, int>(interface, index);
+            return qMakePair(interface, index);
 
         } else {
             m_handledObjects.remove(uintptr);
         }
     }
-    return QPair<QAIPointer, int>(QAIPointer(), 0);
+    return qMakePair(QAIPointer(), 0);
 }
 
 
