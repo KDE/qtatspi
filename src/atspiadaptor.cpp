@@ -1436,7 +1436,7 @@ QStringList AtSpiAdaptor::accessibleInterfaces(QAccessibleInterface *interface, 
 QSpiRelationArray AtSpiAdaptor::relationSet(QAccessibleInterface *interface, int child, const QDBusConnection &connection) const
 {
     QSpiRelationArray relations;
-    if (child == 0) {
+    if (child != 0) {
         qDebug() << "AtSpiAdaptor::relationSet currently has a problem with child ids.";
         // FIXME for example trees need to express their child relations here.
         return relations;
