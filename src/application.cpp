@@ -93,13 +93,13 @@ bool QSpiApplicationAdaptor::eventFilter(QObject *target, QEvent *event)
             } else if (keyEvent->key() == Qt::Key_Backtab) {
                 de.text = "Backtab";
             } else if (keyEvent->key() == Qt::Key_Left) {
-                de.text = "Left";
+                de.text = (keyEvent->modifiers() | Qt::KeypadModifier) ? "KP_Left" : "Left";
             } else if (keyEvent->key() == Qt::Key_Right) {
-                de.text = "Right";
+                de.text = (keyEvent->modifiers() | Qt::KeypadModifier) ? "KP_Right" : "Right";
             } else if (keyEvent->key() == Qt::Key_Up) {
-                de.text = "Up";
+                de.text = (keyEvent->modifiers() | Qt::KeypadModifier) ? "KP_Up" : "Up";
             } else if (keyEvent->key() == Qt::Key_Down) {
-                de.text = "Down";
+                de.text = (keyEvent->modifiers() | Qt::KeypadModifier) ? "KP_Down" : "Down";
             } else if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
                 de.text = "Return";
             } else if (keyEvent->key() == Qt::Key_Backspace) {
@@ -107,13 +107,15 @@ bool QSpiApplicationAdaptor::eventFilter(QObject *target, QEvent *event)
             } else if (keyEvent->key() == Qt::Key_Delete) {
                 de.text = "Delete";
             } else if (keyEvent->key() == Qt::Key_PageUp) {
-                de.text = "Page_Up";
+                de.text = (keyEvent->modifiers() | Qt::KeypadModifier) ? "KP_Page_Up" : "Page_Up";
             } else if (keyEvent->key() == Qt::Key_PageDown) {
-                de.text = "Page_Down";
+                de.text = (keyEvent->modifiers() | Qt::KeypadModifier) ? "KP_Page_Up" : "Page_Down";
             } else if (keyEvent->key() == Qt::Key_Home) {
-                de.text = "Home";
+                de.text = (keyEvent->modifiers() | Qt::KeypadModifier) ? "KP_Home" : "Home";
             } else if (keyEvent->key() == Qt::Key_End) {
-                de.text = "End";
+                de.text = (keyEvent->modifiers() | Qt::KeypadModifier) ? "KP_End" : "End";
+            } else if (keyEvent->key() == Qt::Key_Clear && (keyEvent->modifiers() | Qt::KeypadModifier)) {
+                de.text = "KP_Begin"; // Key pad 5
             } else if (keyEvent->key() == Qt::Key_Escape) {
                 de.text = "Escape";
             } else if (keyEvent->key() == Qt::Key_Space) {
@@ -122,6 +124,8 @@ bool QSpiApplicationAdaptor::eventFilter(QObject *target, QEvent *event)
                 de.text = "Caps_Lock";
             } else if (keyEvent->key() == Qt::Key_NumLock) {
                 de.text = "Num_Lock";
+            } else if (keyEvent->key() == Qt::Key_Insert) {
+                de.text = "Insert";
             } else {
                 de.text = keyEvent->text();
             }
@@ -129,7 +133,7 @@ bool QSpiApplicationAdaptor::eventFilter(QObject *target, QEvent *event)
 //            "F7", "F8", "F9", "F10", "F11", "F12"
 
             // FIXME
-            de.isText = !keyEvent->text().trimmed().isEmpty();
+            de.isText = !de.text.isEmpty();
 
 #ifdef KEYBOARD_DEBUG
             qDebug() << "Key event text: " << event->type() << de.isText << " " << de.text
@@ -148,12 +152,12 @@ bool QSpiApplicationAdaptor::eventFilter(QObject *target, QEvent *event)
             int timeout = 100;
             bool sent = dbusConnection.callWithCallback(m, this, SLOT(notifyKeyboardListenerCallback(QDBusMessage)),
                             SLOT(notifyKeyboardListenerError(QDBusError, QDBusMessage)), timeout);
-            if (!sent)
-                return false;
-
-            //queue the event and send it after callback
-            keyEvents.enqueue(QPair<QObject*, QKeyEvent*> (target, copyKeyEvent(keyEvent)));
-            return true;
+            if (sent) {
+                //queue the event and send it after callback
+                keyEvents.enqueue(QPair<QObject*, QKeyEvent*> (target, copyKeyEvent(keyEvent)));
+                qDebug() << "Sent key: " << de.text;
+                return true;
+            }
     }
         default:
             break;
