@@ -867,15 +867,17 @@ QPair<QAIPointer, int> AtSpiAdaptor::interfaceFromPath(const QString& dbusPath) 
             QObject* object = reinterpret_cast<QObject*>(uintptr);
 
             QAIPointer interface = QAIPointer(QAccessible::queryAccessibleInterface(object));
+            if (!interface)
+                return qMakePair(QAIPointer(), 0);
             QAIPointer child;
 
             for (int i = 6; i < parts.size(); ++i) {
                 QAccessibleInterface *childInterface;
                 index = interface->navigate(QAccessible::Child, parts.at(i).toInt(), &childInterface);
-                child = QAIPointer(childInterface);
                 if (index < 0)
                     return qMakePair(QAIPointer(), 0);
 
+                child = QAIPointer(childInterface);
                 if (index == 0 && child)
                     interface = child;
             }
