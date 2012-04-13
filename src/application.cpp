@@ -178,7 +178,8 @@ void QSpiApplicationAdaptor::notifyKeyboardListenerCallback(const QDBusMessage& 
     }
     Q_ASSERT(message.arguments().length() == 1);
     if (message.arguments().at(0).toBool() == true) {
-        keyEvents.dequeue();
+        QPair<QObject*, QKeyEvent*> event = keyEvents.dequeue();
+        delete event.second;
     } else {
         QPair<QObject*, QKeyEvent*> event = keyEvents.dequeue();
         QApplication::postEvent(event.first, event.second);
