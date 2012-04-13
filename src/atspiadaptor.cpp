@@ -1082,16 +1082,15 @@ void AtSpiAdaptor::notify(int reason, QAccessibleInterface *interface, int child
         //        break;
 
     case QAccessible::ParentChanged:
-        qDebug() << "FIXME: handle parent changed.";
         break;
     case QAccessible::DialogStart:
-        qDebug() << "FIXME: handle dialog start.";
         break;
     case QAccessible::DialogEnd:
-        qDebug() << "FIXME: handle dialog end.";
         break;
     case QAccessible::TableModelChanged:
         // For now ignore this event, should be handled together with active descendant changed
+        break;
+    case QAccessible::SelectionRemove:
         break;
     default:
         qWarning() << "QSpiAccessible::accessibleEvent not handled: " << QString::number(reason, 16)
@@ -1186,6 +1185,8 @@ bool AtSpiAdaptor::handleMessage(const QDBusMessage &message, const QDBusConnect
 
     QString interface = message.interface();
     QString function = message.member();
+
+    // qDebug() << "AtSpiAdaptor::handleMessage: " << interface << function;
 
     if (function == "Introspect") {
         //introspect(message.path());
