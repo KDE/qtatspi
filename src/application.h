@@ -34,16 +34,10 @@
 class QSpiApplicationAdaptor :public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(int Id READ id WRITE setId)
 
 public:
     QSpiApplicationAdaptor(const QDBusConnection &connection, QObject *parent);
     virtual ~QSpiApplicationAdaptor() {}
-
-    // the Id property gets written and read by the accessibility framework
-    // we do nothing with it internally, it is only for the at-spi2 to identify us
-    int id() const;
-    void setId(int value);
 
     void sendEvents(bool active);
 
