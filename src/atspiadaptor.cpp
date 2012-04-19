@@ -1262,17 +1262,14 @@ void AtSpiAdaptor::registerApplication()
     registry = new SocketProxy(QSPI_REGISTRY_NAME,
                                QSPI_OBJECT_PATH_ROOT, m_dbus->connection());
 
-    QDBusPendingReply<QSpiObjectReference> reply;
     QSpiObjectReference ref = QSpiObjectReference(m_dbus->connection(), QDBusObjectPath(QSPI_OBJECT_PATH_ROOT));
-    reply = registry->Embed(ref);
+    QDBusPendingReply<QSpiObjectReference> reply = registry->Embed(ref);
     reply.waitForFinished();
     if (reply.isValid ()) {
         const QSpiObjectReference &socket = reply.value();
         accessibilityRegistry = QSpiObjectReference(socket);
     } else {
-        qWarning() << "Error in contacting registry";
-        qWarning() << reply.error().name();
-        qWarning() << reply.error().message();
+        qWarning() << "Error in contacting registry: " << reply.error().name() << reply.error().message();
     }
     delete registry;
 }
