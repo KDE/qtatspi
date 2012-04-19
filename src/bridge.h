@@ -51,10 +51,6 @@ public:
 
         QDBusConnection dBusConnection() const;
 
-private Q_SLOTS:
-        void windowActivated(QObject* window);
-        void objectDestroyed(QObject*);
-
 private:
 //        void notifyAboutCreation(QSpiAdaptor* accessible);
 //        void notifyAboutDestruction(QSpiAdaptor* accessible);
