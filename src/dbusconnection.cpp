@@ -103,7 +103,7 @@ QString DBusConnection::getAccessibilityBusAddressXAtom() const
     char *propData = 0;
     unsigned long nItems;
     unsigned long leftOver;
-    Atom AT_SPI_BUS = XInternAtom (bridge_display, "AT_SPI_BUS", False);
+    Atom AT_SPI_BUS = XInternAtom(bridge_display, "AT_SPI_BUS", False);
     XGetWindowProperty (bridge_display,
                         XDefaultRootWindow (bridge_display),
                         AT_SPI_BUS, 0L,

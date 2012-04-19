@@ -194,3 +194,4 @@ void QSpiApplicationAdaptor::notifyKeyboardListenerError(const QDBusError& error
         QApplication::postEvent(event.first, event.second);
     }
 }
+
