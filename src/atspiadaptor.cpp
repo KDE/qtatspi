@@ -2009,7 +2009,7 @@ QRect AtSpiAdaptor::getRangeExtents(QAccessibleInterface *interface,
     return rect;
 }
 
-QRect translateRectToWindowCoordinates(QAccessibleInterface *interface, const QRect &rect)
+QRect AtSpiAdaptor::translateRectToWindowCoordinates(QAccessibleInterface *interface, const QRect &rect)
 {
     QAccessibleInterface *window = getWindow(interface);
     if (window) {
