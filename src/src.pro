@@ -44,6 +44,6 @@ target.path = $$[QT_INSTALL_PLUGINS]/accessiblebridge
 
 INSTALLS += target
 
-
+LIBS += -lX11
 
 
