@@ -93,13 +93,13 @@ bool QSpiApplicationAdaptor::eventFilter(QObject *target, QEvent *event)
             } else if (keyEvent->key() == Qt::Key_Backtab) {
                 de.text = "Backtab";
             } else if (keyEvent->key() == Qt::Key_Left) {
-                de.text = (keyEvent->modifiers() | Qt::KeypadModifier) ? "KP_Left" : "Left";
+                de.text = (keyEvent->modifiers() & Qt::KeypadModifier) ? "KP_Left" : "Left";
             } else if (keyEvent->key() == Qt::Key_Right) {
-                de.text = (keyEvent->modifiers() | Qt::KeypadModifier) ? "KP_Right" : "Right";
+                de.text = (keyEvent->modifiers() & Qt::KeypadModifier) ? "KP_Right" : "Right";
             } else if (keyEvent->key() == Qt::Key_Up) {
-                de.text = (keyEvent->modifiers() | Qt::KeypadModifier) ? "KP_Up" : "Up";
+                de.text = (keyEvent->modifiers() & Qt::KeypadModifier) ? "KP_Up" : "Up";
             } else if (keyEvent->key() == Qt::Key_Down) {
-                de.text = (keyEvent->modifiers() | Qt::KeypadModifier) ? "KP_Down" : "Down";
+                de.text = (keyEvent->modifiers() & Qt::KeypadModifier) ? "KP_Down" : "Down";
             } else if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
                 de.text = "Return";
             } else if (keyEvent->key() == Qt::Key_Backspace) {
@@ -107,14 +107,14 @@ bool QSpiApplicationAdaptor::eventFilter(QObject *target, QEvent *event)
             } else if (keyEvent->key() == Qt::Key_Delete) {
                 de.text = "Delete";
             } else if (keyEvent->key() == Qt::Key_PageUp) {
-                de.text = (keyEvent->modifiers() | Qt::KeypadModifier) ? "KP_Page_Up" : "Page_Up";
+                de.text = (keyEvent->modifiers() & Qt::KeypadModifier) ? "KP_Page_Up" : "Page_Up";
             } else if (keyEvent->key() == Qt::Key_PageDown) {
-                de.text = (keyEvent->modifiers() | Qt::KeypadModifier) ? "KP_Page_Up" : "Page_Down";
+                de.text = (keyEvent->modifiers() & Qt::KeypadModifier) ? "KP_Page_Up" : "Page_Down";
             } else if (keyEvent->key() == Qt::Key_Home) {
-                de.text = (keyEvent->modifiers() | Qt::KeypadModifier) ? "KP_Home" : "Home";
+                de.text = (keyEvent->modifiers() & Qt::KeypadModifier) ? "KP_Home" : "Home";
             } else if (keyEvent->key() == Qt::Key_End) {
-                de.text = (keyEvent->modifiers() | Qt::KeypadModifier) ? "KP_End" : "End";
-            } else if (keyEvent->key() == Qt::Key_Clear && (keyEvent->modifiers() | Qt::KeypadModifier)) {
+                de.text = (keyEvent->modifiers() & Qt::KeypadModifier) ? "KP_End" : "End";
+            } else if (keyEvent->key() == Qt::Key_Clear && (keyEvent->modifiers() & Qt::KeypadModifier)) {
                 de.text = "KP_Begin"; // Key pad 5
             } else if (keyEvent->key() == Qt::Key_Escape) {
                 de.text = "Escape";
