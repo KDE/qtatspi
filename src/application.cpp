@@ -155,7 +155,6 @@ bool QSpiApplicationAdaptor::eventFilter(QObject *target, QEvent *event)
             if (sent) {
                 //queue the event and send it after callback
                 keyEvents.enqueue(QPair<QObject*, QKeyEvent*> (target, copyKeyEvent(keyEvent)));
-                qDebug() << "Sent key: " << de.text;
                 return true;
             }
     }
