@@ -149,7 +149,7 @@ bool QSpiApplicationAdaptor::eventFilter(QObject *target, QEvent *event)
             m.setArguments(QVariantList() <<QVariant::fromValue(de));
 
             // FIXME: this is critical, the timeout should probably be pretty low to allow normal processing
-            int timeout = 100;
+            int timeout = 300;
             bool sent = dbusConnection.callWithCallback(m, this, SLOT(notifyKeyboardListenerCallback(QDBusMessage)),
                             SLOT(notifyKeyboardListenerError(QDBusError, QDBusMessage)), timeout);
             if (sent) {
