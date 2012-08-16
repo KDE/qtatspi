@@ -24,6 +24,8 @@
 #include <qdbusmessage.h>
 #include <qdbusreply.h>
 #include <qwidget.h>
+#include <qabstractitemview.h>
+#include <qabstractproxymodel.h>
 
 #include <qdebug.h>
 
@@ -890,7 +892,69 @@ QPair<QAIPointer, int> AtSpiAdaptor::interfaceFromPath(const QString& dbusPath) 
     return qMakePair(QAIPointer(), 0);
 }
 
+void AtSpiAdaptor::handleModelChange(QAccessibleInterface *interface) {
+    QAccessibleTable2Interface *table2Interface = interface->table2Interface();
+    if (!table2Interface)
+        return;
 
+    QAbstractItemView *view = qobject_cast< QAbstractItemView* >(interface->object());
+    if (view) {
+        if (qobject_cast< QAbstractProxyModel* >(view->model()))
+            return; //Handling it like a normal model would crash
+    }
+
+    int firstEntry;
+    int lastEntry;
+    QAccessible2::TableModelChange change = table2Interface->modelChange();
+
+    switch (change.type) {
+    case QAccessible2::TableModelChangeInsert:
+        if ((change.firstRow < table2Interface->rowCount()) && (change.firstColumn < table2Interface->columnCount())) {
+            QAccessibleTable2CellInterface *firstCell = table2Interface->cellAt(change.firstRow, change.firstColumn);
+            firstEntry = firstCell ? interface->indexOfChild(firstCell) : 0;
+            lastEntry = interface->childCount();
+        } else {
+            firstEntry = 0;
+            lastEntry = interface->childCount();
+        }
+        break;
+    case QAccessible2::TableModelChangeDelete:
+        if (change.firstRow < table2Interface->rowCount()) {
+            if (change.firstColumn < table2Interface->columnCount()) {
+                QAccessibleTable2CellInterface *firstCell = table2Interface->cellAt(change.firstRow, change.firstColumn);
+                firstEntry = firstCell ? interface->indexOfChild(firstCell) : 0;
+                lastEntry = interface->childCount();
+            } else {
+                firstEntry = 0;
+                lastEntry = interface->childCount();
+            }
+        } else {
+            return;
+        }
+        break;
+    case QAccessible2::TableModelChangeUpdate:
+        if ((change.firstRow < table2Interface->rowCount()) && (change.firstColumn < table2Interface->columnCount())) {
+            QAccessibleTable2CellInterface *firstCell = table2Interface->cellAt(change.firstRow, change.firstColumn);
+            firstEntry = firstCell ? interface->indexOfChild(firstCell) : 0;
+            QAccessibleTable2CellInterface *lastCell = table2Interface->cellAt(change.lastRow, change.lastColumn);
+            lastEntry = lastCell ? interface->indexOfChild(lastCell) : interface->childCount();
+        } else {
+            firstEntry = 0;
+            lastEntry = interface->childCount();
+        }
+        break;
+    }
+
+    for (int i = firstEntry; i <= lastEntry; i++) {
+          QString path = pathForInterface(interface, i);
+          QVariantList args = packDBusSignalArguments(QLatin1String("accessible-name"), 0, 0, variantForPath(path));
+          sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                        QLatin1String("PropertyChange"), args);
+          args = packDBusSignalArguments(QLatin1String("accessible-description"), 0, 0, variantForPath(path));
+          sendDBusSignal(path, QLatin1String(ATSPI_DBUS_INTERFACE_EVENT_OBJECT),
+                        QLatin1String("PropertyChange"), args);
+    }
+}
 /*!
     This function gets called when Qt notifies about accessibility updates.
 */
@@ -1088,7 +1152,9 @@ void AtSpiAdaptor::notify(int reason, QAccessibleInterface *interface, int child
     case QAccessible::DialogEnd:
         break;
     case QAccessible::TableModelChanged:
-        // For now ignore this event, should be handled together with active descendant changed
+        if (sendObject || sendObject_property_change || sendObject_property_change_accessible_name) {
+            handleModelChange(interface);
+        }
         break;
     case QAccessible::SelectionRemove:
         break;

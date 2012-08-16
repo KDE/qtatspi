@@ -62,6 +62,7 @@ private:
     bool sendDBusSignal(const QString &path, const QString &interface, const QString &name, const QVariantList &arguments) const;
     QVariant variantForPath(const QString &path) const;
 
+    void handleModelChange(QAccessibleInterface *interface);
     void sendFocusChanged(QAccessibleInterface *interface, int child) const;
     void notifyAboutCreation(QAccessibleInterface *interface, int child) const;
     void notifyAboutDestruction(QAccessibleInterface *interface, int child) const;
