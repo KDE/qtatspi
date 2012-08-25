@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>5756</width>
-    <height>602</height>
+    <width>800</width>
+    <height>651</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,12 +50,6 @@
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
          </spacer>
         </item>
         <item row="1" column="0" colspan="2">
@@ -92,12 +86,6 @@
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>5563</width>
-            <height>20</height>
-           </size>
           </property>
          </spacer>
         </item>
@@ -348,6 +336,20 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="renameButton">
+            <property name="text">
+             <string>Rename</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="reorderButton">
+            <property name="text">
+             <string>Reorder</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="hideButton">
             <property name="text">
              <string>Hide translations</string>
@@ -545,8 +547,8 @@ p, li { white-space: pre-wrap; }
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>5563</width>
-             <height>70</height>
+             <width>96</width>
+             <height>26</height>
             </rect>
            </property>
           </widget>
@@ -755,14 +757,6 @@ Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>5756</width>
-     <height>21</height>
-    </rect>
-   </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>&amp;File</string>

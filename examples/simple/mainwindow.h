@@ -36,6 +36,8 @@ public:
 public Q_SLOTS:
     void createButton();
     void addListItem();
+    void renameListItem();
+    void reorderListItems();
     void removeListItem();
     void greet();
 

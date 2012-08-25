@@ -21,6 +21,7 @@
 #include <QDebug>
 #include <QDialog>
 #include <QMessageBox>
+#include <QInputDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(createButton()));
     connect(ui->action_Quit, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(ui->addListButton, SIGNAL(clicked()), this, SLOT(addListItem()));
+    connect(ui->renameButton, SIGNAL(clicked()), this, SLOT(renameListItem()));
+    connect(ui->reorderButton, SIGNAL(clicked()), this, SLOT(reorderListItems()));
     connect(ui->removeListButton, SIGNAL(clicked()), this, SLOT(removeListItem()));
     connect(ui->greetButton, SIGNAL(clicked()), this, SLOT(greet()));
     connect(ui->hideButton, SIGNAL(clicked()), ui->showButton, SLOT(show()));
@@ -82,7 +85,25 @@ void MainWindow::addListItem()
     ui->listWidget->addItem("Foo");
 }
 
+void MainWindow::renameListItem()
+{
+    bool doRename;
+    QString currentName = ui->listWidget->currentItem()->text();
+    QString newName = QInputDialog::getText(this, QLatin1String("New name"), QLatin1String("Insert the new name"), QLineEdit::Normal, currentName, &doRename);
+
+    if (doRename) {
+        ui->listWidget->currentItem()->setText(newName);
+    }
+}
+
+void MainWindow::reorderListItems()
+{
+    ui->listWidget->model()->sort(0);
+}
+
+
 void MainWindow::removeListItem()
 {
-    delete ui->listWidget->takeItem(ui->listWidget->count()-1);
+    int positionToRemove = ui->listWidget->currentRow();
+    delete ui->listWidget->takeItem(positionToRemove);
 }
