@@ -1246,6 +1246,14 @@ bool AtSpiAdaptor::applicationInterface(QAccessibleInterface *interface, int, co
         Q_ASSERT(message.signature() == "ss");
         QDBusMessage reply = message.createReply(QVariant::fromValue(QDBusVariant(QLatin1String("Qt"))));
         return connection.send(reply);
+    } else if (function == "GetVersion") {
+        Q_ASSERT(message.signature() == "ss");
+        QDBusMessage reply = message.createReply(QVariant::fromValue(QDBusVariant(QLatin1String(qVersion()))));
+        return connection.send(reply);
+    } else if (function == "GetLocale") {
+        Q_ASSERT(message.signature() == "u");
+        QDBusMessage reply = message.createReply(QVariant::fromValue(QLocale().name()));
+        return connection.send(reply);
     } else {
         qDebug() << "AtSpiAdaptor::applicationInterface " << message.path() << interface << function;
     }
