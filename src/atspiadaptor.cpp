@@ -1428,6 +1428,10 @@ QStringList AtSpiAdaptor::accessibleInterfaces(QAccessibleInterface *interface, 
     // Do we need to cache the state?
     //    state = interface->state(childIndex());
 
+    if (interface->role(index) == QAccessible::Application) {
+        ifaces << ATSPI_DBUS_INTERFACE_APPLICATION;
+    }
+
     return ifaces;
 }
 
