@@ -692,7 +692,8 @@ void AtSpiAdaptor::setBitFlag(const QString &flag)
                 sendObject_text_selection_changed = 1;
             } else if (right.startsWith(QLatin1String("ValueChanged"))) {
                 sendObject_value_changed = 1;
-            } else if (right.startsWith(QLatin1String("VisibleDataChanged"))) {
+            } else if (right.startsWith(QLatin1String("VisibleDataChanged")) // how it should be
+                    || right.startsWith(QLatin1String("VisibledataChanged")) ) { // how it seems to be (atm)
                 sendObject_visible_data_changed = 1;
             } else {
                 qWarning() << "WARNING: subscription string not handled:" << flag;
