@@ -26,6 +26,8 @@
 #include <QAccessibleInterface>
 #include <QQueue>
 
+class DBusConnection;
+
 /*
  * Used for the root object.
  *
@@ -36,7 +38,7 @@ class QSpiApplicationAdaptor :public QObject
     Q_OBJECT
 
 public:
-    QSpiApplicationAdaptor(const QDBusConnection &connection, QObject *parent);
+    QSpiApplicationAdaptor(DBusConnection *connection, QObject *parent);
     virtual ~QSpiApplicationAdaptor() {}
 
     void sendEvents(bool active);
@@ -57,7 +59,7 @@ private:
     int applicationId;
     QQueue<QPair<QObject*, QKeyEvent*> > keyEvents;
 
-    QDBusConnection dbusConnection;
+    DBusConnection *dbusConnection;
 };
 
 #endif

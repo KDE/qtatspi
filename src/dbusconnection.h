@@ -21,21 +21,36 @@
 #define DBUSCONNECTION_H
 
 #include <QtCore/QString>
+#include <QtCore/QObject>
 #include <QtDBus/QDBusConnection>
+#include <QtDBus/QDBusPendingCallWatcher>
 
-class DBusConnection
+class DBusConnection : public QObject
 {
+    Q_OBJECT
 public:
     DBusConnection();
+    bool isFetchingConnection() const;
+    bool isConnected() const;
     QDBusConnection connection() const;
+//     static bool isEnabled();
+
+signals:
+    void connectionFetched();
+
+private slots:
+    void initFinished();
 
 private:
+    void init();
+    QDBusConnection connectDBus();
     QString getAccessibilityBusAddress() const;
     QString getAccessibilityBusAddressDBus() const;
     QString getAccessibilityBusAddressXAtom() const;
-    QDBusConnection connectDBus();
 
     QDBusConnection dbusConnection;
+    QDBusPendingCallWatcher *initWatcher;
+    bool connected;
 };
 
 #endif // DBUSCONNECTION_H

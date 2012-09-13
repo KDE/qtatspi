@@ -107,7 +107,7 @@ AtSpiAdaptor::AtSpiAdaptor(DBusConnection *connection, QObject *parent)
     , sendWindow_shade(0)
     , sendWindow_unshade(0)
 {
-    m_applicationAdaptor = new QSpiApplicationAdaptor(m_dbus->connection(), this);
+    m_applicationAdaptor = new QSpiApplicationAdaptor(m_dbus, this);
     connect(m_applicationAdaptor, SIGNAL(windowActivated(QObject*,bool)), this, SLOT(windowActivated(QObject*,bool)));
 }
 

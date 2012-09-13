@@ -20,6 +20,7 @@
 #include "application.h"
 
 #include "qapplication.h"
+#include "dbusconnection.h"
 #include <QDBusPendingReply>
 #include <QDebug>
 
@@ -36,7 +37,7 @@
     QSpiApplicationAdaptor
 */
 
-QSpiApplicationAdaptor::QSpiApplicationAdaptor(const QDBusConnection &connection, QObject *parent)
+QSpiApplicationAdaptor::QSpiApplicationAdaptor(DBusConnection *connection, QObject *parent)
     : QObject(parent), dbusConnection(connection)
 {
 }
@@ -150,7 +151,7 @@ bool QSpiApplicationAdaptor::eventFilter(QObject *target, QEvent *event)
 
             // FIXME: this is critical, the timeout should probably be pretty low to allow normal processing
             int timeout = 100;
-            bool sent = dbusConnection.callWithCallback(m, this, SLOT(notifyKeyboardListenerCallback(QDBusMessage)),
+            bool sent = dbusConnection->connection().callWithCallback(m, this, SLOT(notifyKeyboardListenerCallback(QDBusMessage)),
                             SLOT(notifyKeyboardListenerError(QDBusError, QDBusMessage)), timeout);
             if (sent) {
                 //queue the event and send it after callback

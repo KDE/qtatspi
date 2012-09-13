@@ -51,6 +51,9 @@ public:
 
         QDBusConnection dBusConnection() const;
 
+private slots:
+        void initDBusConnection();
+
 private:
 //        void notifyAboutCreation(QSpiAdaptor* accessible);
 //        void notifyAboutDestruction(QSpiAdaptor* accessible);
@@ -59,9 +62,8 @@ private:
         DeviceEventControllerProxy *dec;
 
         AtSpiAdaptor *dbusAdaptor;
-
+        bool rootObjectInitialized;
         DBusConnection* dbusConnection;
-        bool initialized;
 };
 
 #endif

@@ -98,7 +98,7 @@ private:
     QDBusInterface* rootApplication;
     QDBusInterface* mainWindow;
 
-    DBusConnection dbus;
+    QSharedPointer<DBusConnection> dbus;
 };
 
 // helper to find children of a dbus object
@@ -138,7 +138,7 @@ QString tst_QtAtSpi::getParent(QDBusInterface* interface)
 // helper to get dbus object
 QDBusInterface* tst_QtAtSpi::getInterface(const QString& path, const QString& interfaceName)
 {
-    return new QDBusInterface(address, path, interfaceName, dbus.connection(), this);
+    return new QDBusInterface(address, path, interfaceName, dbus->connection(), this);
 }
 
 
@@ -150,7 +150,7 @@ void tst_QtAtSpi::initTestCase()
     qApp->setApplicationName("tst_QtAtSpi app");
     QCOMPARE(qgetenv("QT_ACCESSIBILITY"), QByteArray("1"));
 
-    dbus = DBusConnection();
+    dbus = QSharedPointer<DBusConnection>(new DBusConnection());
 
     m_window = new AccessibleTestWindow();
     m_window->show();
@@ -174,7 +174,7 @@ void tst_QtAtSpi::cleanupTestCase()
 
 void tst_QtAtSpi::registerDbus()
 {
-    QVERIFY(dbus.connection().isConnected());
+    QVERIFY(dbus->connection().isConnected());
 
     root = getInterface("/org/a11y/atspi/accessible/root",
                         "org.a11y.atspi.Accessible");
