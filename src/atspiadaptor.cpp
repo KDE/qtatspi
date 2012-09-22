@@ -1259,7 +1259,7 @@ bool AtSpiAdaptor::handleMessage(const QDBusMessage &message, const QDBusConnect
         qWarning() << "WARNING Qt AtSpiAdaptor: Could not find accessible on path: " << message.path();
         return false;
     }
-    if (!accessible.first.isValid()) {
+    if (!accessible.first->isValid()) {
         qWarning() << "WARNING Qt AtSpiAdaptor: Accessible invalid: " << message.path();
         return false;
     }
