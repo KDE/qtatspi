@@ -2269,11 +2269,13 @@ bool AtSpiAdaptor::tableInterface(QAccessibleInterface *interface, int child, co
     } else if (function == "GetAccessibleAt") {
         int row = message.arguments().at(0).toInt();
         int column = message.arguments().at(1).toInt();
-        Q_ASSERT(interface->table2Interface());
-        Q_ASSERT(row >= 0);
-        Q_ASSERT(column >= 0);
-        Q_ASSERT(row < interface->table2Interface()->rowCount());
-        Q_ASSERT(column < interface->table2Interface()->columnCount());
+        if ((row < 0) ||
+            (column < 0) ||
+            (row >= interface->table2Interface()->rowCount()) ||
+            (column >= interface->table2Interface()->columnCount())) {
+            qWarning() << "WARNING: invalid index for tableInterface GetAccessibleAt (" << row << ", " << column << ")";
+            return false;
+        }
 
         QSpiObjectReference ref;
         QAccessibleInterface* cell = interface->table2Interface()->cellAt(row, column);
