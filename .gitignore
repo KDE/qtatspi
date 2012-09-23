@@ -6,6 +6,9 @@ examples/calculator/calculator
 examples/simple/simple
 examples/declarative/declarative
 
+build
+CMakeLists.txt.user
+
 doc/html
 
 callgrind.out.*

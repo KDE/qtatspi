@@ -21,6 +21,7 @@
 #include "bridge.h"
 
 #include <qaccessible2.h>
+#include <kcomponentdata.h>
 
 #include "atspiadaptor.h"
 
@@ -52,6 +53,9 @@ QSpiAccessibleBridge::QSpiAccessibleBridge()
         qWarning() << "Could not connect to dbus.";
     }
 
+    // This gives us translations
+    KComponentData componentData("qtatspi_qt");
+
     qSpiInitializeStructTypes();
     qSpiInitializeConstantMappings();
 
@@ -77,7 +81,7 @@ QDBusConnection QSpiAccessibleBridge::dBusConnection() const
     return dbusConnection->connection();
 }
 
-void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *interface)
+void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *)
 {
     // the interface we get will be for the QApplication object.
     // we already cache it in the constructor.

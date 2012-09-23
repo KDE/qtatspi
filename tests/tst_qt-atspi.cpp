@@ -17,6 +17,7 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define QT_GUI_LIB
 #include <QtTest/QtTest>
 #include <QtGui>
 #include <QDBusArgument>
@@ -238,7 +239,7 @@ void tst_QtAtSpi::testLineEdit()
     COMPARE3(lineEdit->text(), textInterface->call(QDBus::Block, "GetText", 0, -1).arguments().first().toString(), newText);
     QCOMPARE(textInterface->call(QDBus::Block, "GetText", 0, 4).arguments().first().toString(), QLatin1String("Text"));
     editableTextInterface->call(QDBus::Block, "DeleteText", 4, 8);
-    COMPARE3(lineEdit->text(), "Te" + textInterface->call(QDBus::Block, "GetText", 2, 10).arguments().first().toString() + "ed!", QLatin1String("Text changed!"));
+    COMPARE3(lineEdit->text(), QString("Te" + textInterface->call(QDBus::Block, "GetText", 2, 10).arguments().first().toString() + "ed!"), QLatin1String("Text changed!"));
     editableTextInterface->call(QDBus::Block, "InsertText", 12, " again ", 6);
     QCOMPARE(lineEdit->text(), QLatin1String("Text changed again!"));
     COMPARE3(lineEdit->text().length(), textInterface->property("CharacterCount").toInt(), 19);
