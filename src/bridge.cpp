@@ -81,7 +81,7 @@ QDBusConnection QSpiAccessibleBridge::dBusConnection() const
     return dbusConnection->connection();
 }
 
-void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *)
+void QSpiAccessibleBridge::setRootObject(QAccessibleInterface *interface)
 {
     // the interface we get will be for the QApplication object.
     // we already cache it in the constructor.
