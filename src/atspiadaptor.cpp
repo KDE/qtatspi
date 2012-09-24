@@ -701,8 +701,8 @@ void AtSpiAdaptor::setBitFlag(const QString &flag)
         }
         break;
     }
-    case 'w': { // window
-        if (flag.size() < 7) {
+    case 'w': { // Window::
+        if (flag.size() <= 8) {
             sendWindow = 1;
         } else { // object:Foo:Bar
             QString right = flag.mid(7);
