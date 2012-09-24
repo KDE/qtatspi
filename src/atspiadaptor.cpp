@@ -895,7 +895,7 @@ QPair<QAIPointer, int> AtSpiAdaptor::interfaceFromPath(const QString& dbusPath) 
 
 void AtSpiAdaptor::handleModelChange(QAccessibleInterface *interface) {
     QAccessibleTable2Interface *table2Interface = interface->table2Interface();
-    if (!table2Interface)
+    if (!table2Interface || !interface->isValid())
         return;
 
     QAbstractItemView *view = qobject_cast< QAbstractItemView* >(interface->object());
