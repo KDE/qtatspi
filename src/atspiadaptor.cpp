@@ -970,15 +970,11 @@ void AtSpiAdaptor::notify(int reason, QAccessibleInterface *interface, int child
         return;
     }
 
-    if ((reason == QAccessible::ObjectShow) || (reason == QAccessible::ObjectHide) && interface->object()) {
+    if (reason == QAccessible::ObjectShow && interface->object()) {
         if (child != 0) {
             qWarning() << "State for child changed: " << interface->object() << child;
             return;
         }
-        QWidget *w = qobject_cast<QWidget*>(interface->object());
-        if (w && w->topLevelWidget())
-            windowActivated(interface->object(), reason == QAccessible::ObjectShow);
-
         int state = interface->state(child);
         interface->object()->setProperty(ACCESSIBLE_LAST_STATE, state);
     }

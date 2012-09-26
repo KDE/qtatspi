@@ -41,6 +41,9 @@ public:
 
     void sendEvents(bool active);
 
+Q_SIGNALS:
+    void windowActivated(QObject* window, bool active);
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
 
