@@ -1,9 +1,13 @@
 Qt AT-SPI2 bridge
 =================
 
-This is a Qt plugin that bridges Qt's accessibility API to AT-SPI2.
+This is a Qt 4 plugin that bridges Qt's accessibility API to AT-SPI2.
 With recent versions of AT-SPI2 this should make Qt applications accessible
 with the help of tools such as Gnome's Orca screen-reader.
+
+This plugin is part of Qt 5. Any patch committed here MUST go to Qt 5 first,
+unless it is not applicable there.
+See qtbase/src/platformsupport/linuxaccessibility
 
 Switch gnome to use at-spi2:
 gconftool-2 --set /desktop/gnome/interface/at-spi-dbus --type bool true
