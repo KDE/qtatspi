@@ -27,6 +27,8 @@
 #include "dbusconnection.h"
 #include "struct_marshallers.h"
 
+// #define QTATSPI_DEBUG_INVALID_OBJECTS
+
 class QAccessibleInterface;
 class QSpiAccessibleInterface;
 class QSpiApplicationAdaptor;
@@ -116,6 +118,10 @@ private:
     bool initialized;
 
     mutable QHash<quintptr, QWeakPointer<QObject> > m_handledObjects;
+
+#ifdef QTATSPI_DEBUG_INVALID_OBJECTS
+    mutable QHash<quintptr, QString> m_debugObjects;
+#endif
 
     // Bit fields - which updates to send
 

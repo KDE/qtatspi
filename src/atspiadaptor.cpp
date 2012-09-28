@@ -888,7 +888,14 @@ QPair<QAIPointer, int> AtSpiAdaptor::interfaceFromPath(const QString& dbusPath) 
 
         } else {
             m_handledObjects.remove(uintptr);
+#ifdef QTATSPI_DEBUG_INVALID_OBJECTS
+            qWarning() << "DEAD Object: " << m_debugObjects[uintptr];
+#endif
         }
+    } else {
+#ifdef QTATSPI_DEBUG_INVALID_OBJECTS
+        qWarning() << "INVALID Object: " << m_debugObjects[uintptr];
+#endif
     }
     return qMakePair(QAIPointer(), 0);
 }
@@ -1630,8 +1637,14 @@ QString AtSpiAdaptor::pathForInterface(QAccessibleInterface *interface, int chil
     if (childIndex > 0) {
         path.append('/' + QString::number(childIndex));
     }
-    if (!inDestructor && !m_handledObjects.contains(uintptr))
+    if (!inDestructor && !m_handledObjects.contains(uintptr)) {
         m_handledObjects[uintptr] = QWeakPointer<QObject>(interfaceWithObject->object());
+
+#ifdef QTATSPI_DEBUG_INVALID_OBJECTS
+        qDebug() << "Created object: " << uintptr << interfaceWithObject->object();
+        m_debugObjects[uintptr] = QString(interfaceWithObject->object()->metaObject()->className()) + " child: " + QString::number(childIndex) + " role: " + QString::number(interfaceWithObject->role(childIndex));
+#endif
+    }
     delete childInterface;
     return path;
 }
