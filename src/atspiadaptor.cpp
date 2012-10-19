@@ -1590,7 +1590,7 @@ QString AtSpiAdaptor::pathForObject(QObject *object) const
         qDebug() << "AtSpiAdaptor::pathForObject: warning: creating path with QAction as object.";
     }
     quintptr uintptr = reinterpret_cast<quintptr>(object);
-    if (!m_handledObjects.contains(uintptr))
+    if (!m_handledObjects.contains(uintptr) || m_handledObjects.value(uintptr) == 0)
         m_handledObjects[uintptr] = QWeakPointer<QObject>(object);
     return QSPI_OBJECT_PATH_PREFIX + QString::number(uintptr);
 }
@@ -1640,7 +1640,7 @@ QString AtSpiAdaptor::pathForInterface(QAccessibleInterface *interface, int chil
     if (childIndex > 0) {
         path.append('/' + QString::number(childIndex));
     }
-    if (!inDestructor && !m_handledObjects.contains(uintptr)) {
+    if (!inDestructor && (!m_handledObjects.contains(uintptr) || m_handledObjects.value(uintptr) == 0)) {
         m_handledObjects[uintptr] = QWeakPointer<QObject>(interfaceWithObject->object());
 
 #ifdef QTATSPI_DEBUG_INVALID_OBJECTS
