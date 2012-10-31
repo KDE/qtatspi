@@ -1,0 +1,8 @@
+# Fetching translations from KDE svn:
+
+svn checkout -N svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/ l10n
+cd l10n
+for i in `svn ls` ; do svn up -N $i; done
+for i in `ls`; do svn up -N $i/messages && svn up -N $i/messages/playground-accessibility; done
+for i in `ls`; do cp $i/messages/playground-accessibility/qtatspi_qt.po ../qtatspi_qt_$i.po; done
+

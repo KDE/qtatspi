@@ -18,6 +18,7 @@ pkg_check_modules(ATSPI2 REQUIRED atspi-2)
 include_directories(${ATSPI2_INCLUDE_DIRS})
 
 add_subdirectory(src)
+add_subdirectory(translations)
 add_subdirectory(tests)
 add_subdirectory(examples)
 
