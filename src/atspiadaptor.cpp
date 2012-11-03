@@ -2215,7 +2215,7 @@ bool AtSpiAdaptor::valueInterface(QAccessibleInterface *interface, int child, co
                             QVariant::fromValue(QDBusVariant(QVariant::fromValue(val)))));
     } else if (function == "GetMinimumIncrement") {
         connection.send(message.createReply(
-                            QVariant::fromValue(QDBusVariant(QVariant::fromValue(0.0)))));
+                            QVariant::fromValue(QDBusVariant(QVariant::fromValue(0.1)))));
     } else if (function == "GetMinimumValue") {
         bool success;
         double val = interface->valueInterface()->minimumValue().toDouble(&success);
