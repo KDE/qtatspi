@@ -911,8 +911,8 @@ void AtSpiAdaptor::handleModelChange(QAccessibleInterface *interface) {
             return; //Handling it like a normal model would crash
     }
 
-    int firstEntry;
-    int lastEntry;
+    int firstEntry = 0;
+    int lastEntry = -1;
     QAccessible2::TableModelChange change = table2Interface->modelChange();
 
     switch (change.type) {
