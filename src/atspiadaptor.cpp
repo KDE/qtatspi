@@ -1142,6 +1142,10 @@ void AtSpiAdaptor::notify(int reason, QAccessibleInterface *interface, int child
             if ((oldState^newState) & QAccessible::Checked) {
                 int checked = (newState & QAccessible::Checked) ? 1 : 0;
                 notifyStateChange(interface, child, QLatin1String("checked"), checked);
+            } else if ((oldState^newState) & QAccessible::Unavailable) {
+                bool enabled = !(newState & QAccessible::Unavailable);
+                notifyStateChange(interface, child, QLatin1String("enabled"), enabled);
+                notifyStateChange(interface, child, QLatin1String("sensitive"), enabled);
             }
             interface->object()->setProperty(ACCESSIBLE_LAST_STATE, (uint)newState);
         }
