@@ -86,6 +86,8 @@ private:
     QString pathForInterface(QAccessibleInterface *interface, int index, bool inDestructor = false) const;
     QString pathForObject(QObject *object) const;
 
+    void notifyStateChange(QAccessibleInterface *interface, int child, const QString &state, int value);
+
     // accessible helper functions
     AtspiRole getRole(QAccessibleInterface *interface, int child) const;
     QSpiRelationArray relationSet(QAccessibleInterface *interface, int child, const QDBusConnection &connection) const;
