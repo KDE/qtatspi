@@ -17,6 +17,10 @@ include(FindPkgConfig)
 pkg_check_modules(ATSPI2 REQUIRED atspi-2)
 include_directories(${ATSPI2_INCLUDE_DIRS})
 
+
+set(QTATSPI_QT_PLUGIN_INSTALL_DIR lib${LIB_SUFFIX}/qt4/plugins/
+    CACHE PATH "The directory where QtAtSpi plugin will be installed to.")
+
 add_subdirectory(src)
 add_subdirectory(translations)
 add_subdirectory(tests)

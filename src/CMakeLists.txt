@@ -32,5 +32,5 @@ kde4_add_library(qspiaccessiblebridge SHARED ${qspiaccessiblebridge_SRCS})
 
 target_link_libraries(qspiaccessiblebridge ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTDBUS_LIBRARY} ${X11_X11_LIB} ${KDE4_KDECORE_LIBS})
 
-install(TARGETS qspiaccessiblebridge DESTINATION ${QT_PLUGINS_DIR}/accessiblebridge/)
+install(TARGETS qspiaccessiblebridge DESTINATION ${QTATSPI_QT_PLUGIN_INSTALL_DIR}/accessiblebridge/)
 
