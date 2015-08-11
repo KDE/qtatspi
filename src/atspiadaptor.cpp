@@ -2090,12 +2090,13 @@ QVariantList AtSpiAdaptor::getAttributeValue(QAccessibleInterface *interface, in
     return list;
 }
 
-QRect AtSpiAdaptor::getCharacterExtents(QAccessibleInterface *interface, int offset, uint coordType) const
+QList<QVariant> AtSpiAdaptor::getCharacterExtents(QAccessibleInterface *interface, int offset, uint coordType) const
 {
     QRect rect = interface->textInterface()->characterRect(offset, QAccessible2::RelativeToScreen);
     if (coordType == ATSPI_COORD_TYPE_WINDOW)
         rect = translateRectToWindowCoordinates(interface, rect);
-    return rect;
+
+    return QList<QVariant>() << rect.x() << rect.y() << rect.width() << rect.height();
 }
 
 QRect AtSpiAdaptor::getRangeExtents(QAccessibleInterface *interface,
