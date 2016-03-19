@@ -104,7 +104,7 @@ private:
     // text helper functions
     QVariantList getAttributes(QAccessibleInterface *interface, int offset, bool includeDefaults) const;
     QVariantList getAttributeValue(QAccessibleInterface *interface, int offset, const QString &attributeName) const;
-    QRect getCharacterExtents(QAccessibleInterface *interface, int offset, uint coordType) const;
+    QList<QVariant> getCharacterExtents(QAccessibleInterface *interface, int offset, uint coordType) const;
     QRect getRangeExtents(QAccessibleInterface *interface, int startOffset, int endOffset, uint coordType) const;
     QAccessible2::BoundaryType qAccessibleBoundaryType(int atspiTextBoundaryType) const;
 
