@@ -2099,14 +2099,14 @@ QList<QVariant> AtSpiAdaptor::getCharacterExtents(QAccessibleInterface *interfac
     return QList<QVariant>() << rect.x() << rect.y() << rect.width() << rect.height();
 }
 
-QRect AtSpiAdaptor::getRangeExtents(QAccessibleInterface *interface,
+QList<QVariant> AtSpiAdaptor::getRangeExtents(QAccessibleInterface *interface,
                                     int startOffset, int endOffset, uint coordType) const
 {
     if (endOffset == -1)
         endOffset = interface->textInterface()->characterCount();
 
     if (endOffset <= startOffset) {
-        return QRect();
+        return QList<QVariant>() << -1 << -1 << 0 << 0;
     }
 
     QRect rect = interface->textInterface()->characterRect(startOffset, QAccessible2::RelativeToScreen);
@@ -2118,7 +2118,7 @@ QRect AtSpiAdaptor::getRangeExtents(QAccessibleInterface *interface,
     if (coordType == ATSPI_COORD_TYPE_WINDOW)
         rect = translateRectToWindowCoordinates(interface, rect);
 
-    return rect;
+    return QList<QVariant>() << rect.x() << rect.y() << rect.width() << rect.height();
 }
 
 QRect AtSpiAdaptor::translateRectToWindowCoordinates(QAccessibleInterface *interface, const QRect &rect)

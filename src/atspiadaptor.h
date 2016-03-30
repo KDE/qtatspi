@@ -105,7 +105,7 @@ private:
     QVariantList getAttributes(QAccessibleInterface *interface, int offset, bool includeDefaults) const;
     QVariantList getAttributeValue(QAccessibleInterface *interface, int offset, const QString &attributeName) const;
     QList<QVariant> getCharacterExtents(QAccessibleInterface *interface, int offset, uint coordType) const;
-    QRect getRangeExtents(QAccessibleInterface *interface, int startOffset, int endOffset, uint coordType) const;
+    QList<QVariant> getRangeExtents(QAccessibleInterface *interface, int startOffset, int endOffset, uint coordType) const;
     QAccessible2::BoundaryType qAccessibleBoundaryType(int atspiTextBoundaryType) const;
 
     static bool inheritsQAction(QObject *object);
